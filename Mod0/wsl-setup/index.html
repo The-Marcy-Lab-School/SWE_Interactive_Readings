@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Missing Terminal — Setting Up WSL</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:16rem;font-family:var(--mlrk-font-code)}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The Missing Terminal</h1>
+<p class="mlrk-lead">Every setup guide you'll follow this fellowship assumes one thing: a real Linux-style terminal, with real Unix commands, a real package manager, and tools like <code>git</code> and <code>python3</code> that just work. On a Mac, that terminal is already there. On Windows, it isn't — and Microsoft's own engineers ran into that exact wall badly enough that they built an entire feature to fix it: the Windows Subsystem for Linux, or WSL. This reading is about what WSL actually is, and getting a real one running.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~13–14 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. Why this exists</h2>
+<p>Back before WSL existed, a Windows developer who needed real Linux tools had exactly two bad options. Install a full virtual machine — VirtualBox or VMware, a whole second operating system running inside the first one, its own multi-gigabyte disk image, several GB of RAM permanently reserved just to keep it running in the background. Or dual-boot: partition the hard drive, install Ubuntu alongside Windows, and reboot the entire machine every time the task switched from "write code" to "reply to email." Neither is a small cost, and both were the honest answer for years.</p>
+<p>Microsoft's own developers hit this wall constantly — enough that in 2016 Microsoft partnered with Canonical (the company behind Ubuntu) to ship something new: a real Linux environment that starts in about a second, shares files directly with Windows, and costs nothing to leave running. That's WSL. Not a simulation of Linux commands, and not a full second computer pretending to be one — a real Linux kernel, running alongside Windows on the same machine.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 640 300" role="img" aria-labelledby="cmpTitle cmpDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="cmpTitle">Three ways to get Linux on a Windows machine, compared by weight</title>
+  <desc id="cmpDesc">Dual boot requires a full disk partition and a reboot to switch. A traditional virtual machine runs a whole second operating system on top of Windows, using several gigabytes of RAM at all times. WSL runs a real Linux kernel directly alongside Windows, starting in about a second and using memory only while it's actually being used.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="15" y="20" width="180" height="240" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="105" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Dual boot</text>
+    <text x="105" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Reboot the whole</text>
+    <text x="105" y="128" text-anchor="middle" font-size="12" fill="#261F1D">machine to switch</text>
+    <text x="105" y="146" text-anchor="middle" font-size="12" fill="#261F1D">between Windows</text>
+    <text x="105" y="164" text-anchor="middle" font-size="12" fill="#261F1D">and Linux</text>
+    <text x="105" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#C92929">Heaviest switch cost</text>
+
+    <rect x="230" y="20" width="180" height="240" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
+    <text x="320" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Traditional VM</text>
+    <text x="320" y="110" text-anchor="middle" font-size="12" fill="#261F1D">A whole second OS,</text>
+    <text x="320" y="128" text-anchor="middle" font-size="12" fill="#261F1D">running on top of</text>
+    <text x="320" y="146" text-anchor="middle" font-size="12" fill="#261F1D">Windows, several GB</text>
+    <text x="320" y="164" text-anchor="middle" font-size="12" fill="#261F1D">of RAM reserved</text>
+    <text x="320" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#83671C">Heavy, always-on cost</text>
+
+    <rect x="445" y="20" width="180" height="240" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="535" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">WSL</text>
+    <text x="535" y="110" text-anchor="middle" font-size="12" fill="#261F1D">A real Linux kernel,</text>
+    <text x="535" y="128" text-anchor="middle" font-size="12" fill="#261F1D">alongside Windows,</text>
+    <text x="535" y="146" text-anchor="middle" font-size="12" fill="#261F1D">starts in ~1 second,</text>
+    <text x="535" y="164" text-anchor="middle" font-size="12" fill="#261F1D">shares files directly</text>
+    <text x="535" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#264326">Lightest, on demand</text>
+  </g>
+</svg>
+
+<p><strong>Where this is headed:</strong> once WSL is running, everything else this fellowship's environment setup asks you to do — installing <code>git</code>, running <code>python3</code>, navigating a real file system — works exactly the way it's written, no Windows-specific workaround needed. This is the one setup step that unlocks all the others.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>WSL</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>WSL (Windows Subsystem for Linux)</strong><br>A Windows feature that runs a real Linux environment directly alongside Windows, without a traditional virtual machine or a separate boot.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>distro</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Distribution (distro)</strong><br>A specific packaged version of Linux — Ubuntu is the most common default for WSL, but Debian, Fedora, and others are also available.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>kernel</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Kernel</strong><br>The core of an operating system that talks directly to the hardware. WSL2 runs a genuine Linux kernel, not an imitation of one.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>shell</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Shell</strong><br>The program that reads the commands you type and runs them — bash is the default shell in most Linux distros, including Ubuntu on WSL.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Getting it installed</h2>
+<p>The entire install is one command, run from PowerShell or Windows Terminal opened <strong>as Administrator</strong>:</p>
+<div class="mlrk-code"><div class="mlrk-screen">wsl --install</div></div>
+<p>That single command downloads the WSL feature itself, installs a real Linux kernel, and sets Ubuntu as the default distro — all in one pass. After it finishes, Windows asks for a restart. On the first launch after restarting, Ubuntu asks you to create a username and password for that Linux environment specifically — separate from your Windows login, and worth writing down somewhere, since it's what you'll type every time a command needs elevated permission (<code>sudo</code>) from here on.</p>
+
+<div class="mlrk-card">
+<p>Referring to the steps above: put them in the order they actually happen.</p>
+<ul class="mlrk-orderlist" id="wsl-order">
+  <li class="mlrk-orderitem" data-step="admin"><span class="mlrk-order-num"></span> Open PowerShell or Windows Terminal as Administrator</li>
+  <li class="mlrk-orderitem" data-step="install"><span class="mlrk-order-num"></span> Run <code>wsl --install</code></li>
+  <li class="mlrk-orderitem" data-step="restart"><span class="mlrk-order-num"></span> Restart the computer when prompted</li>
+  <li class="mlrk-orderitem" data-step="userpass"><span class="mlrk-order-num"></span> Create a Linux username and password on first launch</li>
+</ul>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="wsl-check">Check my order</button></div>
+<div id="wsl-orderfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Nothing about Ubuntu can happen until the feature itself is installed, and nothing about the feature finishes installing until after the restart.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Try it: your first real Linux commands</h2>
+<p>Once Ubuntu opens, you land in a real Linux home directory. Try a few real commands below — this is a simulated shell for practice, but every command here works exactly the same in the real thing.</p>
+<div class="mlrk-terminal" id="wsl-terminal">
+  <div class="mlrk-terminal-log" aria-live="polite"></div>
+  <div class="mlrk-terminal-row"><span class="mlrk-terminal-prompt"></span><input class="mlrk-terminal-input" type="text" aria-label="Terminal input" autocomplete="off" spellcheck="false"></div>
+</div>
+<p class="mlrk-small">Try: <code>pwd</code>, then <code>ls</code>, then <code>mkdir fellowship</code>, then <code>cd fellowship</code>.</p>
+
+<div class="mlrk-card" style="margin-top:1rem">
+<p><strong>Fill in the blank:</strong> the command that creates a new folder called <code>fellowship</code> is:</p>
+<div class="mlrk-fillblank"><input type="text" id="wsl-mkdir-input" autocomplete="off" placeholder="e.g. cmd fellowship"> <button type="button" class="mlrk-btn" id="wsl-mkdir-check">Check</button></div>
+<div id="wsl-mkdirfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Watch: WSL, set up start to finish</h2>
+<div class="mlrk-video-wrap"><div id="wsl-video"></div></div>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=Z05cgYgqG2A" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>As you watch, notice that every step maps to what section 3 above already walked through — the install command, the restart, then the first-launch username/password prompt.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
+<p>WSL exists because Microsoft's own developers needed real Linux tools without the cost of a full virtual machine or a dual boot — and now every Windows-based engineer in this fellowship gets that same real Linux environment for free, built into Windows itself. <code>wsl --install</code>, a restart, and a username/password are the entire setup.</p>
+<label for="wsl-reflect"><strong>In 2–3 sentences:</strong> before reading this, what did you assume "installing Linux" meant? How is WSL actually different from that?</label>
+<textarea id="wsl-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="wsl-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="wsl-copy">Copy Plain Text Answers</button>
+<p id="wsl-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "wsl-setup-reading";
+  const TITLE = "The Missing Terminal — Setting Up WSL";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.orderSteps("#wsl-order", {id:"act-order", correctOrder:["admin","install","restart","userpass"], feedbackSelector:"#wsl-orderfb", checkSelector:"#wsl-check"});
+
+  K.terminal("#wsl-terminal", {
+    id:"act-terminal",
+    startPath:"/home/student",
+    minCommands:3,
+    filesystem:{
+      "/home/student":{type:"dir", children:["notes.txt"]},
+      "/home/student/notes.txt":{type:"file", contents:"WSL setup notes"}
+    },
+    commands:{
+      mkdir(args, state){
+        if(!args[0]) return "mkdir: missing operand";
+        const path = state.cwd + "/" + args[0];
+        state.fs[path] = {type:"dir", children:[]};
+        state.fs[state.cwd].children.push(args[0]);
+        return "";
+      }
+    }
+  });
+
+  const mkdirBtn = document.getElementById("wsl-mkdir-check");
+  const mkdirInput = document.getElementById("wsl-mkdir-input");
+  const mkdirFb = document.getElementById("wsl-mkdirfb");
+  K.Scoring.register("act-mkdir-fillblank", 1, "quiz");
+  let mkdirAttempts = 0, mkdirDone = false;
+  mkdirBtn.addEventListener("click", function(){
+    if(mkdirDone) return;
+    mkdirAttempts++;
+    const val = mkdirInput.value.trim().toLowerCase();
+    const ok = val === "mkdir fellowship";
+    if(ok){
+      K.Scoring.award("act-mkdir-fillblank", mkdirAttempts===1?1:0.5);
+      mkdirFb.className="mlrk-feedback mlrk-show mlrk-good";
+      mkdirFb.innerHTML="<strong>Correct.</strong> <code>mkdir</code> (make directory) followed by the name creates the folder.";
+      mkdirDone = true;
+    } else if(mkdirAttempts>=2){
+      K.Scoring.award("act-mkdir-fillblank", 0);
+      mkdirFb.className="mlrk-feedback mlrk-show mlrk-reveal";
+      mkdirFb.innerHTML="<strong>The answer is:</strong> <code>mkdir fellowship</code>";
+      mkdirDone = true;
+    } else {
+      mkdirFb.className="mlrk-feedback mlrk-show mlrk-bad";
+      mkdirFb.innerHTML="<strong>Not quite.</strong> Check the terminal simulator above for the exact command name.";
+    }
+    mkdirFb.setAttribute("tabindex","-1"); mkdirFb.focus();
+  });
+
+  K.video({id:"act-video", elementId:"wsl-video", videoId:"Z05cgYgqG2A"});
+
+  K.freeResponse({id:"act-reflect", selector:"#wsl-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#wsl-scorechip"); });
+  K.Scoring.renderChip("#wsl-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#wsl-copy", onDone:function(ok){
+    document.getElementById("wsl-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

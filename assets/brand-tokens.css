@@ -1,0 +1,76 @@
+/* Marcy Lab School — Software Engineering Fellowship
+   Same brand palette used across every Marcy Lab School fellowship (ported
+   from the Data Analytics Fellowship's reading repo, which generated it from
+   brand/brand/tokens.json). Don't hand-edit hexes without checking that
+   source of truth if the two ever need to diverge. */
+
+:root{
+  /* raw palette */
+  --mlrk-cream-50:#FFFCF7;
+  --mlrk-cream-100:#FFF6E4;
+  --mlrk-cream-200:#FFEECA;
+  --mlrk-forest-900:#264326;
+  --mlrk-forest-600:#327A5F;
+  --mlrk-sage-300:#A6C2B4;
+  --mlrk-blue-700:#2274B5;
+  --mlrk-blue-900:#2F5A8B;
+  --mlrk-orange-600:#EF541E;
+  --mlrk-gold-500:#EEBC32;
+  --mlrk-gold-300:#FECC5B;
+  --mlrk-gold-700:#83671C;
+  --mlrk-red-700:#C92929;
+  --mlrk-red-100:#F7DFDF;
+  --mlrk-pink-300:#F8BAC9;
+  --mlrk-ink-900:#261F1D;
+  --mlrk-gray-100:#E9EFEB;
+  --mlrk-gray-200:#E4E7EB;
+  --mlrk-gray-300:#E1E3E0;
+  --mlrk-gray-400:#CFD9E3;
+  --mlrk-gray-500:#B3BBB0;
+  --mlrk-blue-100:#DEEAF4;
+  --mlrk-white:#FFFFFF;
+
+  /* roles — use these in reading-kit.css / a reading's page-specific tweaks,
+     not the raw palette above, so a future re-theme only touches this block */
+  --mlrk-bg-light: var(--mlrk-cream-50);
+  --mlrk-bg-light-alt: var(--mlrk-cream-100);
+  --mlrk-bg-card: var(--mlrk-cream-200);
+  --mlrk-bg-dark: var(--mlrk-ink-900);
+  --mlrk-bg-brand-deep: var(--mlrk-forest-900);
+  --mlrk-bg-brand-mid: var(--mlrk-forest-600);
+  --mlrk-bg-accent-blue: var(--mlrk-blue-900);
+  --mlrk-text-on-light: var(--mlrk-ink-900);
+  --mlrk-text-on-light-muted: var(--mlrk-forest-600);
+  --mlrk-text-on-dark: var(--mlrk-cream-50);
+  --mlrk-heading-on-light: var(--mlrk-ink-900);
+  --mlrk-heading-on-dark: var(--mlrk-cream-50);
+  --mlrk-link-on-light: var(--mlrk-blue-700);
+  --mlrk-danger: var(--mlrk-red-700);
+  --mlrk-highlight: var(--mlrk-gold-500);
+  --mlrk-divider-on-light: var(--mlrk-gray-300);
+  --mlrk-divider-on-dark: var(--mlrk-gray-500);
+  --mlrk-emphasis-on-light: var(--mlrk-forest-900);
+  --mlrk-emphasis-on-dark: var(--mlrk-gold-500);
+  --mlrk-focus-ring: #FFBF47;
+
+  /* callout styles — fill + border pairs, always same-hue, per BRAND_GUIDELINES §"Callout boxes" */
+  --mlrk-callout-green-fill: var(--mlrk-sage-300);
+  --mlrk-callout-green-border: var(--mlrk-forest-900);
+  --mlrk-callout-blue-fill: var(--mlrk-blue-100);
+  --mlrk-callout-blue-border: var(--mlrk-blue-700);
+  --mlrk-callout-gold-fill: var(--mlrk-gold-300);
+  --mlrk-callout-gold-border: var(--mlrk-gold-700);
+  --mlrk-callout-red-fill: var(--mlrk-red-100);
+  --mlrk-callout-red-border: var(--mlrk-red-700);
+
+  /* type — web body text needs to be larger than the slide-deck scale;
+     14px is the hard floor per the reading constraints, 17-18px is the
+     actual default for anything read continuously in a browser */
+  --mlrk-font-heading: Helvetica, Arial, sans-serif;
+  --mlrk-font-body: Helvetica, Arial, sans-serif;
+  --mlrk-font-accent: Fraunces, Georgia, serif; /* quotes/captions only */
+  --mlrk-font-code: "Roboto Mono", Consolas, Monaco, monospace;
+  --mlrk-size-body: 1.0625rem;   /* 17px */
+  --mlrk-size-body-small: 0.9375rem; /* 15px — never below 14px */
+  --mlrk-size-caption: 0.875rem; /* 14px floor */
+}
