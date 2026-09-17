@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Gene That Became a Date — Python Variables &amp; Types</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank{display:flex;align-items:center;gap:.5rem;margin:.5rem 0}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:14rem;font-family:var(--mlrk-font-code)}
+.var-predict-row{margin:.9rem 0 0.2rem}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}.mlrk-fillblank input{width:10rem}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The Gene That Became a Date</h1>
+<p class="mlrk-lead">In 2016, researchers discovered that roughly one in five published genetics papers with a supplementary gene list contained an error, because Microsoft Excel had quietly turned real gene names, like <code>SEPT2</code>, into calendar dates. Nobody typed a date. A spreadsheet just decided, on its own, what type a piece of text "really" was. Every value in a running program has a type the same way, and this reading is about the four types Python uses constantly — <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code> — and how to keep control of them yourself instead of letting something else guess.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~10 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. When a spreadsheet decided a gene was a date</h2>
+<p>Human genes have short official symbols — <code>SEPT2</code>, <code>MARCH1</code>, <code>DEC1</code> — so scientists can refer to them quickly across papers and databases. In 2016, a team of Australian researchers (Ziemann, Eren, and El-Osta, published in <em>Genome Biology</em>) went looking through years of published genetics papers and found that about 20% of the ones with a supplementary gene list had at least one gene name silently mangled. <code>SEPT2</code> had become the date "2-Sep." <code>MARCH1</code> had become "1-Mar." The scientists hadn't typed a date anywhere. Microsoft Excel had opened their gene list, glanced at text that looked date-shaped, and rewritten it as a date automatically, before anyone saved the file.</p>
+<p>The damage wasn't cosmetic. Once a gene symbol becomes a date, it's a different value entirely — sorting, searching, and matching it against any other dataset all silently point at the wrong thing, and nothing throws an error to say so. The fix scientists reached for wasn't a smarter spreadsheet setting: in 2020 the official body that assigns human gene symbols, the HUGO Gene Nomenclature Committee, permanently renamed the worst-offending genes so software could no longer mistake them for dates — <code>MARCH1</code> became <code>MARCHF1</code>, <code>SEPT1</code> became <code>SEPTIN1</code>, and so on. A 2021 follow-up study found the problem was still showing up in roughly 30% of newer papers.</p>
+<p>Excel didn't do this out of carelessness. It did it because every single value has to be treated as <em>some</em> type, and when nothing pins that type down explicitly, the program decides for you — and it doesn't always decide the way you meant. That is exactly the problem this reading is about solving on purpose, in Python, before it ever gets the chance to guess.</p>
+
+<div class="mlrk-card">
+<p><strong>Quick check:</strong> why did <code>SEPT2</code> and <code>MARCH1</code> turn into dates?</p>
+<div id="scn-quiz">
+  <button type="button" class="mlrk-choice" data-a="typo">Excel's spellchecker "corrected" what it thought were typos</button>
+  <button type="button" class="mlrk-choice" data-a="guess">Excel's default type-guessing read the text as date-shaped and silently converted it</button>
+  <button type="button" class="mlrk-choice" data-a="mistake">The scientists accidentally typed the wrong gene names</button>
+</div>
+<div id="scn-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Vocabulary</h2>
+<p>Flip each card before the sections below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>variable</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Variable</strong><br>A name that points at a value Python is holding in memory. Not a box that "is" the value — a label attached to it.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>assignment</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Assignment (<code>=</code>)</strong><br>The operation that makes a name point at a value, e.g. <code>age = 27</code>. Read it as "point <code>age</code> at 27," not "age equals 27."</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>type</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Type</strong><br>What kind of value something is — a whole number, a decimal, text, or a true/false — which determines what operations on it actually do.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>int</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>int (integer)</strong><br>A whole number, positive or negative, with no decimal point: <code>27</code>, <code>-4</code>, <code>0</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>float</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>float (floating-point number)</strong><br>A number with a decimal point: <code>19.99</code>, <code>3.0</code>, <code>-0.5</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>str</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>str (string)</strong><br>Text, always wrapped in quotes: <code>"Ada Lovelace"</code>, <code>"10027"</code>. Digits inside quotes are still text, not a number.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>bool</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>bool (boolean)</strong><br>Exactly one of two values: <code>True</code> or <code>False</code> — capitalized, no quotes.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. A variable is a name, not a box</h2>
+<p>It's tempting to picture <code>x = 5</code> as "a box called <code>x</code> with a 5 inside it." That mental model breaks the moment you write <code>x = "hello"</code> right after — did the 5 turn into text? It didn't. Python never changes a value in place like that. What actually happened both times is simpler: the name <code>x</code> got pointed at a value somewhere in memory. The first line points it at the integer 5. The second line points that same name at a completely different value, the string <code>"hello"</code>, and the 5 is left with nothing pointing at it at all. A variable is a name attached to a value, not a container that becomes the value.</p>
+<p>This matters because two values can look identical on the page and behave nothing alike, depending only on their type. <code>count = 5</code> and <code>code = "5"</code> print the same single character. But <code>count</code> points at an integer, and <code>code</code> points at a string — and the exact same <code>+</code> operator does something different to each one:</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 640 380" role="img" aria-labelledby="varTitle varDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="varTitle">The same operator behaving differently depending on type</title>
+  <desc id="varDesc">count is a name pointing at the integer value 5. code is a name pointing at the string value 5, written in quotes. Adding count to itself with the plus operator produces 10, integer addition. Adding code to itself with the plus operator produces the two characters 55, string concatenation, because plus means something different for text than it does for numbers.</desc>
+  <defs>
+    <marker id="varArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#261F1D"/>
+    </marker>
+  </defs>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="85" y="30" width="160" height="46" rx="23" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="165" y="58" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">count</text>
+    <line x1="165" y1="76" x2="165" y2="115" stroke="#261F1D" stroke-width="2.5" marker-end="url(#varArrow)"/>
+    <rect x="105" y="118" width="120" height="56" rx="12" fill="#FFFFFF" stroke="#261F1D" stroke-width="2"/>
+    <text x="165" y="151" text-anchor="middle" font-size="20" font-weight="800" fill="#261F1D">5</text>
+    <text x="165" y="167" text-anchor="middle" font-size="12" fill="#327A5F">int</text>
+
+    <rect x="395" y="30" width="160" height="46" rx="23" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="475" y="58" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">code</text>
+    <line x1="475" y1="76" x2="475" y2="115" stroke="#261F1D" stroke-width="2.5" marker-end="url(#varArrow)"/>
+    <rect x="415" y="118" width="120" height="56" rx="12" fill="#FFFFFF" stroke="#261F1D" stroke-width="2"/>
+    <text x="475" y="151" text-anchor="middle" font-size="20" font-weight="800" fill="#261F1D">"5"</text>
+    <text x="475" y="167" text-anchor="middle" font-size="12" fill="#2274B5">str</text>
+
+    <text x="320" y="205" text-anchor="middle" font-size="13" fill="#261F1D">Same-looking value, different type underneath</text>
+
+    <rect x="30" y="225" width="270" height="140" rx="14" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="165" y="263" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">count + count</text>
+    <text x="165" y="290" text-anchor="middle" font-size="12" fill="#327A5F">int addition</text>
+    <text x="165" y="333" text-anchor="middle" font-size="26" font-weight="800" fill="#264326">10</text>
+
+    <rect x="340" y="225" width="270" height="140" rx="14" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="475" y="263" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">code + code</text>
+    <text x="475" y="290" text-anchor="middle" font-size="12" fill="#2274B5">str concatenation</text>
+    <text x="475" y="333" text-anchor="middle" font-size="26" font-weight="800" fill="#2F5A8B">"55"</text>
+  </g>
+</svg>
+
+<p>On numbers, <code>+</code> means addition. On strings, <code>+</code> means concatenation — glue the two pieces of text together, end to end. Same symbol, two entirely different behaviors, and Python decides which one to run by checking the type of the values on either side of it, not by anything the symbol itself says. This is exactly the same category of problem as the gene-name story above: a value that looks like a number isn't automatically treated like one. A real-world example of the same trap: a US ZIP code like <code>"02134"</code> has to be stored as a <code>str</code>, because as an <code>int</code> it would quietly lose its leading zero and become <code>2134</code> — a different, wrong ZIP code, with no error to flag it.</p>
+
+<div class="mlrk-card">
+<p><strong>Predict the output:</strong> type what each snippet prints, then check all four together.</p>
+
+<div class="var-predict-row">
+<div class="mlrk-code"><div class="mlrk-screen">x = 5
+y = 5
+print(x + y)</div></div>
+<div class="mlrk-fillblank"><label for="pred-1">Prints:</label> <input type="text" id="pred-1" autocomplete="off" placeholder="?"></div>
+</div>
+
+<div class="var-predict-row">
+<div class="mlrk-code"><div class="mlrk-screen">x = "5"
+y = "5"
+print(x + y)</div></div>
+<div class="mlrk-fillblank"><label for="pred-2">Prints:</label> <input type="text" id="pred-2" autocomplete="off" placeholder="?"></div>
+</div>
+
+<div class="var-predict-row">
+<div class="mlrk-code"><div class="mlrk-screen">price = "19.99"
+print(price * 2)</div></div>
+<div class="mlrk-fillblank"><label for="pred-3">Prints:</label> <input type="text" id="pred-3" autocomplete="off" placeholder="?"></div>
+</div>
+
+<div class="var-predict-row">
+<div class="mlrk-code"><div class="mlrk-screen">is_ready = True
+print(is_ready)</div></div>
+<div class="mlrk-fillblank"><label for="pred-4">Prints:</label> <input type="text" id="pred-4" autocomplete="off" placeholder="?"></div>
+</div>
+
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="predict-check">Check all four</button></div>
+<div id="predict-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p><code>*</code> on a string repeats the text that many times, the same way <code>+</code> on two strings glues them together — neither one does math, because <code>price</code> here is a <code>str</code>, not a number. And Python's boolean values print exactly as <code>True</code> or <code>False</code>, capitalized, with no quotes.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. What type is this?</h2>
+<p>Drag each value into the type it actually is — go by what's really written, not by what it looks like it means.</p>
+
+<div class="mlrk-card" id="type-activity">
+<div class="mlrk-drag-source" id="type-chips">
+  <span class="mlrk-draggable" id="chip-1"><code>42</code></span>
+  <span class="mlrk-draggable" id="chip-2"><code>"42"</code></span>
+  <span class="mlrk-draggable" id="chip-3"><code>3.14</code></span>
+  <span class="mlrk-draggable" id="chip-4"><code>True</code></span>
+  <span class="mlrk-draggable" id="chip-5"><code>"hello"</code></span>
+  <span class="mlrk-draggable" id="chip-6"><code>0.0</code></span>
+</div>
+<div class="mlrk-grid">
+  <div class="mlrk-dropzone" id="zone-int"><strong>int</strong></div>
+  <div class="mlrk-dropzone" id="zone-float"><strong>float</strong></div>
+  <div class="mlrk-dropzone" id="zone-str"><strong>str</strong></div>
+  <div class="mlrk-dropzone" id="zone-bool"><strong>bool</strong></div>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="type-check">Check my answers</button></div>
+<div id="type-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Quotation marks are the tell: if a value has quotes around it, it's a <code>str</code> no matter what the text inside looks like — that's exactly how a gene name like <code>SEPT2</code> is supposed to stay text instead of becoming a date.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Summary &amp; reflection</h2>
+<p>A variable is a name pointing at a value, and assignment (<code>=</code>) is what points it there. Every value has a type — <code>int</code>, <code>float</code>, <code>str</code>, or <code>bool</code> among the basics — and that type decides what an operation like <code>+</code> actually does, not the symbol alone. Leaving a value's type to a guess is exactly what turned real gene names into calendar dates in thousands of spreadsheets; naming and typing a value on purpose is how a program avoids the same fate.</p>
+<label for="var-reflect"><strong>In 2–3 sentences:</strong> pick one value you'd expect to see in a program you might build (a price, a username, a score, anything) and explain which of the four types it should be, and what would break if it were stored as the wrong one.</label>
+<textarea id="var-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="var-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="var-copy">Copy Plain Text Answers</button>
+<p id="var-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "variables-data-types-reading";
+  const TITLE = "The Gene That Became a Date — Python Variables & Types";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.quiz({
+    id: "act-scenario-quiz",
+    buttonSelector: "#scn-quiz .mlrk-choice",
+    feedbackSelector: "#scn-fb",
+    correct: "guess",
+    maxAttempts: 2,
+    feedback: {
+      typo: "Spellcheck flags words, not gene symbols shaped like dates — and it doesn't rewrite the file automatically.",
+      guess: "Right. Excel's default type-guessing decided the text matched a date pattern and silently converted it, before anyone chose that.",
+      mistake: "The scientists typed the correct gene symbols — the conversion happened after, inside the spreadsheet."
+    }
+  });
+
+  const predictAnswers = {
+    "pred-1": "10",
+    "pred-2": "55",
+    "pred-3": "19.9919.99",
+    "pred-4": "True"
+  };
+  const predictBtn = document.getElementById("predict-check");
+  const predictFb = document.getElementById("predict-fb");
+  K.Scoring.register("act-predict-output", 1, "activity");
+  let predictAttempts = 0, predictDone = false;
+  predictBtn.addEventListener("click", function(){
+    if (predictDone) return;
+    predictAttempts++;
+    const ids = Object.keys(predictAnswers);
+    const results = ids.map(function(id){
+      const val = document.getElementById(id).value.trim();
+      return val === predictAnswers[id];
+    });
+    const numCorrect = results.filter(Boolean).length;
+    if (numCorrect === ids.length) {
+      K.Scoring.award("act-predict-output", predictAttempts === 1 ? 1 : 0.5);
+      predictFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      predictFb.innerHTML = "<strong>All four correct" + (predictAttempts > 1 ? " (2nd try)" : "") + ".</strong> The type of each value decided what its operator actually did.";
+      predictDone = true;
+    } else if (predictAttempts >= 2) {
+      K.Scoring.award("act-predict-output", numCorrect / ids.length * 0.5);
+      predictFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      predictFb.innerHTML = "<strong>Here are the answers:</strong><ul>" +
+        "<li><code>print(x + y)</code> with two ints, prints <code>10</code></li>" +
+        "<li><code>print(x + y)</code> with two strs, prints <code>55</code></li>" +
+        "<li><code>print(price * 2)</code> with a str, prints <code>19.9919.99</code></li>" +
+        "<li><code>print(is_ready)</code> prints <code>True</code></li></ul>";
+      predictDone = true;
+    } else {
+      predictFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      predictFb.innerHTML = numCorrect + " of " + ids.length + " correct so far. Adjust and check once more before the answers are shown.";
+    }
+    predictFb.setAttribute("tabindex", "-1");
+    predictFb.focus();
+    K.Storage.save(READING_ID, K.snapshot(READING_ID, TITLE));
+  });
+
+  K.dragDrop("#type-activity", "act-type-classify");
+  K.selfCheck({
+    buttonSelector: "#type-check",
+    feedbackSelector: "#type-fb",
+    mapping: {
+      "chip-1": {expectedId: "zone-int", label: "42", expectedLabel: "int"},
+      "chip-2": {expectedId: "zone-str", label: '"42" (quoted, so it is text)', expectedLabel: "str"},
+      "chip-3": {expectedId: "zone-float", label: "3.14", expectedLabel: "float"},
+      "chip-4": {expectedId: "zone-bool", label: "True", expectedLabel: "bool"},
+      "chip-5": {expectedId: "zone-str", label: '"hello"', expectedLabel: "str"},
+      "chip-6": {expectedId: "zone-float", label: "0.0", expectedLabel: "float"}
+    }
+  });
+
+  K.freeResponse({id: "act-reflect", selector: "#var-reflect", minWords: 10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#var-scorechip"); });
+  K.Scoring.renderChip("#var-scorechip");
+
+  K.copyPlainText({readingId: READING_ID, title: TITLE, buttonSelector: "#var-copy", onDone: function(ok){
+    document.getElementById("var-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

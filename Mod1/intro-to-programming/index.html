@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What Is a Program, Really?</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>What Is a Program, Really?</h1>
+<p class="mlrk-lead">In April 2011, a genetics textbook called <em>The Making of a Fly</em> was listed on Amazon for $23,698,655.93 — plus $3.99 shipping. Nobody at Amazon set that price on purpose. Two different sellers were each running a tiny pricing program: one program's entire job was "set my price to 0.9983 times the other seller's price," and the other's entire job was "set my price to 1.270589 times the other seller's price." Neither program ever asked whether the resulting number made any sense. Each one did exactly, precisely, only what it was told, once a day, without ever noticing the price cross one million dollars, then ten million. That is the single most important thing to understand about programming before writing a line of Python: a computer runs the instructions you actually wrote, not the ones you meant.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~11 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No coding experience needed</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. The book that cost more than a house</h2>
+<p>The two sellers were called profnath and bordeebook, and neither of them was doing anything sneaky. Profnath's program checked bordeebook's current price once a day and set its own price to 0.9983 times that number, always coming in just slightly cheaper. Bordeebook's program did the mirror-image thing: it checked profnath's price and set its own to 1.270589 times that number, always coming in noticeably more expensive, as if to say "the cheaper copy is basically sold out, so mine is the premium option." Each program was simple, each program worked exactly as written, and each program ran once more the next day using whatever number the other program had just produced.</p>
+<p>That is a loop with no exit condition. Profnath's higher output became bordeebook's input, and bordeebook's higher output became profnath's input the next day, over and over, each one multiplying a slightly bigger number. On April 18th the price hit its peak: $23,698,655.93. The following day, a human being finally noticed and manually reset profnath's price to a sane $106.23 — at which point bordeebook's program, still just following its one instruction, promptly and obediently set its own price to $106.23 times 1.270589, or $134.97. (The full price log survives; a biologist named Michael Eisen first spotted the listing and <a href="https://www.michaeleisen.org/blog/p/358/" target="_blank" rel="noopener">wrote up exactly what he found</a>.)</p>
+<p>Neither program had a bug in it, in the sense of doing something other than what its code said. Both programs did precisely what they were told, every single day. The actual problem is what was never told to them: nobody wrote an instruction for "and stop if this number gets ridiculous," because no human engineer imagined they needed to spell that out. A person would never let a used book's price wander past a million dollars without stopping to ask "wait, does this look right?" A computer does not do that unless a line of code specifically tells it to. It has no instinct for "ridiculous." It has no fallback plan. It has the instructions it was given, and it runs them.</p>
+<p>That single idea, that a computer will keep doing exactly what its instructions say with zero built-in judgment about whether the result makes sense, is the foundation everything else in programming sits on top of. Before any Python syntax, this is the mental model worth having solid.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>program</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Program</strong><br>A complete set of instructions written for a computer to carry out, in order, to accomplish some goal. Profnath's pricing program was only a few instructions long, and it still ran for weeks without anyone checking on it.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>instruction</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Instruction</strong><br>One single exact action inside a program: "multiply this number by 1.270589," "compare these two prices," "print this line." A program is a sequence of these, nothing more.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>algorithm</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Algorithm</strong><br>A numbered sequence of exact steps that reaches a goal, independent of any particular programming language. A recipe is an algorithm for a dish; a program is one specific way of writing an algorithm down for a computer to run.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>execute</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Execute / execution</strong><br>What a computer does with an instruction: carries it out literally and immediately, with no interpretation of what you probably meant instead of what you actually wrote.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Instructions run in order, exactly as written</h2>
+<p>Two things are true of every program, from a five-line pricing bot to a full application: the instructions run one after another, in the exact order they're written, and each one runs exactly as written, with no step where the computer pauses to guess at your intent. Change the order of two steps and you often get a different, sometimes broken, result, even though every individual instruction is still perfectly correct on its own. Leave a step vague, or skip one the computer would need, and there's no built-in judgment to quietly patch the gap. A person filling in a vague recipe uses common sense without noticing they're doing it. A computer has no such fallback to fall back on.</p>
+
+<p>The classic way to see this is with a task everyone already knows how to do: making a peanut butter sandwich. Compare a vague version of the instructions against an exact one.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 640 340" role="img" aria-labelledby="sandTitle sandDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="sandTitle">Vague sandwich instructions compared with exact sandwich instructions</title>
+  <desc id="sandDesc">Vague instructions read: get the bread out, put peanut butter on, add the jelly, put it together. Followed literally with no common sense to fill gaps, the result is that no amount or method was ever given, so the sandwich never actually gets made. Exact instructions read: take two slices from the bag, unscrew the peanut butter jar, spread one tablespoon with a knife, press the two slices together. Followed literally, the result is the same finished sandwich, made the exact same way every time.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="15" y="20" width="290" height="300" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="160" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Vague instructions</text>
+    <text x="35" y="90" font-size="13" fill="#261F1D">1. Get the bread out</text>
+    <text x="35" y="114" font-size="13" fill="#261F1D">2. Put peanut butter on</text>
+    <text x="35" y="138" font-size="13" fill="#261F1D">3. Add the jelly</text>
+    <text x="35" y="162" font-size="13" fill="#261F1D">4. Put it together</text>
+    <line x1="35" y1="180" x2="280" y2="180" stroke="#C92929" stroke-width="1"/>
+    <text x="35" y="205" font-size="12" font-weight="700" fill="#C92929">Result:</text>
+    <text x="35" y="228" font-size="12" fill="#261F1D">No amount or method given,</text>
+    <text x="35" y="248" font-size="12" fill="#261F1D">sandwich never actually gets made</text>
+
+    <rect x="335" y="20" width="290" height="300" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="480" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Exact instructions</text>
+    <text x="355" y="90" font-size="13" fill="#261F1D">1. Take 2 slices from the bag</text>
+    <text x="355" y="114" font-size="13" fill="#261F1D">2. Unscrew the peanut butter jar</text>
+    <text x="355" y="138" font-size="13" fill="#261F1D">3. Spread 1 tbsp with a knife</text>
+    <text x="355" y="162" font-size="13" fill="#261F1D">4. Press the two slices together</text>
+    <line x1="355" y1="180" x2="600" y2="180" stroke="#264326" stroke-width="1"/>
+    <text x="355" y="205" font-size="12" font-weight="700" fill="#264326">Result:</text>
+    <text x="355" y="228" font-size="12" fill="#261F1D">Same finished sandwich,</text>
+    <text x="355" y="248" font-size="12" fill="#261F1D">made the exact same way every time</text>
+  </g>
+</svg>
+
+<p>Notice that "put peanut butter on" isn't actually an instruction a literal executor can run at all: on what, with what, how much? A human reader quietly fills in "on the bread, with a knife, a reasonable amount" without even noticing there was a gap. A computer has nothing to fill it with unless a person wrote that detail down first. This is exactly the same gap that let profnath and bordeebook's prices run to $23 million: "multiply by this number" is a perfectly exact instruction on its own, but "and stop if the result looks ridiculous" was never written down anywhere, so it was never part of what either program actually did.</p>
+
+<p><strong>Try it:</strong> here's a different everyday task, broken into steps but shuffled out of order. Put them back in the order a person (or a program) actually has to perform them.</p>
+<div class="mlrk-card">
+<ul class="mlrk-orderlist" id="tea-order">
+  <li class="mlrk-orderitem" data-step="fill"><span class="mlrk-order-num"></span> Fill the kettle with cold water</li>
+  <li class="mlrk-orderitem" data-step="boil"><span class="mlrk-order-num"></span> Turn on the kettle and wait for the water to boil</li>
+  <li class="mlrk-orderitem" data-step="bag"><span class="mlrk-order-num"></span> Put a tea bag in the mug</li>
+  <li class="mlrk-orderitem" data-step="pour"><span class="mlrk-order-num"></span> Pour the boiling water into the mug</li>
+  <li class="mlrk-orderitem" data-step="steep"><span class="mlrk-order-num"></span> Wait 3-4 minutes, then take the tea bag out</li>
+</ul>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="tea-check">Check my order</button></div>
+<div id="tea-orderfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Nothing can boil before there's water in the kettle, and nothing can be poured before it's finished boiling. The tea bag can go in the mug any time before the pour, but it can't do anything on its own after that except sit and steep.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Predict what happens</h2>
+<div class="mlrk-card" id="card-order">
+<p><strong>Suppose the tea steps above got run in this order instead:</strong> pour the boiling water into the mug, <em>then</em> turn on the kettle and wait for the water to boil. What actually happens?</p>
+<button type="button" class="mlrk-choice" data-a="right">Nothing pours correctly. There's no boiling water yet at that point, so the "pour" step has nothing to act on and the instruction just fails.</button>
+<button type="button" class="mlrk-choice" data-a="commonsense">The computer notices the kettle hasn't boiled yet, waits automatically, and pours once it's actually ready.</button>
+<button type="button" class="mlrk-choice" data-a="sameresult">It doesn't matter. All five steps still happen eventually, so the tea comes out the same either way.</button>
+<div id="orderfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>5. What would actually happen</h2>
+<p>A well-known way people demonstrate this idea for fun is by asking a kid to write step-by-step sandwich instructions, then having an adult follow them "exactly as written," refusing to fix anything with common sense the way a computer wouldn't. Select every statement below that's actually true about how a literal instruction-follower, human or computer, behaves.</p>
+<div class="mlrk-card"><p><strong>Select every TRUE statement.</strong></p>
+<label style="display:block;margin:.4rem 0"><input type="checkbox" class="sa-box" value="a"> If an instruction says "add sugar to taste" and never gives an exact amount or stopping point, a program executing it literally has no way to know when to stop.</label>
+<label style="display:block;margin:.4rem 0"><input type="checkbox" class="sa-box" value="b"> In a "follow the instructions exactly" sandwich demonstration, the adult usually ends up with a perfect sandwich, because they quietly fix any vague step using common sense.</label>
+<label style="display:block;margin:.4rem 0"><input type="checkbox" class="sa-box" value="c"> In the 2011 Amazon pricing story, one seller's program would have stopped raising its price on its own once it passed a million dollars, since that's obviously unreasonable for a used book.</label>
+<label style="display:block;margin:.4rem 0"><input type="checkbox" class="sa-box" value="d"> Two programs that each run exactly as written, with no bugs in the code itself, can still produce a result nobody wanted, if the instructions never accounted for the situation they ended up in.</label>
+<button type="button" id="sasubmit" class="mlrk-btn">Check my selections</button>
+<div id="safb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
+<p>Two sellers' pricing programs multiplied a number back and forth until a used book hit $23.7 million, not because either program had a bug, but because "stop if this gets ridiculous" was never written down as an instruction. Every program, from that pricing bot to the first line of Python this fellowship writes, works the same way: instructions run in the exact order they're written, each one exactly as written, with no common-sense fallback for anything left vague or missing.</p>
+<label for="intro-reflect"><strong>In 2-3 sentences:</strong> describe a time you gave someone (a sibling, a coworker, anyone) an instruction they followed "exactly" in a way you didn't intend. What detail was missing that a computer would also need spelled out?</label>
+<textarea id="intro-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Your score &amp; keep a copy of your work</h2>
+<div id="intro-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="intro-copy">Copy Plain Text Answers</button>
+<p id="intro-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "intro-to-programming-reading";
+  const TITLE = "What Is a Program, Really?";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.orderSteps("#tea-order", {id:"act-tea-order", correctOrder:["fill","boil","bag","pour","steep"], feedbackSelector:"#tea-orderfb", checkSelector:"#tea-check"});
+
+  K.quiz({id:"q-order", buttonSelector:"#card-order .mlrk-choice", feedbackSelector:"#orderfb", correct:"right",
+    feedback:{
+      right:"Exactly. The instruction \"pour the boiling water\" only means something once water has actually boiled. Out of order, a literal executor doesn't skip ahead or guess your intent, it just fails or does something nonsensical.",
+      commonsense:"This is exactly the common-sense fallback a computer does not have. Reordering the steps changes what the program actually does, and nothing pauses to notice the order looks wrong.",
+      sameresult:"The order steps run in is part of what an algorithm actually is. The same steps in a different order can produce a broken result instead of the same one."
+    }});
+
+  K.selectAll({id:"q-selectall", boxSelector:".sa-box", submitSelector:"#sasubmit", feedbackSelector:"#safb", options:[
+    {value:"a", label:"If an instruction says \"add sugar to taste\" and never gives an exact amount or stopping point, a program executing it literally has no way to know when to stop.", correct:true,
+      hint:"Think about whether \"to taste\" gives an exact number a computer could check against.",
+      explain:"Exactly why \"add sugar to taste\" isn't a real instruction a computer could run at all. There's no exact quantity and no exact stopping condition, only a human's intuition."},
+    {value:"b", label:"In a \"follow the instructions exactly\" sandwich demonstration, the adult usually ends up with a perfect sandwich, because they quietly fix any vague step using common sense.", correct:false,
+      hint:"Think about why these demonstrations are funny in the first place. Would that still be true if the adult fixed vague steps as they went?",
+      explain:"The opposite is what actually happens, and it's the whole reason these demonstrations are entertaining: the adult refuses to use any judgment a computer wouldn't have, so a vague step produces a mess, not a fix."},
+    {value:"c", label:"In the 2011 Amazon pricing story, one seller's program would have stopped raising its price on its own once it passed a million dollars, since that's obviously unreasonable for a used book.", correct:false,
+      hint:"Go back to section 1: did either pricing program have a rule for \"stop if the price is too high,\" or only a rule for \"multiply by a fixed number\"?",
+      explain:"Nothing like that was ever true. Each program only knew how to multiply the competitor's price by a fixed number, once a day, forever. \"Unreasonable\" isn't a concept a computer has unless a person writes a specific rule for it."},
+    {value:"d", label:"Two programs that each run exactly as written, with no bugs in the code itself, can still produce a result nobody wanted, if the instructions never accounted for the situation they ended up in.", correct:true,
+      hint:"This is the reading's central idea, stated directly at the end of section 1 and section 3.",
+      explain:"This is the core lesson of the whole reading: a program can be entirely bug-free and still misbehave badly if what it was actually told to do doesn't cover the situation it ends up in."}
+  ]});
+
+  K.freeResponse({id:"act-reflect", selector:"#intro-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#intro-scorechip"); });
+  K.Scoring.renderChip("#intro-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#intro-copy", onDone:function(ok){
+    document.getElementById("intro-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

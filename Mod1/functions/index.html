@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Discount Bug — Why Python Functions Exist</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:700px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:20rem;font-family:var(--mlrk-font-code)}
+.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+.fn-checklist{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0}
+.fn-checklist label{display:flex;gap:.55rem;align-items:flex-start;cursor:pointer}
+.fn-checklist input{margin-top:.3rem}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The Discount Bug</h1>
+<p class="mlrk-lead">Roast &amp; Co., a small coffee shop, keeps a short Python script behind the counter that calculates each customer's total after their loyalty discount. When the shop raised that discount from 10% to 15%, whoever updated the script edited the formula in two places and missed a third — small-size orders quietly kept charging the old rate for weeks before a regular customer did the math out loud and complained. The fix wasn't more code. It was less: one function, defined once, called three times.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~13 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. The bug that one function would have prevented</h2>
+<p>Here's the script Roast &amp; Co. was actually running. Someone had written the loyalty-discount math once, for a small order, then copy-pasted that same block twice more for medium and large — changing only the price each time:</p>
+<div class="mlrk-code"><pre># small order
+price = 3.50
+total = price * 0.90
+print(total)
+
+# medium order
+price = 4.25
+total = price * 0.90
+print(total)
+
+# large order
+price = 4.75
+total = price * 0.90
+print(total)</pre></div>
+<p>That worked fine until the shop raised the loyalty discount from 10% off to 15% off, meaning the multiplier needed to change from <code>0.90</code> (pay 90% of the price) to <code>0.85</code> (pay 85%). Someone opened the script, found the line, updated it, and then had to remember to find the <em>same</em> line two more times, in two more blocks that looked almost identical. They caught two of the three. The diagram below shows exactly where it went wrong, and what replacing all three blocks with one function actually looks like.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 700 500" role="img" aria-labelledby="fnDiagTitle fnDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="fnDiagTitle">Three copy-pasted discount calculations collapsing into one Python function called three times</title>
+  <desc id="fnDiagDesc">Before: three separate code blocks each calculate an order total by multiplying price by a discount rate. The small-order block still uses the old 0.90 rate while the medium and large blocks were updated to 0.85 — a mismatch caused by having to edit the same formula in three separate places. After: one function, order_total, defines the formula exactly once and is called three times with three different price arguments, so there is only one place left to update when the rate changes again.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="350" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Before: the same formula, copied three times</text>
+
+    <rect x="15" y="40" width="210" height="150" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="120" y="65" text-anchor="middle" font-size="14" font-weight="700" fill="#261F1D">Small order</text>
+    <text x="120" y="95" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">price = 3.50</text>
+    <text x="120" y="117" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#C92929">total = price * 0.90</text>
+    <text x="120" y="139" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">print(total)</text>
+    <text x="120" y="170" text-anchor="middle" font-size="11" font-weight="700" fill="#C92929">Still the old rate!</text>
+
+    <rect x="245" y="40" width="210" height="150" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="350" y="65" text-anchor="middle" font-size="14" font-weight="700" fill="#261F1D">Medium order</text>
+    <text x="350" y="95" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">price = 4.25</text>
+    <text x="350" y="117" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">total = price * 0.85</text>
+    <text x="350" y="139" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">print(total)</text>
+    <text x="350" y="170" text-anchor="middle" font-size="11" fill="#2274B5" font-weight="700">Updated</text>
+
+    <rect x="475" y="40" width="210" height="150" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="580" y="65" text-anchor="middle" font-size="14" font-weight="700" fill="#261F1D">Large order</text>
+    <text x="580" y="95" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">price = 4.75</text>
+    <text x="580" y="117" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">total = price * 0.85</text>
+    <text x="580" y="139" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">print(total)</text>
+    <text x="580" y="170" text-anchor="middle" font-size="11" fill="#2274B5" font-weight="700">Updated</text>
+
+    <text x="350" y="225" text-anchor="middle" font-size="15" font-weight="700" fill="#264326">This becomes one function, called three times:</text>
+
+    <rect x="185" y="250" width="330" height="80" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="205" y="280" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">def order_total(price):</text>
+    <text x="225" y="305" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">return price * 0.85</text>
+
+    <line x1="350" y1="330" x2="120" y2="380" stroke="#B3BBB0" stroke-width="2"/>
+    <line x1="350" y1="330" x2="350" y2="380" stroke="#B3BBB0" stroke-width="2"/>
+    <line x1="350" y1="330" x2="580" y2="380" stroke="#B3BBB0" stroke-width="2"/>
+
+    <rect x="40" y="380" width="160" height="50" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="120" y="410" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">order_total(3.50)</text>
+
+    <rect x="270" y="380" width="160" height="50" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="350" y="410" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">order_total(4.25)</text>
+
+    <rect x="500" y="380" width="160" height="50" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="580" y="410" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">order_total(4.75)</text>
+
+    <text x="350" y="460" text-anchor="middle" font-size="12" fill="#264326">Change the rate once, right here — every call immediately uses the new number.</text>
+  </g>
+</svg>
+
+<p>This pattern — the same logic, copy-pasted with a couple of numbers changed each time — is one of the most common ways bugs like Roast &amp; Co.'s actually happen. Programmers have a name for the fix: <strong>DRY</strong>, short for "don't repeat yourself." A function is Python's basic tool for it. Write the logic once, then run it as many times as you need, with different inputs each time.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>function</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Function</strong><br>A named, reusable block of code that performs one task. Write it once, then run it as many times as you want.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>def</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>def</strong><br>The Python keyword that starts a function definition, short for "define." Everything indented underneath the <code>def</code> line is the function's body.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>parameter</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Parameter</strong><br>The name written inside the parentheses in a function's definition — a placeholder for whatever value gets passed in later. In <code>def order_total(price):</code>, <code>price</code> is the parameter.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>argument</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Argument</strong><br>The actual value handed to a function when it's called. In <code>order_total(4.25)</code>, <code>4.25</code> is the argument — it fills in the <code>price</code> parameter for that one call.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>return</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>return</strong><br>Hands a value back out of the function to wherever it was called, so that value can be stored, printed, or used in more code. A function stops running the moment it hits a <code>return</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>call</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Calling a function</strong><br>Actually running it, by writing its name followed by parentheses with any arguments inside — e.g. <code>order_total(4.25)</code>. Defining a function with <code>def</code> doesn't run it; calling it does.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Writing your own function</h2>
+<p>Here's the function from the diagram above, on its own:</p>
+<div class="mlrk-code"><pre>def order_total(price):
+    return price * 0.85</pre></div>
+<p>Reading it line by line: <code>def</code> starts the definition, <code>order_total</code> is the name being given to this block of logic, and <code>price</code> in the parentheses is the parameter — a stand-in for whatever number gets passed in. The indented line underneath is the function's body: the actual math. Nothing runs yet just from typing this — a <code>def</code> block only <em>runs</em> the moment it gets called, by name, with an argument in the parentheses: <code>order_total(4.25)</code>.</p>
+
+<div class="mlrk-card">
+<p><strong>Predict:</strong> using the <code>order_total</code> function above, what does <code>order_total(10)</code> return?</p>
+<div id="fn-predict1">
+  <button type="button" class="mlrk-choice" data-a="8.5">8.5</button>
+  <button type="button" class="mlrk-choice" data-a="10.85">10.85</button>
+  <button type="button" class="mlrk-choice" data-a="1.5">1.5</button>
+  <button type="button" class="mlrk-choice" data-a="9.15">9.15</button>
+</div>
+<div id="fn-predict1fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<div class="mlrk-card" style="margin-top:1rem">
+<p><strong>Predict:</strong> what does <code>order_total(20)</code> return?</p>
+<div id="fn-predict2">
+  <button type="button" class="mlrk-choice" data-a="17">17</button>
+  <button type="button" class="mlrk-choice" data-a="20.85">20.85</button>
+  <button type="button" class="mlrk-choice" data-a="3">3</button>
+  <button type="button" class="mlrk-choice" data-a="18.5">18.5</button>
+</div>
+<div id="fn-predict2fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<p style="margin-top:1.4rem">Now write one of your own. Roast &amp; Co. also wants a function that adds their flat $0.75 to-go cup fee on top of whatever price comes in:</p>
+<div class="mlrk-card">
+<p><strong>Fill in the blank</strong> so the function takes a price and returns that price plus the $0.75 fee:</p>
+<div class="mlrk-code"><pre>def add_cup_fee(price):
+    ____________</pre></div>
+<div class="mlrk-fillblank"><input type="text" id="fn-cupfee-input" autocomplete="off" placeholder="e.g. return price + 0.75"> <button type="button" class="mlrk-btn" id="fn-cupfee-check">Check</button></div>
+<div id="fn-cupfeefb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>The function needs to hand the new total back out to whatever called it — that's the job of one specific keyword from the vocabulary above, followed by the math itself: the parameter, a <code>+</code>, and <code>0.75</code>.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. return vs. print: the mix-up that trips everyone up</h2>
+<p>The single most common beginner mistake with functions isn't the <code>def</code> line — it's assuming that <code>print()</code> inside a function makes a value available outside it. It doesn't. <code>print()</code> only displays something in the terminal; the value is gone the instant the function finishes. <code>return</code> is the only thing that hands a value back to be stored, reused, or passed into more code.</p>
+<div class="mlrk-grid">
+<div class="mlrk-card">
+<p><strong>Only prints — the value is lost</strong></p>
+<div class="mlrk-code"><pre>def show_total(price):
+    print(price * 0.85)
+
+result = show_total(10)
+print(result)</pre></div>
+<p class="mlrk-small">The terminal shows <code>8.5</code> once (from inside the function), then <code>None</code> — because <code>show_total</code> never handed anything back, so <code>result</code> was never actually set to <code>8.5</code>.</p>
+</div>
+<div class="mlrk-card">
+<p><strong>Returns — the value survives</strong></p>
+<div class="mlrk-code"><pre>def get_total(price):
+    return price * 0.85
+
+result = get_total(10)
+print(result)</pre></div>
+<p class="mlrk-small">The terminal shows <code>8.5</code> once — because <code>result</code> now actually holds the returned number, which <code>print(result)</code> is just displaying.</p>
+</div>
+</div>
+
+<div class="mlrk-card" style="margin-top:1rem">
+<p>Given this function:</p>
+<div class="mlrk-code"><pre>def greet(name):
+    print("Hello, " + name)
+
+result = greet("Amir")
+print(result)</pre></div>
+<p>Select every statement below that's actually true about what happens when this code runs:</p>
+<div class="fn-checklist">
+<label><input type="checkbox" class="fn-greet-box" value="a"> Calling <code>greet("Amir")</code> prints "Hello, Amir" to the console.</label>
+<label><input type="checkbox" class="fn-greet-box" value="b"> <code>result</code> ends up storing the string "Hello, Amir" so it can be reused later.</label>
+<label><input type="checkbox" class="fn-greet-box" value="c"> <code>print(result)</code> outputs <code>None</code>, because <code>greet</code> never uses <code>return</code>.</label>
+<label><input type="checkbox" class="fn-greet-box" value="d"> To make <code>result</code> actually equal "Hello, Amir", <code>greet</code> would need a <code>return</code> statement.</label>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="fn-greet-check">Check my answers</button></div>
+<div id="fn-greetfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Watch: the return statement in under four minutes</h2>
+<div class="mlrk-video-wrap"><div id="fn-video"></div></div>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=ZnBQfF5JFDM" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>Watch for the same pattern from section 4 above: a function that computes a value, hands it back with <code>return</code>, and only then gets passed into <code>print()</code> from the outside.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
+<p>Roast &amp; Co.'s bug happened because the same formula lived in three places at once, and updating it meant remembering to change all three. A function fixes that by definition: the logic exists exactly once, and every call — <code>order_total(3.50)</code>, <code>order_total(4.25)</code>, <code>order_total(4.75)</code> — reads from that same single copy. <code>return</code> is what makes the function's result usable afterward; <code>print()</code> only ever displays it in the moment.</p>
+<label for="fn-reflect"><strong>In 2–3 sentences:</strong> think of a time you copy-pasted a chunk of code, a formula, or even a spreadsheet row, and changed a couple of numbers each time. Now that you've seen how a function replaces that pattern, where's one place you could use a function instead?</label>
+<textarea id="fn-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="fn-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="fn-copy">Copy Plain Text Answers</button>
+<p id="fn-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "python-functions-reading";
+  const TITLE = "The Discount Bug — Why Python Functions Exist";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.quiz({
+    id: "act-predict1",
+    buttonSelector: "#fn-predict1 .mlrk-choice",
+    feedbackSelector: "#fn-predict1fb",
+    correct: "8.5",
+    feedback: {
+      "8.5": "Right — price * 0.85 = 10 * 0.85 = 8.5.",
+      "10.85": "That reads as price + 0.85, not price times 0.85 — check the operator inside the function body.",
+      "1.5": "That's the amount the discount removes (10 * 0.15), not what the customer actually pays.",
+      "9.15": "Re-trace the exact line inside the function body: return price * 0.85."
+    }
+  });
+
+  K.quiz({
+    id: "act-predict2",
+    buttonSelector: "#fn-predict2 .mlrk-choice",
+    feedbackSelector: "#fn-predict2fb",
+    correct: "17",
+    feedback: {
+      "17": "Right — price * 0.85 = 20 * 0.85 = 17.",
+      "20.85": "That reads as price + 0.85, not price times 0.85 — check the operator inside the function body.",
+      "3": "That's the amount the discount removes (20 * 0.15), not what the customer actually pays.",
+      "18.5": "Re-trace the exact line inside the function body: return price * 0.85."
+    }
+  });
+
+  function normalizeExpr(s){ return s.trim().toLowerCase().replace(/\s+/g,""); }
+  const cupfeeBtn = document.getElementById("fn-cupfee-check");
+  const cupfeeInput = document.getElementById("fn-cupfee-input");
+  const cupfeeFb = document.getElementById("fn-cupfeefb");
+  K.Scoring.register("act-cupfee-fillcode", 1, "quiz");
+  let cupfeeAttempts = 0, cupfeeDone = false;
+  cupfeeBtn.addEventListener("click", function(){
+    if(cupfeeDone) return;
+    cupfeeAttempts++;
+    const val = normalizeExpr(cupfeeInput.value);
+    const ok = /^return\(?(price\+0?\.75|0?\.75\+price)\)?$/.test(val);
+    if(ok){
+      K.Scoring.award("act-cupfee-fillcode", cupfeeAttempts===1?1:0.5);
+      cupfeeFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      cupfeeFb.innerHTML = "<strong>Correct.</strong> <code>return price + 0.75</code> hands the new total back out of the function.";
+      cupfeeDone = true;
+    } else if(cupfeeAttempts >= 2){
+      K.Scoring.award("act-cupfee-fillcode", 0);
+      cupfeeFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      cupfeeFb.innerHTML = "<strong>The answer is:</strong> <code>return price + 0.75</code>";
+      cupfeeDone = true;
+    } else {
+      cupfeeFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      cupfeeFb.innerHTML = "<strong>Not quite.</strong> Start with the keyword that hands a value back, then add the fee to the parameter." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    cupfeeFb.setAttribute("tabindex","-1"); cupfeeFb.focus();
+  });
+
+  K.selectAll({
+    id: "act-greet-selectall",
+    boxSelector: ".fn-greet-box",
+    submitSelector: "#fn-greet-check",
+    feedbackSelector: "#fn-greetfb",
+    options: [
+      {value:"a", label:'Calling greet("Amir") prints "Hello, Amir" to the console.', correct:true,
+        explain:"print() runs no matter what — that line executes as soon as greet is called."},
+      {value:"b", label:'result ends up storing the string "Hello, Amir" so it can be reused later.', correct:false,
+        hint:"greet only calls print() — nothing in its body hands a value back with return.",
+        explain:"greet has no return statement, so it hands back nothing at all (Python fills in None automatically)."},
+      {value:"c", label:"print(result) outputs None, because greet never uses return.", correct:true,
+        explain:"With no return statement, result was set to None the moment greet finished running."},
+      {value:"d", label:"To make result actually equal \"Hello, Amir\", greet would need a return statement.", correct:true,
+        explain:'Swapping print("Hello, " + name) for return "Hello, " + name would let result actually capture that string.'}
+    ]
+  });
+
+  K.video({id:"act-video", elementId:"fn-video", videoId:"ZnBQfF5JFDM"});
+
+  K.freeResponse({id:"act-reflect", selector:"#fn-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#fn-scorechip"); });
+  K.Scoring.renderChip("#fn-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#fn-copy", onDone:function(ok){
+    document.getElementById("fn-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

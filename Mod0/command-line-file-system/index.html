@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Know Where You Are — Command Line Navigation &amp; File Systems</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:22rem;max-width:100%;font-family:var(--mlrk-font-code)}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>Know Where You Are</h1>
+<p class="mlrk-lead">In January 2015, Valve's own Steam client for Linux quietly deleted everything a user's account could touch — game saves, personal documents, sometimes an entire backup drive that happened to be mounted at the time. Nobody hacked anyone. A single line inside Steam's own uninstall script built a delete command out of a folder path, and the script never checked whether that path still pointed at a real, specific place before running it. This reading is about the exact skill that line was missing: always knowing precisely where you are in a file system, and exactly which path (absolute or relative) a command is about to act on.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~13 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. What actually happened</h2>
+<p>Steam's Linux client kept a variable called <code>STEAMROOT</code> pointing at the folder holding all of Steam's own files, computed each time the app launched by moving into that folder and asking the shell where it had landed. Deep in the uninstall/update logic sat a cleanup line built from that variable: something shaped like <code>rm -rf "$STEAMROOT/"*</code> — delete everything inside this folder. For almost everyone, that folder was a specific, harmless place.</p>
+<p>But if the step that computed <code>STEAMROOT</code> ever silently failed — for a small number of users, a broken folder shortcut (a symlink) made exactly that happen — the variable came back empty instead of a real path. The delete line still ran. With <code>STEAMROOT</code> empty, <code>"$STEAMROOT/"*</code> collapsed into <code>/*</code>: not "everything inside one folder," but "everything inside the root of the entire file system that this user account can reach." The script had no way to tell the difference between the two, because it never confirmed the actual, current, absolute path before acting on it.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 640 250" role="img" aria-labelledby="fsTreeTitle fsTreeDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="fsTreeTitle">A folder tree with the current location marked, and its absolute path called out</title>
+  <desc id="fsTreeDesc">Starting at the home folder fellow, which contains notes.txt and a projects folder. Inside projects is weather-app, highlighted as the current working directory. Weather-app contains README.md, a src folder holding main.py, and a tests folder holding test_main.py. A callout box gives the absolute path to the current location as slash home slash fellow slash projects slash weather-app — the same location no matter which folder you started navigating from.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="8" y="10" width="352" height="222" rx="12" fill="#FFFFFF" stroke="#CFD9E3" stroke-width="2"/>
+    <g font-family="Menlo, Consolas, monospace" font-size="14" fill="#261F1D" xml:space="preserve">
+      <text x="24" y="34">fellow/</text>
+      <text x="24" y="56">├── notes.txt</text>
+      <text x="24" y="78">└── projects/</text>
+      <rect x="18" y="88" width="220" height="22" rx="4" fill="#A6C2B4" stroke="#264326" stroke-width="1.5"/>
+      <text x="24" y="100">    └── weather-app/</text>
+      <text x="24" y="122">        ├── README.md</text>
+      <text x="24" y="144">        ├── src/</text>
+      <text x="24" y="166">        │   └── main.py</text>
+      <text x="24" y="188">        └── tests/</text>
+      <text x="24" y="210">            └── test_main.py</text>
+    </g>
+    <polygon points="360,99 388,88 388,110" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <rect x="388" y="60" width="234" height="78" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="400" y="82" font-size="14" font-weight="700" fill="#261F1D">You are here</text>
+    <text x="400" y="102" font-size="12" fill="#261F1D">Absolute path:</text>
+    <text x="400" y="120" font-family="Menlo, Consolas, monospace" font-size="12" fill="#2F5A8B">/home/fellow/projects/</text>
+    <text x="400" y="134" font-family="Menlo, Consolas, monospace" font-size="12" fill="#2F5A8B">weather-app</text>
+  </g>
+</svg>
+
+<p>That absolute path — <code>/home/fellow/projects/weather-app</code> — means the same exact folder no matter what folder you happened to be sitting in when you typed it, because it's traced all the way from the root, <code>/</code>. A relative path like <code>src/main.py</code> only means something once you already know where "here" is. The Steam bug is what happens when code silently loses track of "here" and acts anyway.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>absolute path</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Absolute path</strong><br>A full path starting from the root of the file system (a leading <code>/</code>), like <code>/home/fellow/projects/weather-app</code>. It means the same location no matter what your current folder is.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>relative path</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Relative path</strong><br>A path written from wherever you currently are, no leading <code>/</code> — like <code>src/main.py</code> or <code>../notes.txt</code>. The exact same relative path can point at a different file depending on your current folder.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>working directory</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Current working directory (cwd)</strong><br>The one folder you're "standing in" right now. <code>pwd</code> (print working directory) prints its absolute path.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>root directory</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Root directory (<code>/</code>)</strong><br>The single top-level folder that every other folder on the system lives inside, directly or nested many levels deep.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>parent directory</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Parent directory (<code>..</code>)</strong><br>The folder exactly one level up from wherever you are. <code>cd ..</code> always moves up one level, whatever that level currently is.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. The five commands that run everything</h2>
+<p>Everything above comes down to five commands. <code>pwd</code> prints your current absolute path — the honest answer to "where am I, exactly," the thing Steam's script never actually asked. <code>ls</code> lists what's in the current folder (or a folder you name). <code>cd &lt;folder&gt;</code> moves into a folder — a relative name moves relative to where you are, a path starting with <code>/</code> moves to that absolute location regardless of where you started. <code>mkdir &lt;name&gt;</code> creates a new folder inside the current one. <code>touch &lt;name&gt;</code> creates a new, empty file inside the current one.</p>
+<p>Below is a simulated shell that starts inside <code>/home/fellow/projects</code> — an empty projects folder, next to a home folder that already has one leftover file in it. Build out the <code>weather-app</code> project shown in the diagram above, one command at a time.</p>
+<div class="mlrk-terminal" id="cli-terminal">
+  <div class="mlrk-terminal-log" aria-live="polite"></div>
+  <div class="mlrk-terminal-row"><span class="mlrk-terminal-prompt"></span><input class="mlrk-terminal-input" type="text" aria-label="Terminal input" autocomplete="off" spellcheck="false"></div>
+</div>
+<p class="mlrk-small">Try, in order: <code>pwd</code>, <code>ls</code>, <code>mkdir weather-app</code>, <code>cd weather-app</code>, <code>mkdir src</code>, <code>mkdir tests</code>, <code>touch README.md</code>, <code>cd src</code>, <code>touch main.py</code>, <code>cd ..</code>, <code>pwd</code>.</p>
+
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p><code>mkdir</code> makes the folder, but you still have to <code>cd</code> into it afterward before anything you build next lands inside it instead of next to it.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Quick check: predict the output</h2>
+<p>Say you're inside <code>/home/fellow/projects/weather-app/src</code> — one level deeper than the terminal above ever takes you, but the same tree as the diagram in section 1. You run <code>cd ..</code>, then <code>ls</code>.</p>
+<div class="mlrk-card" id="cli-predict-quiz">
+<button type="button" class="mlrk-choice" data-a="a">README.md, src, tests</button>
+<button type="button" class="mlrk-choice" data-a="b">main.py</button>
+<button type="button" class="mlrk-choice" data-a="c">notes.txt, projects</button>
+<button type="button" class="mlrk-choice" data-a="d">weather-app</button>
+<div id="cli-predict-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p><code>cd ..</code> moves up exactly one level from <code>src</code>. Which folder is that, and what does the diagram in section 1 say lives inside it?</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Watch: the core commands in under 5 minutes</h2>
+<div class="mlrk-video-wrap"><div id="cli-video"></div></div>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=Z6LN5JjFNuw" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>Watch for the same pattern from section 3: <code>pwd</code> to confirm the current absolute path, <code>ls</code> to see what's actually there, then <code>mkdir</code>/<code>touch</code> to build something new — always checked, never assumed.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>6. One more check: absolute path practice</h2>
+<p>Using the diagram in section 1, type the full absolute path to <code>test_main.py</code> — starting from the root, <code>/</code>.</p>
+<div class="mlrk-card">
+<div class="mlrk-fillblank"><input type="text" id="cli-abspath-input" autocomplete="off" placeholder="e.g. /home/fellow/..."> <button type="button" class="mlrk-btn" id="cli-abspath-check">Check</button></div>
+<div id="cli-abspathfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary &amp; reflection</h2>
+<p>A file system is a tree: one root, folders branching off it, files and more folders branching off those. <code>pwd</code> tells you exactly where you are in that tree right now. <code>ls</code> tells you what's actually around you before you act. <code>cd</code> moves you through it — relative to where you stand, or by absolute path regardless of where you stand. <code>mkdir</code> and <code>touch</code> build new branches and leaves. The Steam bug happened because one script skipped the first two and trusted a path it never confirmed.</p>
+<label for="cli-reflect"><strong>In 2–3 sentences:</strong> now that you've practiced building out a real folder structure by hand, what's one habit — checking <code>pwd</code>, running <code>ls</code> before a command that changes anything, something else — you'd want to build into your own command-line work to avoid a mistake like Steam's?</label>
+<textarea id="cli-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="cli-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="cli-copy">Copy Plain Text Answers</button>
+<p id="cli-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "cli-file-system-reading";
+  const TITLE = "Know Where You Are — Command Line Navigation & File Systems";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.terminal("#cli-terminal", {
+    id:"act-terminal",
+    startPath:"/home/fellow/projects",
+    minCommands:6,
+    filesystem:{
+      "/home/fellow":{type:"dir", children:["notes.txt","projects"]},
+      "/home/fellow/notes.txt":{type:"file", contents:"remember to write a README before pushing anything public"},
+      "/home/fellow/projects":{type:"dir", children:[]}
+    },
+    commands:{
+      mkdir(args, state){
+        if(!args[0]) return "mkdir: missing operand";
+        const path = state.cwd + "/" + args[0];
+        if(state.fs[path]) return "mkdir: cannot create directory '"+args[0]+"': File exists";
+        state.fs[path] = {type:"dir", children:[]};
+        state.fs[state.cwd].children.push(args[0]);
+        return "";
+      },
+      touch(args, state){
+        if(!args[0]) return "touch: missing operand";
+        const path = state.cwd + "/" + args[0];
+        if(!state.fs[path]){
+          state.fs[path] = {type:"file", contents:""};
+          state.fs[state.cwd].children.push(args[0]);
+        }
+        return "";
+      }
+    }
+  });
+
+  K.quiz({
+    id:"act-predict-output",
+    buttonSelector:"#cli-predict-quiz .mlrk-choice",
+    feedbackSelector:"#cli-predict-fb",
+    correct:"a",
+    maxAttempts:2,
+    feedback:{
+      a:"That's the contents of weather-app — README.md, src, and tests — which is exactly one level up from src.",
+      b:"main.py is what ls shows while you're still inside src, before the cd .. moves you up.",
+      c:"notes.txt and projects live one level further up, inside fellow — that's two cd .. moves from src, not one.",
+      d:"weather-app itself is the name you'd see if you were sitting inside projects, one level above where cd .. actually lands you."
+    }
+  });
+
+  const abspathBtn = document.getElementById("cli-abspath-check");
+  const abspathInput = document.getElementById("cli-abspath-input");
+  const abspathFb = document.getElementById("cli-abspathfb");
+  const ANSWER = "/home/fellow/projects/weather-app/tests/test_main.py";
+  K.Scoring.register("act-abspath-fillblank", 1, "quiz");
+  let abspathAttempts = 0, abspathDone = false;
+  abspathBtn.addEventListener("click", function(){
+    if(abspathDone) return;
+    abspathAttempts++;
+    const val = abspathInput.value.trim().replace(/\/+$/,"");
+    const ok = val === ANSWER;
+    if(ok){
+      K.Scoring.award("act-abspath-fillblank", abspathAttempts===1?1:0.5);
+      abspathFb.className="mlrk-feedback mlrk-show mlrk-good";
+      abspathFb.innerHTML="<strong>Correct.</strong> Traced all the way from the root, that's the one path that always points at this exact file.";
+      abspathDone = true;
+    } else if(abspathAttempts>=2){
+      K.Scoring.award("act-abspath-fillblank", 0);
+      abspathFb.className="mlrk-feedback mlrk-show mlrk-reveal";
+      abspathFb.innerHTML="<strong>The answer is:</strong> <code>"+ANSWER+"</code>";
+      abspathDone = true;
+    } else {
+      abspathFb.className="mlrk-feedback mlrk-show mlrk-bad";
+      abspathFb.innerHTML="<strong>Not quite.</strong> Start from the root <code>/</code> and follow every folder in the diagram down to the file, one slash at a time.";
+    }
+    abspathFb.setAttribute("tabindex","-1"); abspathFb.focus();
+  });
+
+  K.video({id:"act-video", elementId:"cli-video", videoId:"Z6LN5JjFNuw"});
+
+  K.freeResponse({id:"act-reflect", selector:"#cli-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#cli-scorechip"); });
+  K.Scoring.renderChip("#cli-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#cli-copy", onDone:function(ok){
+    document.getElementById("cli-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>
