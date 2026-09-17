@@ -17,7 +17,6 @@
 <header class="mlrk-header"><div class="mlrk-wrap">
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>The Exception Nobody Caught</h1>
-<p class="mlrk-lead">On June 12, 2025, a single blank field inside a routine configuration update crashed Google Cloud's Service Control, the internal system that checks every incoming API request for identity, permissions, and quota before letting it through to any Google Cloud service. Within seconds of the bad update reaching Google's globally-synced database, every regional copy of Service Control hit the same unhandled exception and crashed into a loop, taking down Gmail, Spotify, Discord, Snapchat, and dozens of other services built on Google Cloud for roughly three hours. Google's own incident report traces the entire outage back to one specific, avoidable gap in the code: a path that could fail on unexpected data, with nothing written to catch that failure before it reached the point of no return. This reading is about the Python tool built to close exactly that gap, catching one named, expected kind of failure with <code>try</code>/<code>except</code>, and why writing <code>except:</code> with nothing after it is its own kind of trap.</p>
 <div class="mlrk-meta">
   <span class="mlrk-pill">~14 minutes</span>
   <span class="mlrk-pill">Interactive</span>

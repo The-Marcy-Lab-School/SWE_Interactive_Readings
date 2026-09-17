@@ -19,7 +19,6 @@
 <header class="mlrk-header"><div class="mlrk-wrap">
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>Don't Reach Past the Teller</h1>
-<p class="mlrk-lead">PocketVault, a fictional personal-banking app, built its <code>BankAccount</code> class around one rule it exists to guarantee: a balance can never go negative. The class's own <code>withdraw()</code> method checks for that before it changes anything — but Python never actually stops other code from reaching straight past that method and changing the balance directly. When a payout script did exactly that last quarter, skipping the check entirely, several accounts went negative overnight. This reading is about the one naming habit, and the one code habit, that keep a class in control of its own state no matter what code is calling it.</p>
 <div class="mlrk-meta">
   <span class="mlrk-pill">~12 minutes</span>
   <span class="mlrk-pill">Interactive</span>

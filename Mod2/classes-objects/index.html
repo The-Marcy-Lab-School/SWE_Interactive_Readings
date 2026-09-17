@@ -21,7 +21,6 @@
 <header class="mlrk-header"><div class="mlrk-wrap">
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>The Fare That Went to the Wrong Ride</h1>
-<p class="mlrk-lead">Nimbus Rides, a small ride-share startup, dispatches drivers using a Python script that tracks whatever ride is currently active with a handful of plain variables: <code>rider</code>, <code>pickup</code>, <code>fare</code>. That worked fine when a driver only ever had one ride going at a time. Then Nimbus added a feature letting a driver accept a second pickup while the first ride was still finishing up — and the script, which had never expected two rides to exist at once, started overwriting ride #1's variables with ride #2's before ride #1 ever got billed. The fix wasn't a smarter variable name. It was giving every ride its own independent bundle of data — a Python <strong>class</strong>.</p>
 <div class="mlrk-meta">
   <span class="mlrk-pill">~13 minutes</span>
   <span class="mlrk-pill">Interactive</span>
