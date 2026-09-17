@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Loop That Never Stopped — for and while Loops in Python</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+.mlrk-snippet{display:block;border:2px solid var(--mlrk-gray-400);border-radius:12px;padding:.7rem;cursor:pointer}
+.mlrk-snippet:hover{border-color:var(--mlrk-bg-brand-deep)}
+.mlrk-snippet input{margin-right:.5rem;transform:translateY(1px)}
+.mlrk-snippet .mlrk-code{margin-top:.5rem}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The Loop That Never Stopped</h1>
+<p class="mlrk-lead">On August 1, 2012, a piece of dormant code inside Knight Capital Group's trading system woke up and started sending thousands of stock orders every second, buying high and selling low again and again, for forty-five straight minutes, before a person finally killed the process. The company lost $460 million before lunch. The mechanism behind it traces back to something every Python beginner meets in their first few weeks: a repeating action whose stop condition never changed, so the repeating never stopped on its own. This reading is about telling <code>for</code> and <code>while</code> loops apart, and building the one habit that keeps a <code>while</code> loop from turning into Knight Capital's forty-five minutes.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~14 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. A trading system that couldn't stop repeating itself</h2>
+<p>On July 27, 2012, Knight Capital rolled out new trading software to eight servers that handled its automated order routing. Copying the new code onto all eight machines was supposed to be routine. One technician missed a server. That eighth machine kept running an old, retired piece of logic called "Power Peg" — code Knight had stopped using years earlier and assumed was gone for good.</p>
+<p>On August 1, new orders from Knight's Retail Liquidity Program carried a flag value that, on the seven correctly-updated servers, meant "handle this the new way." On the eighth server, that same flag value woke Power Peg back up. Power Peg's whole job, back when it was actively used, was to keep sending buy or sell orders for a stock until a running count of shares already filled told it to stop. In 2005, Knight had moved that counting logic to an earlier point in the code and never re-tested Power Peg against the change. By 2012, on that one server, the count Power Peg checked no longer reflected how many shares had actually gone through — so the condition that was supposed to eventually say "stop, you're done" never said it.</p>
+<p>For forty-five minutes, that server kept sending new orders for 212 incoming customer trades without regard to what had already executed — about 4 million trades in total, repeatedly buying high and selling low in over a hundred stocks. Nothing in the code itself was ever going to stop it; a person had to notice and shut the server down by hand. Knight lost $460 million and very nearly collapsed as a company. The SEC later fined it $12 million for the failure.</p>
+<p class="mlrk-small">Source: the U.S. Securities and Exchange Commission's 2013 administrative order against Knight Capital, retold in detail in <a href="https://dougseven.com/2014/04/17/knightmare-a-devops-cautionary-tale/" target="_blank" rel="noopener">Doug Seven, "Knightmare: A DevOps Cautionary Tale," 2014</a>.</p>
+<p>Strip away the trading-floor specifics and the shape of the bug is exactly the shape of a mistake every Python beginner runs into at some point: a loop that's supposed to run until a condition becomes false, with no working way for that condition to ever actually become false. Knight's version involved a badly-retested, decade-old counting function. The beginner's version is almost always simpler: a single line, forgotten inside the loop body, that was supposed to update the one variable the loop's own condition depends on. That's what the rest of this reading is about.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>iterable</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Iterable</strong><br>A collection Python can go through one item at a time: a list, a string, a range of numbers, the lines of a file. <code>for</code> loops are built to walk through iterables.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>for loop</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>for loop</strong><br>Repeats a block of code once for each item in a known, iterable sequence. It stops automatically the moment the sequence runs out — no counting required.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>while loop</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>while loop</strong><br>Repeats a block of code for as long as a condition stays True. Python checks that condition again before every single pass, including the very first one.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>loop condition</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Loop condition</strong><br>The True/False test a <code>while</code> loop checks before each pass, like <code>queue_size &gt; 0</code>. Something inside the loop body has to change the outcome of this test, or the loop never ends on its own.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>infinite loop</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Infinite loop</strong><br>A <code>while</code> loop whose condition never becomes False, so it keeps repeating until something outside the program — a crash, a timeout, or a person — stops it.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. for loops vs. while loops</h2>
+<p>Use a <code>for</code> loop when you already know the full set of things you're repeating over — a list of order IDs, a range of page numbers, every character in a string:</p>
+<div class="mlrk-code"><div class="mlrk-screen">orders = ["A-101", "A-102", "A-103"]
+for order_id in orders:
+    ship(order_id)</div></div>
+<p>Python walks the list <code>orders</code> once per item, in order, and stops automatically the moment the list runs out. There's no manual counting, and no way to accidentally skip the stop — running out of items to walk through <em>is</em> the stop.</p>
+
+<p>Use a <code>while</code> loop when you don't know in advance how many times you'll repeat, only the condition that should eventually end it:</p>
+<div class="mlrk-code"><div class="mlrk-screen">queue_size = 3
+while queue_size > 0:
+    process_next_order()
+    queue_size -= 1</div></div>
+<p>Before every single pass, including the first one, Python re-checks <code>queue_size &gt; 0</code>. The loop only ends once that check comes back False — and that only happens if something inside the loop body actually changes <code>queue_size</code>. Picture the same code with that one line, <code>queue_size -= 1</code>, deleted. Nothing else in the loop would change. Keep that picture in mind for the diagram and the step-through below.</p>
+
+
+<svg class="mlrk-illustration" viewBox="0 0 640 300" role="img" aria-labelledby="loopCmpTitle loopCmpDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="loopCmpTitle">Three loop shapes, compared by whether they can stop themselves</title>
+  <desc id="loopCmpDesc">A for loop walks a known list and always stops on its own once the list runs out. A while loop that updates its condition variable inside the body also stops on its own. A while loop that never updates that variable checks the same condition forever and never stops without outside help.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="15" y="20" width="180" height="240" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="105" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">for loop</text>
+    <text x="105" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Walks a known list</text>
+    <text x="105" y="128" text-anchor="middle" font-size="12" fill="#261F1D">one item at a time</text>
+    <text x="105" y="146" text-anchor="middle" font-size="12" fill="#261F1D">Stops itself the</text>
+    <text x="105" y="164" text-anchor="middle" font-size="12" fill="#261F1D">moment it runs out</text>
+    <text x="105" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#264326">Always finite</text>
+
+    <rect x="230" y="20" width="180" height="240" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="320" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">while (updated)</text>
+    <text x="320" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Checks queue_size</text>
+    <text x="320" y="128" text-anchor="middle" font-size="12" fill="#261F1D">before every pass</text>
+    <text x="320" y="146" text-anchor="middle" font-size="12" fill="#261F1D">The body updates</text>
+    <text x="320" y="164" text-anchor="middle" font-size="12" fill="#261F1D">queue_size each time</text>
+    <text x="320" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#2274B5">Finite, if updated</text>
+
+    <rect x="445" y="20" width="180" height="240" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="535" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">while (buggy)</text>
+    <text x="535" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Checks queue_size</text>
+    <text x="535" y="128" text-anchor="middle" font-size="12" fill="#261F1D">before every pass</text>
+    <text x="535" y="146" text-anchor="middle" font-size="12" fill="#261F1D">But nothing inside</text>
+    <text x="535" y="164" text-anchor="middle" font-size="12" fill="#261F1D">ever changes it</text>
+    <text x="535" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#C92929">Runs forever</text>
+  </g>
+</svg>
+
+<p><strong>Trace it, line by line:</strong> step through the loop above one pass at a time, then step through the same code with its update line missing.</p>
+<div class="mlrk-card"><div id="loop-trace"></div></div>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Watch: for vs. while, when to use each</h2>
+<div class="mlrk-video-wrap"><div id="loop-video"></div></div>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=3IMHXlyulO8" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>As you watch, notice that the video's own rule of thumb, a <code>for</code> loop for a finite collection and a <code>while</code> loop for a condition you can't count out in advance, is exactly what section 3 above just walked through.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Practice: spot the infinite loop</h2>
+<p>Each snippet below is a complete <code>while</code> loop. Some of them will run forever. Select every one that will.</p>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>For each snippet, find the line that's supposed to change the condition's variable. Then check: does it actually run every pass, and does it change the <em>right</em> variable?</p>
+</details>
+<div class="mlrk-grid" style="margin-top:1rem">
+<label class="mlrk-snippet"><input type="checkbox" class="loop-spot-box" value="a">Snippet A
+<div class="mlrk-code"><div class="mlrk-screen">tickets = 5
+while tickets > 0:
+    sell_ticket()</div></div>
+</label>
+<label class="mlrk-snippet"><input type="checkbox" class="loop-spot-box" value="b">Snippet B
+<div class="mlrk-code"><div class="mlrk-screen">tickets = 5
+while tickets > 0:
+    sell_ticket()
+    tickets -= 1</div></div>
+</label>
+<label class="mlrk-snippet"><input type="checkbox" class="loop-spot-box" value="c">Snippet C
+<div class="mlrk-code"><div class="mlrk-screen">attempts = 0
+while attempts < 3:
+    retry_connection()
+    success = True</div></div>
+</label>
+<label class="mlrk-snippet"><input type="checkbox" class="loop-spot-box" value="d">Snippet D
+<div class="mlrk-code"><div class="mlrk-screen">balance = 100
+while balance > 0:
+    balance -= 20
+    print(balance)</div></div>
+</label>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="loop-spot-submit">Check my answers</button></div>
+<div id="loop-spot-fb" class="mlrk-feedback" tabindex="-1"></div>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
+<p>A <code>for</code> loop is for something you can count out in advance: a list, a range, a string's characters. A <code>while</code> loop is for something that depends on a condition changing while the program runs, and it only stops if the code inside its body actually changes that condition. Forgetting that one update is a small, easy mistake, and it happens to beginners and to Wall Street trading systems alike.</p>
+<label for="loop-reflect"><strong>In 2–3 sentences:</strong> pick one <code>while</code> loop you could imagine writing for a real project. What's the one line you'd double-check for, every time, so it doesn't turn into another version of Knight Capital's forty-five minutes?</label>
+<textarea id="loop-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="loop-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="loop-copy">Copy Plain Text Answers</button>
+<p id="loop-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "loops-for-while-reading";
+  const TITLE = "The Loop That Never Stopped — for and while Loops in Python";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.traceStepper("#loop-trace", {
+    steps: [
+      {cell:"queue_size = 3", line:"queue_size is set to 3 before the loop starts."},
+      {cell:"lap 1: 3 > 0? True", line:"while queue_size > 0 checks 3 > 0. That's True, so the body runs: process_next_order() runs, then queue_size -= 1 sets queue_size to 2."},
+      {cell:"lap 2: 2 > 0? True", line:"queue_size is now 2. 2 > 0 is True, so the body runs again and queue_size -= 1 sets it to 1."},
+      {cell:"lap 3: 1 > 0? True", line:"queue_size is now 1. 1 > 0 is True, so the body runs once more and queue_size -= 1 sets it to 0."},
+      {cell:"check: 0 > 0? False", line:"queue_size is now 0. 0 > 0 is False, so Python skips the body and moves past the loop. Three laps happened because queue_size actually reached the value that made the check False."},
+      {cell:"bug: no update line", line:"Now picture the same code with queue_size -= 1 deleted. Lap 1 still runs process_next_order(), but queue_size is still 3 right after, because nothing changed it."},
+      {cell:"lap 2 (buggy): 3 > 0? True", line:"Python checks queue_size > 0 again. queue_size is still 3, so it's still True. process_next_order() runs a second time, for the exact same reason as the first."},
+      {cell:"lap 3 (buggy): 3 > 0? True", line:"queue_size is still 3. Still True. Still running. No line in this version of the loop will ever make queue_size anything other than 3."},
+      {cell:"no natural stop", line:"That's the whole bug: laps keep happening until something outside the loop stops them. In Knight Capital's case, that something was a person shutting the server down by hand, forty-five minutes and $460 million later."}
+    ]
+  });
+
+  K.video({id:"act-video", elementId:"loop-video", videoId:"3IMHXlyulO8"});
+
+  K.selectAll({
+    id: "act-spot-infinite",
+    boxSelector: ".loop-spot-box",
+    submitSelector: "#loop-spot-submit",
+    feedbackSelector: "#loop-spot-fb",
+    maxAttempts: 2,
+    options: [
+      {value:"a", label:"Snippet A (tickets, no update line)", correct:true,
+        hint:"Look for the line that's supposed to change tickets. Is there one anywhere in this body?",
+        explain:"There's no line that changes tickets anywhere in the loop, so tickets > 0 checks True every single pass. This runs forever."},
+      {value:"b", label:"Snippet B (tickets, with tickets -= 1)", correct:false,
+        hint:"Compare this one to Snippet A line by line. What's different?",
+        explain:"tickets -= 1 runs every pass, so tickets eventually reaches 0 and the check goes False. This stops after 5 passes."},
+      {value:"c", label:"Snippet C (attempts, updates success instead)", correct:true,
+        hint:"A line does run every pass here. Check exactly which variable it changes, and compare that to the condition.",
+        explain:"success gets updated every pass, but the condition checks attempts, which never changes from 0. attempts < 3 stays True forever."},
+      {value:"d", label:"Snippet D (balance, counts down by 20)", correct:false,
+        hint:"Walk through what balance equals after each pass. Does it ever reach 0?",
+        explain:"balance drops by 20 every pass: 80, 60, 40, 20, 0. balance > 0 goes False right when balance hits 0, so this stops after 5 passes."}
+    ]
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#loop-reflect", minWords:12});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#loop-scorechip"); });
+  K.Scoring.renderChip("#loop-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#loop-copy", onDone:function(ok){
+    document.getElementById("loop-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

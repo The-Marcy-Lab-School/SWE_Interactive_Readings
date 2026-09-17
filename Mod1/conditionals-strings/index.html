@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>When "Yes" Doesn't Mean Yes</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:680px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:14rem;font-family:var(--mlrk-font-code)}
+.cs-fillblank-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+.cs-fillblank-row label{font-family:var(--mlrk-font-code);font-size:.95rem}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>When "Yes" Doesn't Mean Yes</h1>
+<p class="mlrk-lead">Picture a two-person team building DeskBot: a tiny command-line assistant for their campus help desk that reads whatever a student types, decides what to do next with <code>if</code>/<code>elif</code>/<code>else</code>, and asks a yes/no question before opening a ticket. In the demo, typing exactly <code>yes</code> works perfectly. Within an hour of turning it loose on real students, half of them are typing <code>Yes</code>, <code>YES!</code>, or <code>&nbsp; yes</code> with a stray space left over from autocomplete, and DeskBot treats every single one of them as gibberish. This reading is about why raw text typed by a real person almost never arrives in the exact shape your code expects, and the small set of string methods that clean it up before a single <code>if</code> ever runs.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~11 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. A bug that only shows up with real people</h2>
+<p>Here is the first version of DeskBot's confirmation step, exactly as the team wrote it:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">answer = input("Open a ticket for this? (yes/no): ")
+if answer == "yes":
+    print("Ticket opened.")
+elif answer == "no":
+    print("Cancelled.")
+else:
+    print("Sorry, I didn't understand that.")</pre></div>
+<p>It works every time the person typing is the person who wrote it, because that person always types <code>yes</code> in lowercase with nothing extra, since they already know exactly what the code is checking for. A real student might hit the spacebar by accident before typing, capitalize the first letter out of habit, or add an exclamation point for emphasis. Every one of <code>"&nbsp; yes"</code>, <code>"Yes"</code>, <code>"YES"</code>, and <code>"yes!"</code> is obviously a "yes" to a human reading it. To Python, comparing two strings with <code>==</code> checks for an exact match, character for character &mdash; so none of those equal the literal text <code>"yes"</code>, and every single one falls straight through to the <code>else</code> branch. DeskBot ends up telling a room full of students who answered perfectly reasonably that it doesn't understand them.</p>
+<p>The fix isn't a smarter <code>if</code> statement. It's cleaning the text up <strong>before</strong> the <code>if</code> statement ever looks at it.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid" id="cs-flipcards">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>if / elif / else</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>if / elif / else chain</strong><br>Python checks each condition top to bottom and runs the first branch that matches. If none of them match, <code>else</code> runs as the fallback. Only one branch in the chain ever runs.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>.strip()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>.strip()</strong><br>Returns a copy of a string with leading and trailing whitespace removed. <code>"&nbsp; yes ".strip()</code> produces <code>"yes"</code>. It doesn't touch spaces in the middle of the text.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>.lower()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>.lower()</strong><br>Returns a copy of a string with every letter converted to lowercase. <code>"YES".lower()</code> produces <code>"yes"</code>, so capitalization stops mattering for a comparison.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>.startswith()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>.startswith()</strong><br>Checks whether a string begins with a specific piece of text and returns <code>True</code> or <code>False</code>. <code>"help me".startswith("help")</code> is <code>True</code>, even though the two strings aren't identical.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>in</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>in</strong><br>Checks whether one piece of text appears anywhere inside another and returns <code>True</code> or <code>False</code>. <code>"refund" in "i need a refund please"</code> is <code>True</code>, even though <code>"refund"</code> isn't the whole string.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Cleaning input before comparing it</h2>
+<p>The standard fix is to normalize the text first: call <code>.strip()</code> to drop stray whitespace, then <code>.lower()</code> to make capitalization stop mattering, and only compare the result. Both methods return a brand-new string rather than changing the original, so they can be chained back-to-back on the same line: <code>raw.strip().lower()</code>.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 650 400" role="img" aria-labelledby="csDiagTitle csDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="csDiagTitle">Comparing input with and without normalizing it first</title>
+  <desc id="csDiagDesc">The same raw input, two spaces then "Yes" then a trailing space, run through two different paths. In the top path, step 2 calls .strip() to remove the extra spaces and step 3 calls .lower() to make the text lowercase, so step 4's if check for "yes" matches and the correct branch runs: Ticket opened. In the bottom path, .strip() and .lower() are never called, so step 3's if check compares the raw text exactly as typed, it does not match "yes", and step 4 falls through to the wrong branch: Sorry, I didn't understand that.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="10" y="20" font-size="14" font-weight="700" fill="#264326">With .strip().lower() first</text>
+
+    <rect x="10" y="33" width="140" height="140" rx="10" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="18" y="55" font-size="12" font-weight="700" fill="#261F1D">1  Raw input</text>
+    <text x="18" y="75" font-size="11" fill="#261F1D">input() returns:</text>
+    <text x="18" y="91" font-size="11" fill="#261F1D">"  Yes "</text>
+    <text x="18" y="107" font-size="11" fill="#261F1D">(extra spaces,</text>
+    <text x="18" y="123" font-size="11" fill="#261F1D">capital Y)</text>
+
+    <line x1="150" y1="103" x2="165" y2="103" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="165" y="33" width="140" height="140" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="173" y="55" font-size="12" font-weight="700" fill="#261F1D">2  .strip()</text>
+    <text x="173" y="75" font-size="11" fill="#261F1D">removes the</text>
+    <text x="173" y="91" font-size="11" fill="#261F1D">leading/trailing</text>
+    <text x="173" y="107" font-size="11" fill="#261F1D">spaces</text>
+    <text x="173" y="123" font-size="11" fill="#261F1D">result: "Yes"</text>
+
+    <line x1="305" y1="103" x2="320" y2="103" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="320" y="33" width="140" height="140" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="328" y="55" font-size="12" font-weight="700" fill="#261F1D">3  .lower()</text>
+    <text x="328" y="75" font-size="11" fill="#261F1D">makes every</text>
+    <text x="328" y="91" font-size="11" fill="#261F1D">letter lowercase</text>
+    <text x="328" y="107" font-size="11" fill="#261F1D">result: "yes"</text>
+
+    <line x1="460" y1="103" x2="475" y2="103" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="475" y="33" width="140" height="140" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="483" y="55" font-size="12" font-weight="700" fill="#261F1D">4  if check</text>
+    <text x="483" y="75" font-size="11" fill="#261F1D">"yes" == "yes"</text>
+    <text x="483" y="91" font-size="11" fill="#261F1D">matches</text>
+    <text x="483" y="111" font-size="11" font-weight="700" fill="#264326">Correct branch:</text>
+    <text x="483" y="127" font-size="11" font-weight="700" fill="#264326">"Ticket opened."</text>
+
+    <text x="10" y="198" font-size="14" font-weight="700" fill="#C92929">Skipping .strip().lower()</text>
+
+    <rect x="10" y="211" width="140" height="140" rx="10" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="18" y="233" font-size="12" font-weight="700" fill="#261F1D">1  Raw input</text>
+    <text x="18" y="253" font-size="11" fill="#261F1D">input() returns:</text>
+    <text x="18" y="269" font-size="11" fill="#261F1D">"  Yes "</text>
+    <text x="18" y="285" font-size="11" fill="#261F1D">(extra spaces,</text>
+    <text x="18" y="301" font-size="11" fill="#261F1D">capital Y)</text>
+
+    <line x1="150" y1="281" x2="165" y2="281" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="165" y="211" width="140" height="140" rx="10" fill="#E4E7EB" stroke="#B3BBB0" stroke-width="2" stroke-dasharray="5,4"/>
+    <text x="173" y="233" font-size="12" font-weight="700" fill="#261F1D">2  no cleanup</text>
+    <text x="173" y="253" font-size="11" fill="#261F1D">.strip()/.lower()</text>
+    <text x="173" y="269" font-size="11" fill="#261F1D">never called</text>
+    <text x="173" y="285" font-size="11" fill="#261F1D">text stays exactly</text>
+    <text x="173" y="301" font-size="11" fill="#261F1D">as typed</text>
+
+    <line x1="305" y1="281" x2="320" y2="281" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="320" y="211" width="140" height="140" rx="10" fill="#FFEECA" stroke="#83671C" stroke-width="2"/>
+    <text x="328" y="233" font-size="12" font-weight="700" fill="#261F1D">3  if check</text>
+    <text x="328" y="253" font-size="11" fill="#261F1D">"  Yes " == "yes"</text>
+    <text x="328" y="269" font-size="11" fill="#261F1D">not equal</text>
+    <text x="328" y="285" font-size="11" fill="#261F1D">no match</text>
+
+    <line x1="460" y1="281" x2="475" y2="281" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="475" y="211" width="140" height="140" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="483" y="233" font-size="12" font-weight="700" fill="#261F1D">4  else</text>
+    <text x="483" y="253" font-size="11" fill="#261F1D">falls through</text>
+    <text x="483" y="273" font-size="11" font-weight="700" fill="#C92929">Wrong branch:</text>
+    <text x="483" y="289" font-size="11" font-weight="700" fill="#C92929">"Sorry, I didn't</text>
+    <text x="483" y="305" font-size="11" font-weight="700" fill="#C92929">understand that."</text>
+  </g>
+</svg>
+
+<p>Here's DeskBot's fixed version:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">def handle_answer(raw):
+    answer = raw.strip().lower()
+    if answer == "yes":
+        return "Ticket opened."
+    elif answer == "no":
+        return "Cancelled."
+    else:
+        return "Sorry, I didn't understand that."</pre></div>
+<p>Notice what normalizing does and doesn't fix. It makes inputs that are equivalent, differing only in spacing or capitalization, compare as equal. It does not make every input valid &mdash; typing something that isn't "yes" or "no" at all still falls to <code>else</code>, exactly as it should.</p>
+
+<div class="mlrk-card">
+<p><strong>Predict the branch:</strong> for each raw input below, work out what <code>handle_answer</code> returns before you click an answer.</p>
+
+<p style="margin-top:1rem"><strong>1.</strong> <code>handle_answer("  Yes ")</code> returns:</p>
+<div id="cs-predict1-choices">
+<button type="button" class="mlrk-choice" data-a="opened">"Ticket opened."</button>
+<button type="button" class="mlrk-choice" data-a="cancelled">"Cancelled."</button>
+<button type="button" class="mlrk-choice" data-a="sorry">"Sorry, I didn't understand that."</button>
+</div>
+<div id="cs-predict1-fb" class="mlrk-feedback" tabindex="-1"></div>
+
+<p style="margin-top:1.4rem"><strong>2.</strong> <code>handle_answer("NO")</code> returns:</p>
+<div id="cs-predict2-choices">
+<button type="button" class="mlrk-choice" data-a="opened">"Ticket opened."</button>
+<button type="button" class="mlrk-choice" data-a="cancelled">"Cancelled."</button>
+<button type="button" class="mlrk-choice" data-a="sorry">"Sorry, I didn't understand that."</button>
+</div>
+<div id="cs-predict2-fb" class="mlrk-feedback" tabindex="-1"></div>
+
+<p style="margin-top:1.4rem"><strong>3.</strong> <code>handle_answer("  maybe  ")</code> returns:</p>
+<div id="cs-predict3-choices">
+<button type="button" class="mlrk-choice" data-a="opened">"Ticket opened."</button>
+<button type="button" class="mlrk-choice" data-a="cancelled">"Cancelled."</button>
+<button type="button" class="mlrk-choice" data-a="sorry">"Sorry, I didn't understand that."</button>
+</div>
+<div id="cs-predict3-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Work it out in two steps: first apply <code>.strip().lower()</code> by hand and write down the result, then compare that result to <code>"yes"</code> and <code>"no"</code> the way the <code>if</code>/<code>elif</code>/<code>else</code> chain does.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Partial matches: .startswith() and in</h2>
+<p>Exact-match comparisons work well for a fixed menu of answers like yes/no, but plenty of real input isn't a single fixed word. DeskBot's main menu accepts short commands, and its ticket router scans a whole typed sentence for a keyword &mdash; for both of those, an exact <code>==</code> comparison is the wrong tool.</p>
+<div class="mlrk-code"><pre class="mlrk-screen">command = raw.strip().lower()
+if command.startswith("h"):
+    show_help()
+elif command.startswith("q"):
+    quit_program()</pre></div>
+<p><code>.startswith()</code> checks the beginning of a string against a given prefix, so <code>"help"</code>, <code>"h"</code>, and <code>"help me please"</code> all satisfy <code>command.startswith("h")</code> without needing to match it exactly.</p>
+<div class="mlrk-code"><pre class="mlrk-screen">message = raw.strip().lower()
+if "refund" in message:
+    route_to_billing()
+elif "error" in message:
+    route_to_technical()
+else:
+    route_to_general()</pre></div>
+<p><code>in</code> checks whether one string turns up anywhere inside another, so a full sentence like <code>"my card was charged twice, i need a refund"</code> still matches <code>"refund" in message</code>, even though the two strings look nothing alike.</p>
+
+<div class="mlrk-card">
+<p><strong>Fill in the blanks</strong> to complete DeskBot's message router. Both blanks come straight from the two code examples above.</p>
+<div class="mlrk-fillblank cs-fillblank-row"><label for="cs-blank1"><code>if "refund" ____ message:</code></label> <input type="text" id="cs-blank1" autocomplete="off" placeholder="operator"></div>
+<div class="mlrk-fillblank cs-fillblank-row"><label for="cs-blank2"><code>elif message.____("bug"):</code></label> <input type="text" id="cs-blank2" autocomplete="off" placeholder="method name"></div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="cs-blank-check">Check my answers</button></div>
+<div id="cs-blank-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>The first blank is checking whether the word "refund" turns up anywhere inside the whole message. The second blank is checking whether the message begins with "bug".</p>
+</details>
+
+<div class="mlrk-card" style="margin-top:1.4rem" id="cs-dnd-widget">
+<p><strong>Match each description to the method (or operator) it describes.</strong> Drag each chip into the box below it.</p>
+<div class="mlrk-drag-source">
+<span class="mlrk-draggable" id="cs-chip-strip">Removes leading and trailing whitespace</span>
+<span class="mlrk-draggable" id="cs-chip-lower">Converts every letter to lowercase</span>
+<span class="mlrk-draggable" id="cs-chip-startswith">Checks whether text begins with a given prefix</span>
+<span class="mlrk-draggable" id="cs-chip-in">Checks whether a substring appears anywhere inside text</span>
+</div>
+<div class="mlrk-grid">
+<div><p style="text-align:center"><code>.strip()</code></p><div class="mlrk-dropzone" id="cs-zone-strip" aria-label=".strip() drop zone"></div></div>
+<div><p style="text-align:center"><code>.lower()</code></p><div class="mlrk-dropzone" id="cs-zone-lower" aria-label=".lower() drop zone"></div></div>
+<div><p style="text-align:center"><code>.startswith()</code></p><div class="mlrk-dropzone" id="cs-zone-startswith" aria-label=".startswith() drop zone"></div></div>
+<div><p style="text-align:center"><code>in</code></p><div class="mlrk-dropzone" id="cs-zone-in" aria-label="in drop zone"></div></div>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="cs-dnd-check">Check my matches</button></div>
+<div id="cs-dnd-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Summary and reflection</h2>
+<p>Raw text typed by a real person is not the same thing as the exact string your code is checking for &mdash; extra whitespace and inconsistent capitalization are the norm, not the exception. <code>.strip()</code> and <code>.lower()</code> clean that up before an exact <code>==</code> comparison ever runs. <code>.startswith()</code> and <code>in</code> handle the cases where an exact match was never the right question to begin with.</p>
+<label for="cs-reflect"><strong>In 2-3 sentences:</strong> think of an app or website that made you retype something because of a typo, capitalization, or an extra space it should have handled automatically. What happened, and which of <code>.strip()</code>, <code>.lower()</code>, <code>.startswith()</code>, or <code>in</code> would have prevented it?</label>
+<textarea id="cs-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="cs-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="cs-copy">Copy Plain Text Answers</button>
+<p id="cs-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "conditionals-strings-reading";
+  const TITLE = "When \"Yes\" Doesn't Mean Yes";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards("#cs-flipcards", "act-flipcards");
+
+  function handleAnswer(raw){
+    const answer = raw.trim().toLowerCase();
+    if(answer === "yes") return "opened";
+    if(answer === "no") return "cancelled";
+    return "sorry";
+  }
+  const predictFeedback = {
+    opened: "<code>.strip()</code> removes the extra spaces and <code>.lower()</code> lowercases the capital Y, so the cleaned text is <code>\"yes\"</code>, which matches the first branch.",
+    cancelled: "There's no extra whitespace here, so <code>.strip()</code> does nothing new, but <code>.lower()</code> turns <code>\"NO\"</code> into <code>\"no\"</code>, matching the <code>elif</code> branch.",
+    sorry: "Cleaned up, this is <code>\"maybe\"</code> &mdash; a real word, just not <code>\"yes\"</code> or <code>\"no\"</code>. Normalizing fixes formatting, not meaning, so it falls to <code>else</code>."
+  };
+  function wirePredict(num, raw){
+    const correct = handleAnswer(raw);
+    K.quiz({
+      id: "act-predict"+num,
+      buttonSelector: "#cs-predict"+num+"-choices .mlrk-choice",
+      feedbackSelector: "#cs-predict"+num+"-fb",
+      correct: correct,
+      answerLabel: {opened:"\"Ticket opened.\"", cancelled:"\"Cancelled.\"", sorry:"\"Sorry, I didn't understand that.\""}[correct],
+      feedback: predictFeedback
+    });
+  }
+  wirePredict(1, "  Yes ");
+  wirePredict(2, "NO");
+  wirePredict(3, "  maybe  ");
+
+  const blank1 = document.getElementById("cs-blank1");
+  const blank2 = document.getElementById("cs-blank2");
+  const blankBtn = document.getElementById("cs-blank-check");
+  const blankFb = document.getElementById("cs-blank-fb");
+  K.Scoring.register("act-fillblank-router", 1, "quiz");
+  let blankAttempts = 0, blankDone = false;
+  blankBtn.addEventListener("click", function(){
+    if(blankDone) return;
+    blankAttempts++;
+    const v1 = blank1.value.trim().toLowerCase();
+    const v2 = blank2.value.trim().toLowerCase();
+    const ok = v1 === "in" && v2 === "startswith";
+    if(ok){
+      K.Scoring.award("act-fillblank-router", blankAttempts===1?1:0.5);
+      blankFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      blankFb.innerHTML = "<strong>Correct.</strong> <code>\"refund\" in message</code> checks the whole message for that word, and <code>message.startswith(\"bug\")</code> checks just the beginning.";
+      blankDone = true;
+    } else if(blankAttempts>=2){
+      K.Scoring.award("act-fillblank-router", 0);
+      blankFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      blankFb.innerHTML = "<strong>The answers are:</strong> <code>in</code> for the first blank, <code>startswith</code> for the second.";
+      blankDone = true;
+    } else {
+      blankFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      blankFb.innerHTML = "<strong>Not quite.</strong> Re-check the two code examples above &mdash; one blank is an operator, the other is a method name.";
+    }
+    blankFb.setAttribute("tabindex","-1"); blankFb.focus();
+  });
+
+  K.dragDrop("#cs-dnd-widget", "act-dragdrop");
+  K.selfCheck({
+    buttonSelector: "#cs-dnd-check",
+    feedbackSelector: "#cs-dnd-fb",
+    mapping: {
+      "cs-chip-strip": {expectedId:"cs-zone-strip", label:"Removes leading and trailing whitespace", expectedLabel:".strip()"},
+      "cs-chip-lower": {expectedId:"cs-zone-lower", label:"Converts every letter to lowercase", expectedLabel:".lower()"},
+      "cs-chip-startswith": {expectedId:"cs-zone-startswith", label:"Checks whether text begins with a given prefix", expectedLabel:".startswith()"},
+      "cs-chip-in": {expectedId:"cs-zone-in", label:"Checks whether a substring appears anywhere inside text", expectedLabel:"in"}
+    }
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#cs-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#cs-scorechip"); });
+  K.Scoring.renderChip("#cs-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#cs-copy", onDone:function(ok){
+    document.getElementById("cs-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>
