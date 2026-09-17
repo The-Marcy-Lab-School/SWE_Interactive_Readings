@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Exception Nobody Caught — try/except in Python</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:16rem;font-family:var(--mlrk-font-code)}
+.mlrk-snippet{display:block;border:2px solid var(--mlrk-gray-400);border-radius:12px;padding:.7rem;cursor:pointer}
+.mlrk-snippet:hover{border-color:var(--mlrk-bg-brand-deep)}
+.mlrk-snippet input{margin-right:.5rem;transform:translateY(1px)}
+.mlrk-snippet .mlrk-code{margin-top:.5rem}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The Exception Nobody Caught</h1>
+<p class="mlrk-lead">On June 12, 2025, a single blank field inside a routine configuration update crashed Google Cloud's Service Control, the internal system that checks every incoming API request for identity, permissions, and quota before letting it through to any Google Cloud service. Within seconds of the bad update reaching Google's globally-synced database, every regional copy of Service Control hit the same unhandled exception and crashed into a loop, taking down Gmail, Spotify, Discord, Snapchat, and dozens of other services built on Google Cloud for roughly three hours. Google's own incident report traces the entire outage back to one specific, avoidable gap in the code: a path that could fail on unexpected data, with nothing written to catch that failure before it reached the point of no return. This reading is about the Python tool built to close exactly that gap, catching one named, expected kind of failure with <code>try</code>/<code>except</code>, and why writing <code>except:</code> with nothing after it is its own kind of trap.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~14 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. The update that took down half the internet</h2>
+<p>On May 29, 2025, engineers at Google shipped a new quota-policy feature inside Service Control. The new code path had no error handling wrapped around it, and it wasn't protected behind a feature flag (a switch that would have let a team turn the new path off instantly if it misbehaved) — so it went live everywhere at once, even though nothing had actually exercised it yet.</p>
+<p>Two weeks later, on June 12 at about 10:45 a.m. Pacific time, someone pushed a policy change into Spanner, Google's globally distributed database that keeps configuration data synced across every data center within seconds. That change contained fields that were unexpectedly blank. The moment Service Control tried to read the policy, it hit the new code path, tried to use a value that wasn't there, and hit a null pointer exception: the error you get when code tries to use something that doesn't exist. Nothing in that code path was watching for that specific failure, so nothing caught it. Every Service Control process that read the bad policy crashed outright, and each one immediately reprocessed the same bad data on restart and crashed again, in every region, worldwide, at once.</p>
+<p>For roughly three hours, from 10:49 a.m. to 1:49 p.m. Pacific time, that crash loop meant Service Control could not do its job anywhere: no request could be authenticated, checked against quota, or logged. Every product depending on it failed alongside it, from Gmail and Google Workspace to countless companies' own apps built on top of Google Cloud.</p>
+<p class="mlrk-small">Source: Google Cloud's own incident report on the June 12, 2025 outage, published at <a href="https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW" target="_blank" rel="noopener">status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW</a>.</p>
+<p>None of that ran in Python, and the exact error name (a null pointer exception) belongs to whatever language Service Control is written in. But strip away the data centers, and the shape of the bug is one a Python beginner can reproduce in ten lines: a piece of code that assumes its input will always look a certain way, meets input that doesn't, and has nothing standing between that surprise and a crash. This reading builds a much smaller version of the same shape, a script that processes a batch of signup forms where one form has a bad value, and shows the one habit that would have stopped the small version cold.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>exception</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Exception</strong><br>An error Python detects while your program is running. If nothing catches it, Python stops the program immediately and prints a traceback.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>try/except</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>try/except block</strong><br>Two keywords that work together: code that might fail goes inside <code>try</code>, and what to do if it fails goes inside <code>except</code>. The rest of the program keeps running afterward.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>ValueError</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>ValueError</strong><br>A specific exception Python raises when a value has the right type but content Python can't use the way you're asking, like <code>int("twenty-five")</code>: a string, but not one that becomes a number.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>KeyError</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>KeyError</strong><br>A specific exception Python raises when your code looks up a dictionary key that doesn't exist, like <code>form["age"]</code> on a form that has no <code>"age"</code> entry at all.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>bare except</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Bare except</strong><br><code>except:</code> with no exception type named. It catches literally every exception, the one you expected and every bug you didn't, and on its own tells you nothing about which one just happened.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Catching one specific problem, on purpose</h2>
+<p>Here's the smaller, Python-shaped version of the same bug. This function is supposed to turn a batch of signup forms into a list of valid ages:</p>
+<div class="mlrk-code"><div class="mlrk-screen">def process_signups(forms):
+    valid_ages = []
+    for form in forms:
+        age = int(form["age"])
+        valid_ages.append(age)
+    return valid_ages</div></div>
+<p>Feed it five forms where every age is a clean digit string, and it works exactly as written. Feed it five forms where one age is <code>"twenty-five"</code> instead of <code>"25"</code>, and <code>int("twenty-five")</code> raises a <code>ValueError</code>. Nothing here is set up to catch that. The exception has nowhere to go, so it propagates all the way up, the function stops, and the loop stops with it. The forms that hadn't been processed yet never get their turn, not because anything was wrong with them, but because one unrelated row crashed the whole batch on its way past.</p>
+
+<p>The fix is a <code>try</code>/<code>except</code> block wrapped around just the line that can fail, naming the exact exception type to catch:</p>
+<div class="mlrk-code"><div class="mlrk-screen">def process_signups(forms):
+    valid_ages = []
+    for form in forms:
+        try:
+            age = int(form["age"])
+            valid_ages.append(age)
+        except ValueError:
+            print(f"Skipping row: age {form['age']!r} is not a number")
+    return valid_ages</div></div>
+<p>Python runs the <code>try</code> block first. If <code>int(form["age"])</code> succeeds, the <code>except</code> block never runs at all, it's there for one specific failure and stays out of the way otherwise. If it raises a <code>ValueError</code>, Python jumps straight to the <code>except</code> block, runs it, and keeps going with the next form in the loop. One bad row gets logged and skipped. The rest of the batch finishes.</p>
+
+<p>It would be tempting to skip naming <code>ValueError</code> at all and just write <code>except:</code> by itself, catching everything. That's a real, well-known anti-pattern, and it's worse than it looks. A bare <code>except:</code> doesn't just catch the bad age you expected. It also catches a typo in your own code, like <code>form["agee"]</code> instead of <code>form["age"]</code>, which would raise a <code>KeyError</code>, or a network call that failed for a reason you never anticipated, or any other bug entirely unrelated to bad user input. All of it gets swallowed the same way, silently, and the loop just keeps going as if nothing happened. That's not resilience, it's a program lying to you about how well it's working. Naming the exact exception you expect means real bugs still crash loudly enough that someone notices and fixes them, while the one failure you planned for gets handled gracefully.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 640 300" role="img" aria-labelledby="excCmpTitle excCmpDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="excCmpTitle">Three ways to handle one bad row in a batch of five signups</title>
+  <desc id="excCmpDesc">With no try or except, the ValueError from the bad row crashes the whole function, so zero of five signups are saved. A bare except catches that error but also silently swallows real bugs like typos, hiding problems instead of fixing them. Catching except ValueError specifically logs and skips only the one bad row, so four of five signups are saved, and any other kind of failure still crashes loudly enough to notice.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="15" y="20" width="180" height="240" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="105" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">No try/except</text>
+    <text x="105" y="110" text-anchor="middle" font-size="12" fill="#261F1D">int() raises ValueError</text>
+    <text x="105" y="128" text-anchor="middle" font-size="12" fill="#261F1D">on the bad row</text>
+    <text x="105" y="146" text-anchor="middle" font-size="12" fill="#261F1D">Nothing catches it,</text>
+    <text x="105" y="164" text-anchor="middle" font-size="12" fill="#261F1D">so the batch stops</text>
+    <text x="105" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#C92929">0 of 5 saved</text>
+
+    <rect x="230" y="20" width="180" height="240" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
+    <text x="320" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">except: (bare)</text>
+    <text x="320" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Catches the bad row,</text>
+    <text x="320" y="128" text-anchor="middle" font-size="12" fill="#261F1D">but also catches typos</text>
+    <text x="320" y="146" text-anchor="middle" font-size="12" fill="#261F1D">and other real bugs,</text>
+    <text x="320" y="164" text-anchor="middle" font-size="12" fill="#261F1D">silently, every time</text>
+    <text x="320" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#83671C">Bugs hidden, not fixed</text>
+
+    <rect x="445" y="20" width="180" height="240" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="535" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">except ValueError:</text>
+    <text x="535" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Catches only the</text>
+    <text x="535" y="128" text-anchor="middle" font-size="12" fill="#261F1D">expected problem</text>
+    <text x="535" y="146" text-anchor="middle" font-size="12" fill="#261F1D">Bad row logged,</text>
+    <text x="535" y="164" text-anchor="middle" font-size="12" fill="#261F1D">everything else finishes</text>
+    <text x="535" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#264326">4 of 5 saved</text>
+  </g>
+</svg>
+
+<div class="mlrk-card" style="margin-top:1rem">
+<p><strong>Fill in the code:</strong> this function should catch only the case where <code>int()</code> can't convert the age, log it, and keep going. Type the line that belongs on the blank.</p>
+<div class="mlrk-code"><div class="mlrk-screen">def process_signups(forms):
+    valid_ages = []
+    for form in forms:
+        try:
+            age = int(form["age"])
+            valid_ages.append(age)
+        ____________
+            print(f"Skipping row: age {form['age']!r} is not a number")
+    return valid_ages</div></div>
+<div class="mlrk-fillblank"><input type="text" id="exc-blank-input" autocomplete="off" placeholder="e.g. except SomeError:"> <button type="button" class="mlrk-btn" id="exc-blank-check">Check</button></div>
+<div id="exc-blank-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Look at the line right above the blank: <code>int(form["age"])</code>. What's the name of the exception Python raises when a string can't be converted to a number? And what always comes right after that name in Python, the same way it does after <code>if</code> or inside a function definition?</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Watch: exception handling, start to finish</h2>
+<div class="mlrk-video-wrap"><div id="exc-video"></div></div>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=V_NXT2-QIlE" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>As you watch, notice the specific exception types it names, like <code>ValueError</code>, <code>ZeroDivisionError</code>, and <code>TypeError</code>. Section 3 above is the exact same idea: catch the one you actually expect, by name.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Practice: which exception actually gets raised</h2>
+<p>Each card below pairs a line of code with an exception type. Select every claim that's actually true.</p>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>For each line, work out what Python actually does when it runs, then check that against the claimed exception name. A wrong-type value and a missing dictionary key don't raise the same exception.</p>
+</details>
+<div class="mlrk-grid" style="margin-top:1rem">
+<label class="mlrk-snippet"><input type="checkbox" class="exc-claim-box" value="a">Claim A: this raises <code>ValueError</code>
+<div class="mlrk-code"><div class="mlrk-screen">int("banana")</div></div>
+</label>
+<label class="mlrk-snippet"><input type="checkbox" class="exc-claim-box" value="b">Claim B: this raises <code>KeyError</code>
+<div class="mlrk-code"><div class="mlrk-screen">{"name": "Ana"}["age"]</div></div>
+</label>
+<label class="mlrk-snippet"><input type="checkbox" class="exc-claim-box" value="c">Claim C: this raises <code>ValueError</code>
+<div class="mlrk-code"><div class="mlrk-screen">10 / 0</div></div>
+</label>
+<label class="mlrk-snippet"><input type="checkbox" class="exc-claim-box" value="d">Claim D: this raises <code>KeyError</code>
+<div class="mlrk-code"><div class="mlrk-screen">[10, 20, 30][5]</div></div>
+</label>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="exc-classify-submit">Check my answers</button></div>
+<div id="exc-classify-fb" class="mlrk-feedback" tabindex="-1"></div>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
+<p>A <code>try</code>/<code>except</code> block that names one specific exception type lets a program recover from the one failure you actually planned for, and keeps running instead of stopping cold. A bare <code>except:</code> looks like the same safety net, but it silently catches everything, including the bugs you'd actually want to know about. Google's own three-hour, worldwide outage traced back to a code path with no error handling wrapped around it at all. Naming the exception you expect is the habit that keeps a Python script's version of that failure small, visible, and survivable.</p>
+<label for="exc-reflect"><strong>In 2–3 sentences:</strong> think of one place in a real project, yours or one you can picture, where code loops over a batch of things, files, form submissions, API responses. What's one specific exception type you'd want to catch there, and why would writing a bare <code>except:</code> instead be the wrong call?</label>
+<textarea id="exc-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="exc-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="exc-copy">Copy Plain Text Answers</button>
+<p id="exc-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "errors-exceptions-reading";
+  const TITLE = "The Exception Nobody Caught — try/except in Python";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  const blankInput = document.getElementById("exc-blank-input");
+  const blankBtn = document.getElementById("exc-blank-check");
+  const blankFb = document.getElementById("exc-blank-fb");
+  K.Scoring.register("act-tryexcept-fillblank", 1, "quiz");
+  let blankAttempts = 0, blankDone = false;
+  blankBtn.addEventListener("click", function(){
+    if(blankDone) return;
+    blankAttempts++;
+    const stripped = blankInput.value.trim().toLowerCase().replace(/\s+/g, "");
+    const ok = stripped === "exceptvalueerror:";
+    const hasExceptValueError = /^exceptvalueerror/.test(stripped);
+    if(ok){
+      K.Scoring.award("act-tryexcept-fillblank", blankAttempts===1?1:0.5);
+      blankFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      blankFb.innerHTML = "<strong>Correct.</strong> <code>except ValueError:</code> catches only the case where <code>int()</code> couldn't convert the value, without hiding anything else that might go wrong in this function.";
+      blankDone = true;
+    } else if(blankAttempts>=2){
+      K.Scoring.award("act-tryexcept-fillblank", 0);
+      blankFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      blankFb.innerHTML = "<strong>The answer is:</strong> <code>except ValueError:</code>";
+      blankDone = true;
+    } else if(hasExceptValueError && !stripped.endsWith(":")){
+      blankFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      blankFb.innerHTML = "<strong>Almost.</strong> Add the colon at the end, the same way an <code>if</code> statement or a function definition needs one.";
+    } else {
+      blankFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      blankFb.innerHTML = "<strong>Not quite.</strong> Check the hint above for the exact exception name <code>int()</code> raises here.";
+    }
+    blankFb.setAttribute("tabindex", "-1"); blankFb.focus();
+  });
+
+  K.video({id:"act-video", elementId:"exc-video", videoId:"V_NXT2-QIlE"});
+
+  K.selectAll({
+    id: "act-exc-classify",
+    boxSelector: ".exc-claim-box",
+    submitSelector: "#exc-classify-submit",
+    feedbackSelector: "#exc-classify-fb",
+    maxAttempts: 2,
+    options: [
+      {value:"a", label:"Claim A (int(\"banana\") raises ValueError)", correct:true,
+        hint:"\"banana\" is a string, the right type for int() to accept as an argument. What's wrong isn't the type, it's the content.",
+        explain:"\"banana\" has the right type (a string) but content int() can't parse as a number, so it raises ValueError."},
+      {value:"b", label:"Claim B (missing dict key raises KeyError)", correct:true,
+        hint:"\"age\" isn't one of the keys in that dictionary. What does Python call the exception for a missing dictionary key specifically?",
+        explain:"\"age\" isn't a key in that dictionary, so looking it up raises KeyError."},
+      {value:"c", label:"Claim C (10 / 0 raises ValueError)", correct:false,
+        hint:"10 and 0 are both perfectly valid numbers. The problem isn't their type or content, it's the operation itself.",
+        explain:"Dividing by zero raises ZeroDivisionError, a different exception type entirely. except ValueError: would not catch this one."},
+      {value:"d", label:"Claim D (index past the end raises KeyError)", correct:false,
+        hint:"This is a list, not a dictionary. Lists use position numbers, not named keys.",
+        explain:"Looking past the end of a list raises IndexError, not KeyError. KeyError is specifically for dictionaries."}
+    ]
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#exc-reflect", minWords:12});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#exc-scorechip"); });
+  K.Scoring.renderChip("#exc-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#exc-copy", onDone:function(ok){
+    document.getElementById("exc-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

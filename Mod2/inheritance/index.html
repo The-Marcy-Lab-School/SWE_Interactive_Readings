@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One Employee Class, Two Different Paychecks</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:700px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:22rem;font-family:var(--mlrk-font-code)}
+.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}.mlrk-fillblank input{width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>One Employee Class, Two Different Paychecks</h1>
+<p class="mlrk-lead">Northgate Hardware is writing its own internal payroll script. Every employee needs a name, an ID, and a way to describe themselves on a pay stub, but a cashier paid by the hour and an assistant manager paid a fixed salary calculate their actual paycheck in completely different ways. Write two totally separate classes and every shared detail, like the ID format or the pay-stub wording, has to be changed twice by hand, forever kept in sync. Class inheritance is how Python avoids that: one parent class holds what's shared, and child classes reuse it instead of copying it.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~14 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. The payroll script that grew two heads</h2>
+<p>Here's what a first, no-inheritance attempt at Northgate's payroll script looks like — two classes, written independently:</p>
+<div class="mlrk-code"><pre>class HourlyWorker:
+    def __init__(self, name, employee_id, hourly_rate, hours_worked):
+        self.name = name
+        self.employee_id = employee_id
+        self.hourly_rate = hourly_rate
+        self.hours_worked = hours_worked
+
+    def describe(self):
+        return f"{self.name} (ID {self.employee_id})"
+
+    def calculate_pay(self):
+        return self.hourly_rate * self.hours_worked
+
+
+class SalariedWorker:
+    def __init__(self, name, employee_id, annual_salary):
+        self.name = name
+        self.employee_id = employee_id
+        self.annual_salary = annual_salary
+
+    def describe(self):
+        return f"{self.name} (ID {self.employee_id})"
+
+    def calculate_pay(self):
+        return self.annual_salary / 26</pre></div>
+<p>The <code>name</code>/<code>employee_id</code> setup and the <code>describe()</code> method are typed out twice, word for word. If Northgate ever changes how an ID is formatted, or what a pay stub description says, someone has to remember to edit both classes and keep them matching — a bug waiting to happen the first time someone forgets. The two classes aren't actually unrelated: both <em>are</em> employees, sharing real data and behavior, with only the pay math genuinely different. That relationship is exactly what class inheritance is for.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Vocabulary</h2>
+<p>Flip each card before the walkthrough below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>parent class</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Parent class (base class)</strong><br>The class that holds the shared attributes and methods. Other classes can inherit from it instead of redefining that code themselves.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>child class</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Child class (subclass)</strong><br>A class written as <code>class Child(Parent):</code> — it automatically gets every attribute and method the parent defines, for free, with no copy-pasting.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>override</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Override</strong><br>Writing a method in the child class with the same name as one on the parent. Python uses the child's version instead of the parent's whenever it's called on a child object.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>super()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>super()</strong><br>A way for a child class to call the parent class's own method — most often <code>super().__init__(...)</code>, so the child can still run the parent's setup instead of duplicating it.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. One parent, two children</h2>
+<p>The fix starts with a single <code>Employee</code> class holding everything every employee has in common:</p>
+<div class="mlrk-code"><pre>class Employee:
+    def __init__(self, name, employee_id):
+        self.name = name
+        self.employee_id = employee_id
+
+    def describe(self):
+        return f"{self.name} (ID {self.employee_id})"
+
+    def calculate_pay(self):
+        return 0</pre></div>
+<p>Then <code>HourlyEmployee</code> becomes a <strong>child class</strong> of <code>Employee</code> — written as <code>class HourlyEmployee(Employee):</code> — instead of a standalone copy:</p>
+<div class="mlrk-code"><pre>class HourlyEmployee(Employee):
+    def __init__(self, name, employee_id, hourly_rate, hours_worked):
+        super().__init__(name, employee_id)
+        self.hourly_rate = hourly_rate
+        self.hours_worked = hours_worked
+
+    def calculate_pay(self):
+        return self.hourly_rate * self.hours_worked</pre></div>
+<p>Three things happen here. <code>HourlyEmployee</code> never redefines <code>describe()</code> at all — it inherits that method from <code>Employee</code> completely unchanged, for free. It <strong>overrides</strong> <code>calculate_pay()</code>, because the parent's version (always returns <code>0</code>) is wrong for an hourly worker, so the child's version replaces it. And instead of retyping <code>self.name = name</code> and <code>self.employee_id = employee_id</code>, its <code>__init__</code> calls <code>super().__init__(name, employee_id)</code>, meaning "run <code>Employee</code>'s own setup with these two values," then adds the two attributes that are new to hourly workers.</p>
+<svg class="mlrk-illustration" viewBox="0 0 700 400" role="img" aria-labelledby="inhTitle inhDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="inhTitle">Employee class hierarchy: one parent class, two child classes</title>
+  <desc id="inhDesc">Employee defines name, employee_id, describe(), and a base calculate_pay() that returns 0. HourlyEmployee inherits name, employee_id, and describe() unchanged, adds hourly_rate and hours_worked, and overrides calculate_pay() to return hourly_rate times hours_worked. SalariedEmployee also inherits name, employee_id, and describe() unchanged, adds annual_salary, and overrides calculate_pay() to return annual_salary divided by 26.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <line x1="350" y1="150" x2="170" y2="210" stroke="#83671C" stroke-width="2.5"/>
+    <line x1="350" y1="150" x2="530" y2="210" stroke="#83671C" stroke-width="2.5"/>
+
+    <rect x="240" y="20" width="220" height="130" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="350" y="48" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Employee (parent)</text>
+    <text x="350" y="74" text-anchor="middle" font-size="12" fill="#261F1D">Defines: name, employee_id</text>
+    <text x="350" y="94" text-anchor="middle" font-size="12" fill="#261F1D">Defines: describe()</text>
+    <text x="350" y="114" text-anchor="middle" font-size="12" fill="#261F1D">Defines: calculate_pay()</text>
+    <text x="350" y="134" text-anchor="middle" font-size="12" fill="#261F1D">(base version returns 0)</text>
+
+    <rect x="30" y="210" width="280" height="170" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="170" y="238" text-anchor="middle" font-size="14" font-weight="700" fill="#261F1D">HourlyEmployee(Employee)</text>
+    <text x="170" y="266" text-anchor="middle" font-size="12" fill="#261F1D">Inherits: name, employee_id,</text>
+    <text x="170" y="282" text-anchor="middle" font-size="12" fill="#261F1D">describe()</text>
+    <text x="170" y="306" text-anchor="middle" font-size="12" font-weight="700" fill="#264326">New: hourly_rate, hours_worked</text>
+    <text x="170" y="330" text-anchor="middle" font-size="12" font-weight="700" fill="#264326">Overrides: calculate_pay()</text>
+    <text x="170" y="346" text-anchor="middle" font-size="12" fill="#261F1D">hourly_rate * hours_worked</text>
+
+    <rect x="390" y="210" width="280" height="170" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
+    <text x="530" y="238" text-anchor="middle" font-size="14" font-weight="700" fill="#261F1D">SalariedEmployee(Employee)</text>
+    <text x="530" y="266" text-anchor="middle" font-size="12" fill="#261F1D">Inherits: name, employee_id,</text>
+    <text x="530" y="282" text-anchor="middle" font-size="12" fill="#261F1D">describe()</text>
+    <text x="530" y="306" text-anchor="middle" font-size="12" font-weight="700" fill="#83671C">New: annual_salary</text>
+    <text x="530" y="330" text-anchor="middle" font-size="12" font-weight="700" fill="#83671C">Overrides: calculate_pay()</text>
+    <text x="530" y="346" text-anchor="middle" font-size="12" fill="#261F1D">annual_salary / 26</text>
+  </g>
+</svg>
+<p>Once a <code>HourlyEmployee</code> exists, calling either method just works — Python looks for <code>calculate_pay()</code> on <code>HourlyEmployee</code> first (finds the override), and looks for <code>describe()</code> on <code>HourlyEmployee</code>, doesn't find it there, and walks up to <code>Employee</code> automatically:</p>
+<div class="mlrk-code"><div class="mlrk-screen">cashier = HourlyEmployee("Priya", "E-104", 18.50, 32)
+print(cashier.describe())
+print(cashier.calculate_pay())
+
+Priya (ID E-104)
+592.0</div></div>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Write the second child class yourself</h2>
+<p>Northgate pays salaried employees every two weeks — 26 pay periods a year — so a salary calculation divides the annual amount by 26. Fill in both blanks so <code>SalariedEmployee</code> follows the same pattern <code>HourlyEmployee</code> used above: run the parent's setup through <code>super()</code>, then override the one method that genuinely needs to differ.</p>
+<div class="mlrk-card">
+<div class="mlrk-code"><pre>class SalariedEmployee(Employee):
+    def __init__(self, name, employee_id, annual_salary):
+        ____________
+        self.annual_salary = annual_salary
+
+    def calculate_pay(self):
+        ____________</pre></div>
+<p><strong>First blank</strong> — call the parent's setup with the two values it needs:</p>
+<div class="mlrk-fillblank"><input type="text" id="inh-super-input" autocomplete="off" placeholder="e.g. super().__init__(...)"> <button type="button" class="mlrk-btn" id="inh-super-check">Check</button></div>
+<div id="inh-superfb" class="mlrk-feedback" tabindex="-1"></div>
+<p style="margin-top:1rem"><strong>Second blank</strong> — return the actual paycheck amount:</p>
+<div class="mlrk-fillblank"><input type="text" id="inh-pay-input" autocomplete="off" placeholder="e.g. return ..."> <button type="button" class="mlrk-btn" id="inh-pay-check">Check</button></div>
+<div id="inh-payfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>The first blank doesn't need <code>self.name = name</code> or <code>self.employee_id = employee_id</code> written out again — that's the whole point of calling the parent's own <code>__init__</code> instead. The second blank is just <code>annual_salary</code> divided by the number of pay periods mentioned above.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Watch: <code>__init__</code> and <code>super()</code> across a hierarchy</h2>
+<div class="mlrk-video-wrap"><div id="inh-video"></div></div>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=AyD2VfCDX2o" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>As you watch, map it back to Northgate's classes: every Python class is ultimately a child of something, a child's <code>__init__</code> can override the parent's, and <code>super()</code> is the tool for reaching back up and running the parent's version anyway.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Trace it: where does this actually come from?</h2>
+<p>Drag each attribute or method into the class it's actually defined on — not just any class that happens to be able to use it.</p>
+<div class="mlrk-card" id="trace-activity">
+<div class="mlrk-drag-source" id="trace-chips">
+  <span class="mlrk-draggable" id="trace-1"><code>name</code></span>
+  <span class="mlrk-draggable" id="trace-2"><code>describe()</code></span>
+  <span class="mlrk-draggable" id="trace-3"><code>hourly_rate</code></span>
+  <span class="mlrk-draggable" id="trace-4"><code>hours_worked</code></span>
+  <span class="mlrk-draggable" id="trace-5"><code>annual_salary</code></span>
+  <span class="mlrk-draggable" id="trace-6">calculate_pay() run by a SalariedEmployee</span>
+</div>
+<div class="mlrk-grid">
+  <div class="mlrk-dropzone" id="trace-zone-employee"><strong>Employee</strong></div>
+  <div class="mlrk-dropzone" id="trace-zone-hourly"><strong>HourlyEmployee</strong></div>
+  <div class="mlrk-dropzone" id="trace-zone-salaried"><strong>SalariedEmployee</strong></div>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="trace-check">Check my answers</button></div>
+<div id="trace-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p><code>name</code> and <code>describe()</code> are only ever written once, on <code>Employee</code> — both children just reuse them unchanged. <code>calculate_pay()</code> exists on all three classes, but a <code>SalariedEmployee</code> object always uses the version defined closest to it — its own override, not the parent's.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary &amp; reflection</h2>
+<p><code>class Child(Parent):</code> gets every attribute and method the parent defines without retyping any of it. A child overrides a method only when its behavior genuinely needs to differ, and calls <code>super().__init__(...)</code> to still run the parent's setup instead of duplicating it. Northgate's two employee classes went from two full copies of the same setup code to one shared parent and two small, honest differences.</p>
+<label for="inh-reflect"><strong>In 2–3 sentences:</strong> think of another real pair of things that share a lot but aren't identical (two kinds of app users, two kinds of vehicles, two kinds of game characters). What would the shared parent class hold, and what's the one method each child would need to override?</label>
+<textarea id="inh-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="inh-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="inh-copy">Copy Plain Text Answers</button>
+<p id="inh-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "inheritance-reading";
+  const TITLE = "One Employee Class, Two Different Paychecks";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  const superBtn = document.getElementById("inh-super-check");
+  const superInput = document.getElementById("inh-super-input");
+  const superFb = document.getElementById("inh-superfb");
+  K.Scoring.register("act-super-fillblank", 1, "quiz");
+  let superAttempts = 0, superDone = false;
+  superBtn.addEventListener("click", function(){
+    if(superDone) return;
+    superAttempts++;
+    const val = superInput.value.trim().toLowerCase().replace(/\s+/g, "");
+    const ok = val === "super().__init__(name,employee_id)";
+    if(ok){
+      K.Scoring.award("act-super-fillblank", superAttempts===1?1:0.5);
+      superFb.className="mlrk-feedback mlrk-show mlrk-good";
+      superFb.innerHTML="<strong>Correct.</strong> That runs Employee's own __init__ with these two values, so name and employee_id get set exactly the way the parent already knows how to set them.";
+      superDone = true;
+    } else if(superAttempts>=2){
+      K.Scoring.award("act-super-fillblank", 0);
+      superFb.className="mlrk-feedback mlrk-show mlrk-reveal";
+      superFb.innerHTML="<strong>The answer is:</strong> <code>super().__init__(name, employee_id)</code>";
+      superDone = true;
+    } else {
+      superFb.className="mlrk-feedback mlrk-show mlrk-bad";
+      superFb.innerHTML="<strong>Not quite.</strong> Look at how HourlyEmployee's __init__ called the parent's setup above, then match that exact shape with these two parameter names.";
+    }
+    superFb.setAttribute("tabindex","-1"); superFb.focus();
+  });
+
+  const payBtn = document.getElementById("inh-pay-check");
+  const payInput = document.getElementById("inh-pay-input");
+  const payFb = document.getElementById("inh-payfb");
+  K.Scoring.register("act-pay-fillblank", 1, "quiz");
+  let payAttempts = 0, payDone = false;
+  payBtn.addEventListener("click", function(){
+    if(payDone) return;
+    payAttempts++;
+    const val = payInput.value.trim().toLowerCase().replace(/\s+/g, "");
+    const ok = val === "returnself.annual_salary/26";
+    if(ok){
+      K.Scoring.award("act-pay-fillblank", payAttempts===1?1:0.5);
+      payFb.className="mlrk-feedback mlrk-show mlrk-good";
+      payFb.innerHTML="<strong>Correct.</strong> That overrides the parent's calculate_pay() (which always returns 0) with the real salaried math, using the 26 pay periods mentioned above.";
+      payDone = true;
+    } else if(payAttempts>=2){
+      K.Scoring.award("act-pay-fillblank", 0);
+      payFb.className="mlrk-feedback mlrk-show mlrk-reveal";
+      payFb.innerHTML="<strong>The answer is:</strong> <code>return self.annual_salary / 26</code>";
+      payDone = true;
+    } else {
+      payFb.className="mlrk-feedback mlrk-show mlrk-bad";
+      payFb.innerHTML="<strong>Not quite.</strong> This method needs to hand a number back out with return, using self.annual_salary and the 26 pay periods mentioned above.";
+    }
+    payFb.setAttribute("tabindex","-1"); payFb.focus();
+  });
+
+  K.video({id:"act-video", elementId:"inh-video", videoId:"AyD2VfCDX2o"});
+
+  K.dragDrop("#trace-activity", "act-trace-classify");
+  K.selfCheck({
+    buttonSelector: "#trace-check",
+    feedbackSelector: "#trace-fb",
+    mapping: {
+      "trace-1": {expectedId: "trace-zone-employee", label: "name", expectedLabel: "Employee"},
+      "trace-2": {expectedId: "trace-zone-employee", label: "describe()", expectedLabel: "Employee"},
+      "trace-3": {expectedId: "trace-zone-hourly", label: "hourly_rate", expectedLabel: "HourlyEmployee"},
+      "trace-4": {expectedId: "trace-zone-hourly", label: "hours_worked", expectedLabel: "HourlyEmployee"},
+      "trace-5": {expectedId: "trace-zone-salaried", label: "annual_salary", expectedLabel: "SalariedEmployee"},
+      "trace-6": {expectedId: "trace-zone-salaried", label: "calculate_pay() run by a SalariedEmployee", expectedLabel: "SalariedEmployee (its own override wins)"}
+    }
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#inh-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#inh-scorechip"); });
+  K.Scoring.renderChip("#inh-scorechip");
+
+  K.copyPlainText({readingId: READING_ID, title: TITLE, buttonSelector: "#inh-copy", onDone: function(ok){
+    document.getElementById("inh-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

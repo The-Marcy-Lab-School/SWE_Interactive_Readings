@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One Call, Three Answers — Polymorphism and Dunder Methods</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:700px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:22rem;font-family:var(--mlrk-font-code)}
+.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+.poly-checklist{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0}
+.poly-checklist label{display:flex;gap:.55rem;align-items:flex-start;cursor:pointer}
+.poly-checklist input{margin-top:.3rem}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>One Call, Three Answers</h1>
+<p class="mlrk-lead">Kettle &amp; Co., a small coffee shop, built a staff app that prints today's roster. The code behind it calls the exact same line — <code>employee.describe()</code> — on every person working that day, yet a barista, a shift lead, and the manager each get back a different, correct sentence about their own job. Nobody wrote a chain of <code>if</code> checks to make that happen. Python did it automatically, through a mechanism with a five-dollar name: polymorphism. This reading covers what that word actually means in code, plus one small, genuinely useful dunder (magic) method, <code>__str__</code>, that works through the exact same trick.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~11 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. Same call, three different employees</h2>
+<p>Here are the classes behind Kettle &amp; Co.'s staff app. <code>Barista</code>, <code>ShiftLead</code>, and <code>Manager</code> are each a <strong>subclass</strong> of a shared <code>Employee</code> class — a more specific version of it, that inherits its stuff but can replace any piece of it with its own version:</p>
+<div class="mlrk-code"><pre>class Employee:
+    def __init__(self, name):
+        self.name = name
+
+    def describe(self):
+        return f"{self.name} is a staff member."
+
+
+class Barista(Employee):
+    def describe(self):
+        return f"{self.name} is a barista who pulls the espresso shots."
+
+
+class ShiftLead(Employee):
+    def describe(self):
+        return f"{self.name} is a shift lead who counts the register at closing."
+
+
+class Manager(Employee):
+    def describe(self):
+        return f"{self.name} is a manager who handles payroll and scheduling."</pre></div>
+<p>Each subclass defines its own <code>describe()</code> — same method name as the one already sitting on <code>Employee</code>, rewritten with its own body. That's called <strong>method overriding</strong>: when a subclass defines a method with the exact same name as its parent's, its own version wins for objects of that subclass. Now watch what happens when the app builds a list of today's staff and prints a description of each one, using one identical line of code every time:</p>
+<div class="mlrk-code"><pre>staff = [Barista("Ana"), ShiftLead("Jordan"), Manager("Priya")]
+
+for employee in staff:
+    print(employee.describe())</pre></div>
+<div class="mlrk-code"><pre>Ana is a barista who pulls the espresso shots.
+Jordan is a shift lead who counts the register at closing.
+Priya is a manager who handles payroll and scheduling.</pre></div>
+<p>The loop never checks anyone's job title. It calls <code>.describe()</code> on whatever object happens to be sitting in <code>employee</code> that time through the loop, and each object answers with its own class's version — because Python looks up which <code>describe()</code> to run based on the object's actual class, not based on the line of code doing the calling. That's <strong>polymorphism</strong>: the same method name, called the same way, taking a different, correct form depending on which object it's actually called on.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 700 400" role="img" aria-labelledby="polyDiagTitle polyDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="polyDiagTitle">One method call fanning out into three different behaviors based on each object's own class</title>
+  <desc id="polyDiagDesc">A single call site, print(employee.describe()) inside a loop over the staff list, sends the same describe() call to three different objects. Because Barista, ShiftLead, and Manager each override describe() with their own version, the exact same call produces three different results: Ana's barista description, Jordan's shift-lead description, and Priya's manager description. The same call, three different, correct answers, because each object runs its own class's version.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="225" y="15" width="250" height="65" rx="12" fill="#E4E7EB" stroke="#2F5A8B" stroke-width="2.5"/>
+    <text x="350" y="42" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">for employee in staff:</text>
+    <text x="350" y="63" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">print(employee.describe())</text>
+
+    <line x1="350" y1="80" x2="120" y2="150" stroke="#B3BBB0" stroke-width="2"/>
+    <line x1="350" y1="80" x2="350" y2="150" stroke="#B3BBB0" stroke-width="2"/>
+    <line x1="350" y1="80" x2="580" y2="150" stroke="#B3BBB0" stroke-width="2"/>
+
+    <rect x="15" y="150" width="210" height="150" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="120" y="178" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Barista</text>
+    <text x="120" y="200" text-anchor="middle" font-size="11" fill="#261F1D">runs its own describe()</text>
+    <text x="120" y="230" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#C92929">"Ana is a barista who</text>
+    <text x="120" y="248" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#C92929">pulls the espresso shots."</text>
+
+    <rect x="245" y="150" width="210" height="150" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
+    <text x="350" y="178" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">ShiftLead</text>
+    <text x="350" y="200" text-anchor="middle" font-size="11" fill="#261F1D">runs its own describe()</text>
+    <text x="350" y="230" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#83671C">"Jordan is a shift lead</text>
+    <text x="350" y="248" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#83671C">who counts the register</text>
+    <text x="350" y="266" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#83671C">at closing."</text>
+
+    <rect x="475" y="150" width="210" height="150" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="580" y="178" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Manager</text>
+    <text x="580" y="200" text-anchor="middle" font-size="11" fill="#261F1D">runs its own describe()</text>
+    <text x="580" y="230" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#2274B5">"Priya is a manager who</text>
+    <text x="580" y="248" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#2274B5">handles payroll and</text>
+    <text x="580" y="266" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#2274B5">scheduling."</text>
+
+    <text x="350" y="345" text-anchor="middle" font-size="14" font-weight="700" fill="#264326">Same call, same code, three different, correct answers —</text>
+    <text x="350" y="365" text-anchor="middle" font-size="14" font-weight="700" fill="#264326">because each object runs its own class's version.</text>
+  </g>
+</svg>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>subclass</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Subclass</strong><br>A more specific version of another class (its parent, or superclass) — it inherits everything the parent has, and can override any piece of it. <code>Barista</code>, <code>ShiftLead</code>, and <code>Manager</code> are all subclasses of <code>Employee</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>overriding</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Method overriding</strong><br>Defining a method in a subclass using the exact same name as a method already defined on its parent class, so calling that name on the subclass's objects runs the subclass's version, like each class's own <code>describe()</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>polymorphism</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Polymorphism</strong><br>Calling the exact same method name, like <code>.describe()</code>, on objects of different classes and getting each object's own class-specific behavior back automatically. "Many forms" from one call.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>dunder method</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Dunder method</strong><br>A method name that starts and ends with two underscores ("double underscore," shortened to "dunder"), like <code>__init__</code> or <code>__str__</code> — Python's way of marking a method as special, one that a built-in operation calls automatically instead of you calling it by name.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>__str__</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>__str__</strong><br>The dunder method Python calls automatically whenever an object is handed to <code>print()</code>. Override it in a class to control exactly what text shows up, instead of Python's default, unreadable object description.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Predict the output</h2>
+<p>Using the exact same <code>staff</code> list from section 1 — <code>[Barista("Ana"), ShiftLead("Jordan"), Manager("Priya")]</code> — predict what each individual call returns.</p>
+
+<div class="mlrk-card">
+<p><strong>Predict:</strong> what does <code>staff[0].describe()</code> return?</p>
+<div id="poly-predict1">
+  <button type="button" class="mlrk-choice" data-a="Ana is a barista who pulls the espresso shots.">Ana is a barista who pulls the espresso shots.</button>
+  <button type="button" class="mlrk-choice" data-a="Ana is a staff member.">Ana is a staff member.</button>
+  <button type="button" class="mlrk-choice" data-a="Jordan is a shift lead who counts the register at closing.">Jordan is a shift lead who counts the register at closing.</button>
+  <button type="button" class="mlrk-choice" data-a="AttributeError: 'Barista' object has no attribute 'describe'">AttributeError: 'Barista' object has no attribute 'describe'</button>
+</div>
+<div id="poly-predict1fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<div class="mlrk-card" style="margin-top:1rem">
+<p><strong>Predict:</strong> what does <code>staff[1].describe()</code> return?</p>
+<div id="poly-predict2">
+  <button type="button" class="mlrk-choice" data-a="Jordan is a shift lead who counts the register at closing.">Jordan is a shift lead who counts the register at closing.</button>
+  <button type="button" class="mlrk-choice" data-a="Jordan is a staff member.">Jordan is a staff member.</button>
+  <button type="button" class="mlrk-choice" data-a="Ana is a barista who pulls the espresso shots.">Ana is a barista who pulls the espresso shots.</button>
+  <button type="button" class="mlrk-choice" data-a="Priya is a manager who handles payroll and scheduling.">Priya is a manager who handles payroll and scheduling.</button>
+</div>
+<div id="poly-predict2fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<div class="mlrk-card" style="margin-top:1rem">
+<p><strong>Predict:</strong> what does <code>staff[2].describe()</code> return?</p>
+<div id="poly-predict3">
+  <button type="button" class="mlrk-choice" data-a="Priya is a manager who handles payroll and scheduling.">Priya is a manager who handles payroll and scheduling.</button>
+  <button type="button" class="mlrk-choice" data-a="Priya is a staff member.">Priya is a staff member.</button>
+  <button type="button" class="mlrk-choice" data-a="Jordan is a shift lead who counts the register at closing.">Jordan is a shift lead who counts the register at closing.</button>
+  <button type="button" class="mlrk-choice" data-a="TypeError: describe() takes no arguments">TypeError: describe() takes no arguments</button>
+</div>
+<div id="poly-predict3fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Ignore <code>Employee</code>'s version entirely for these three. Each object in the list is actually a <code>Barista</code>, a <code>ShiftLead</code>, or a <code>Manager</code> — and each of those classes wrote its own <code>describe()</code> that replaces the parent's for objects of that exact class.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. The print() nobody could read</h2>
+<p>Kettle &amp; Co.'s manager wanted a quicker version of the shift report — just print each employee object directly, no <code>.describe()</code> call:</p>
+<div class="mlrk-code"><pre>for employee in staff:
+    print(employee)</pre></div>
+<p>Here's what actually showed up in the terminal:</p>
+<div class="mlrk-code"><pre>&lt;__main__.Employee object at 0x7f9a2c010be0&gt;
+&lt;__main__.Employee object at 0x7f9a2c010c40&gt;
+&lt;__main__.Employee object at 0x7f9a2c010cd0&gt;</pre></div>
+<p>That's Python's default answer to "what should I show for this object?" — a class name and a raw memory address, useless for a report a human has to read, and not even different enough between the three lines to tell who's who at a glance. Here's the part that matters: <code>print()</code> didn't invent that text on its own. Under the hood, <code>print()</code> always calls the object's <code>__str__()</code> method and displays whatever it returns. None of <code>Employee</code>, <code>Barista</code>, <code>ShiftLead</code>, or <code>Manager</code> define one, so Python falls back to its own generic default.</p>
+<p>The fix is exactly the same move as <code>describe()</code>: write a method with that name, and Python uses it instead. Add <code>__str__</code> to <code>Employee</code>:</p>
+<div class="mlrk-code"><pre>class Employee:
+    def __init__(self, name):
+        self.name = name
+
+    def describe(self):
+        return f"{self.name} is a staff member."
+
+    def __str__(self):
+        return f"Employee: {self.name}"</pre></div>
+<p>Now <code>print(employee)</code> shows <code>Employee: Ana</code> instead of a memory address — readable, but it lost the specific-role detail <code>describe()</code> had. Fix that the same way you'd fix any parent-class behavior that's too generic for one particular subclass: override it there too. Add a more specific <code>__str__</code> just to <code>ShiftLead</code>:</p>
+<div class="mlrk-code"><pre>class ShiftLead(Employee):
+    def describe(self):
+        return f"{self.name} is a shift lead who counts the register at closing."
+
+    def __str__(self):
+        return f"{self.name} (Shift Lead)"</pre></div>
+<p>With only <code>ShiftLead</code> overriding it, printing the same <code>staff</code> list now shows a mix — every object still uses whichever <code>__str__</code> actually belongs to its own class, inherited or overridden:</p>
+<div class="mlrk-code"><pre>Employee: Ana
+Jordan (Shift Lead)
+Employee: Priya</pre></div>
+<p><code>__str__</code> is a dunder method: its double-underscore name is Python's signal that this one is special, called automatically by <code>print()</code> rather than by you typing <code>.__str__()</code> yourself. Everything else about it — writing it in a class, overriding it in a subclass — works exactly like <code>describe()</code>.</p>
+
+<div class="mlrk-card">
+<p><strong>Fill in the blank</strong> so that <code>Manager</code> gets the same treatment <code>ShiftLead</code> got above — <code>print(priya)</code> should show exactly <code>Priya (Manager)</code>:</p>
+<div class="mlrk-code"><pre>class Manager(Employee):
+    def describe(self):
+        return f"{self.name} is a manager who handles payroll and scheduling."
+
+    def __str__(self):
+        ____________</pre></div>
+<div class="mlrk-fillblank"><input type="text" id="poly-str-input" autocomplete="off" placeholder="e.g. return f&quot;...&quot;"> <button type="button" class="mlrk-btn" id="poly-str-check">Check</button></div>
+<div id="poly-strfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Copy the exact shape of <code>ShiftLead</code>'s <code>__str__</code> above, but swap in <code>self.name</code> with <code>"Manager"</code> instead of <code>"Shift Lead"</code>.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Quick check</h2>
+<div class="mlrk-card">
+<p>Select every statement below that's actually true:</p>
+<div class="poly-checklist">
+<label><input type="checkbox" class="poly-check-box" value="a"> <span>Overriding a method means writing a same-named method in a subclass that replaces the parent class's version, for objects of that subclass.</span></label>
+<label><input type="checkbox" class="poly-check-box" value="b"> <span>Polymorphism requires writing a separate <code>if</code>/<code>elif</code> chain that checks each object's type before deciding what to do.</span></label>
+<label><input type="checkbox" class="poly-check-box" value="c"> <span>Any method whose name starts and ends with two underscores, like <code>__str__</code>, is a dunder method.</span></label>
+<label><input type="checkbox" class="poly-check-box" value="d"> <span><code>__str__</code> only works if it's defined directly on an object's exact class — inheriting it from a parent class does nothing.</span></label>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="poly-check-submit">Check my answers</button></div>
+<div id="poly-checkfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
+<p>Kettle &amp; Co.'s report worked because <code>Barista</code>, <code>ShiftLead</code>, and <code>Manager</code> each overrode <code>describe()</code> with their own version — one call, three correct answers, with no type-checking anywhere. <code>__str__</code> runs on the same rule, except <code>print()</code> calls it for you automatically, which is what makes it a dunder method instead of an ordinary one.</p>
+<label for="poly-reflect"><strong>In 2–3 sentences:</strong> have you ever seen, or written, code that used a chain of <code>if</code>/<code>elif</code> checks to decide what to do based on what type of thing it was looking at? How would overriding one method name per class, the way <code>describe()</code> does here, change that code?</label>
+<textarea id="poly-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="poly-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="poly-copy">Copy Plain Text Answers</button>
+<p id="poly-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "python-polymorphism-reading";
+  const TITLE = "One Call, Three Answers — Polymorphism and Dunder Methods";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.quiz({
+    id: "act-predict1",
+    buttonSelector: "#poly-predict1 .mlrk-choice",
+    feedbackSelector: "#poly-predict1fb",
+    correct: "Ana is a barista who pulls the espresso shots.",
+    feedback: {
+      "Ana is a barista who pulls the espresso shots.": "Right — staff[0] is a Barista object, so .describe() runs Barista's own version.",
+      "Ana is a staff member.": "That's Employee's version. Ana is actually a Barista object, and Barista overrides describe() with its own line.",
+      "Jordan is a shift lead who counts the register at closing.": "That's Jordan's line, not Ana's — staff[0] is Barista(\"Ana\"), not the ShiftLead.",
+      "AttributeError: 'Barista' object has no attribute 'describe'": "Overriding a method doesn't remove it — Barista still has a describe(), just its own rewritten version."
+    }
+  });
+
+  K.quiz({
+    id: "act-predict2",
+    buttonSelector: "#poly-predict2 .mlrk-choice",
+    feedbackSelector: "#poly-predict2fb",
+    correct: "Jordan is a shift lead who counts the register at closing.",
+    feedback: {
+      "Jordan is a shift lead who counts the register at closing.": "Right — staff[1] is a ShiftLead object, so .describe() runs ShiftLead's own version.",
+      "Jordan is a staff member.": "That's Employee's version. Jordan is actually a ShiftLead object, which overrides describe() with its own line.",
+      "Ana is a barista who pulls the espresso shots.": "That's Ana's line, not Jordan's — staff[1] is ShiftLead(\"Jordan\"), not the Barista.",
+      "Priya is a manager who handles payroll and scheduling.": "That's Priya's line, not Jordan's — staff[1] is ShiftLead(\"Jordan\"), not the Manager."
+    }
+  });
+
+  K.quiz({
+    id: "act-predict3",
+    buttonSelector: "#poly-predict3 .mlrk-choice",
+    feedbackSelector: "#poly-predict3fb",
+    correct: "Priya is a manager who handles payroll and scheduling.",
+    feedback: {
+      "Priya is a manager who handles payroll and scheduling.": "Right — staff[2] is a Manager object, so .describe() runs Manager's own version.",
+      "Priya is a staff member.": "That's Employee's version. Priya is actually a Manager object, which overrides describe() with its own line.",
+      "Jordan is a shift lead who counts the register at closing.": "That's Jordan's line, not Priya's — staff[2] is Manager(\"Priya\"), not the ShiftLead.",
+      "TypeError: describe() takes no arguments": "describe() is only ever called as employee.describe() — no extra arguments are being passed anywhere in this code."
+    }
+  });
+
+  function normalizeExpr(s){ return s.trim().toLowerCase().replace(/\s+/g,""); }
+  const strBtn = document.getElementById("poly-str-check");
+  const strInput = document.getElementById("poly-str-input");
+  const strFb = document.getElementById("poly-strfb");
+  K.Scoring.register("act-str-fillcode", 1, "quiz");
+  let strAttempts = 0, strDone = false;
+  strBtn.addEventListener("click", function(){
+    if(strDone) return;
+    strAttempts++;
+    const val = normalizeExpr(strInput.value);
+    const ok = /^returnf["']\{self\.name\}\(manager\)["']$/.test(val);
+    if(ok){
+      K.Scoring.award("act-str-fillcode", strAttempts===1?1:0.5);
+      strFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      strFb.innerHTML = "<strong>Correct.</strong> <code>return f\"{self.name} (Manager)\"</code> gives print(priya) exactly Priya (Manager), the same pattern ShiftLead used.";
+      strDone = true;
+    } else if(strAttempts >= 2){
+      K.Scoring.award("act-str-fillcode", 0);
+      strFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      strFb.innerHTML = "<strong>The answer is:</strong> <code>return f\"{self.name} (Manager)\"</code>";
+      strDone = true;
+    } else {
+      strFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      strFb.innerHTML = "<strong>Not quite.</strong> Start with the keyword that hands a value back to print(), then build the same f-string shape ShiftLead used, swapping in \"Manager\"." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    strFb.setAttribute("tabindex","-1"); strFb.focus();
+  });
+
+  K.selectAll({
+    id: "act-checklist",
+    boxSelector: ".poly-check-box",
+    submitSelector: "#poly-check-submit",
+    feedbackSelector: "#poly-checkfb",
+    options: [
+      {value:"a", label:"Overriding a method means writing a same-named method in a subclass that replaces the parent class's version, for objects of that subclass.", correct:true,
+        explain:"That's exactly what describe() and __str__ both did above."},
+      {value:"b", label:"Polymorphism requires writing a separate if/elif chain that checks each object's type before deciding what to do.", correct:false,
+        hint:"The staff loop above never once checked anyone's type — that's the whole point of overriding describe() per class.",
+        explain:"Polymorphism is specifically what replaces that if/elif chain — Python picks the right version on its own, based on the object's actual class."},
+      {value:"c", label:"Any method whose name starts and ends with two underscores, like __str__, is a dunder method.", correct:true,
+        explain:"\"Dunder\" is short for \"double underscore\" — that naming pattern is exactly how Python marks a method as special."},
+      {value:"d", label:"__str__ only works if it's defined directly on an object's exact class — inheriting it from a parent class does nothing.", correct:false,
+        hint:"Re-check what printed for Ana and Priya after only ShiftLead got its own __str__.",
+        explain:"Ana and Priya both printed fine as \"Employee: Ana\" and \"Employee: Priya\" using Employee's inherited __str__ — only Jordan needed the override."}
+    ]
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#poly-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#poly-scorechip"); });
+  K.Scoring.renderChip("#poly-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#poly-copy", onDone:function(ok){
+    document.getElementById("poly-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

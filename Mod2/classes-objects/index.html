@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Fare That Went to the Wrong Ride — Writing Your First Python Class</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:700px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:20rem;font-family:var(--mlrk-font-code)}
+.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+.cls-checklist{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0}
+.cls-checklist label{display:flex;gap:.55rem;align-items:flex-start;cursor:pointer}
+.cls-checklist input{margin-top:.3rem}
+.cls-twoline{display:flex;flex-direction:column;gap:.5rem;margin:.6rem 0}
+.cls-twoline .cls-line{display:flex;align-items:center;gap:.5rem;font-family:var(--mlrk-font-code)}
+.cls-twoline .cls-line span{color:var(--mlrk-text-on-light-muted)}
+.cls-twoline input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:100%;max-width:22rem;font-family:var(--mlrk-font-code)}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The Fare That Went to the Wrong Ride</h1>
+<p class="mlrk-lead">Nimbus Rides, a small ride-share startup, dispatches drivers using a Python script that tracks whatever ride is currently active with a handful of plain variables: <code>rider</code>, <code>pickup</code>, <code>fare</code>. That worked fine when a driver only ever had one ride going at a time. Then Nimbus added a feature letting a driver accept a second pickup while the first ride was still finishing up — and the script, which had never expected two rides to exist at once, started overwriting ride #1's variables with ride #2's before ride #1 ever got billed. The fix wasn't a smarter variable name. It was giving every ride its own independent bundle of data — a Python <strong>class</strong>.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~13 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. One set of variables, two rides, one bug</h2>
+<p>Here's roughly what Nimbus Rides' dispatch script looked like. A driver named Marcus picked up Amir first, then — before Amir's ride had finished and been billed — picked up Priya for a second ride along the way:</p>
+<div class="mlrk-code"><pre># Ride 1 begins
+rider = "Amir"
+fare = 22.50
+
+# Ride 2 begins before Ride 1 has been billed
+rider = "Priya"
+fare = 14.00
+
+# Ride 1 finally finishes and tries to bill its rider...
+print("Charging", rider, "$" + str(fare))</pre></div>
+<p>That last line was supposed to bill Amir $22.50. Instead it printed <code>Charging Priya $14.0</code> — because there was only ever <em>one</em> <code>rider</code> variable and <em>one</em> <code>fare</code> variable in the whole script. The moment Ride 2 started, it silently overwrote Ride 1's data, and Ride 1 had no memory of its own left to bill correctly. Amir was never charged. Priya's ride looked like it billed twice.</p>
+<p>Renaming the variables (<code>rider1</code>, <code>rider2</code>, <code>fare1</code>, <code>fare2</code>...) would buy a little time, but it falls apart the moment Nimbus wants a third simultaneous ride, or a tenth. What Nimbus actually needs is a way to say: <strong>every ride gets its own separate, independent copy of this data</strong> — automatically, no matter how many rides exist at once. That's exactly what a Python <strong>class</strong> is for: a blueprint that produces as many independent objects as you need, each one holding its own values.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 700 420" role="img" aria-labelledby="clsDiagTitle clsDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="clsDiagTitle">One Ride class producing two completely independent Ride objects</title>
+  <desc id="clsDiagDesc">At the top, the class Ride defines a blueprint with an __init__ method that sets a rider attribute and a fare attribute on whichever object is being created. Below it, two separate objects are built from that same blueprint: ride1 holds rider "Amir" and fare 22.50, while ride2 holds rider "Priya" and fare 14.00. The two objects came from the exact same class, but each stores its own independent values — changing one never changes the other.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="350" y="16" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">class Ride — defines the blueprint</text>
+
+    <rect x="210" y="30" width="280" height="150" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="230" y="58" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">class Ride:</text>
+    <text x="250" y="81" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">def __init__(self, rider, fare):</text>
+    <text x="270" y="104" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">self.rider = rider</text>
+    <text x="270" y="127" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">self.fare = fare</text>
+    <text x="350" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#264326">Not an object yet — just the plan</text>
+
+    <line x1="350" y1="180" x2="200" y2="215" stroke="#B3BBB0" stroke-width="2"/>
+    <line x1="350" y1="180" x2="500" y2="215" stroke="#B3BBB0" stroke-width="2"/>
+
+    <rect x="90" y="215" width="220" height="150" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="200" y="245" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">ride1</text>
+    <text x="200" y="267" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" fill="#2274B5">Ride("Amir", 22.50)</text>
+    <text x="110" y="300" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">rider = "Amir"</text>
+    <text x="110" y="323" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">fare  = 22.50</text>
+    <text x="200" y="352" text-anchor="middle" font-size="11" font-weight="700" fill="#2274B5">Its own independent data</text>
+
+    <rect x="390" y="215" width="220" height="150" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
+    <text x="500" y="245" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">ride2</text>
+    <text x="500" y="267" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" fill="#83671C">Ride("Priya", 14.00)</text>
+    <text x="410" y="300" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">rider = "Priya"</text>
+    <text x="410" y="323" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">fare  = 14.00</text>
+    <text x="500" y="352" text-anchor="middle" font-size="11" font-weight="700" fill="#83671C">Its own independent data</text>
+
+    <text x="350" y="398" text-anchor="middle" font-size="12" fill="#327A5F">Changing ride2's fare never touches ride1's fare — each object keeps its own copy.</text>
+  </g>
+</svg>
+
+<p>Both <code>ride1</code> and <code>ride2</code> came from the exact same class — the exact same blueprint — but the moment each one gets built, it gets its own separate set of values. That's the whole idea this reading is about.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>class</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Class</strong><br>A blueprint for creating objects. It defines what data every object of that type will hold and what it can do — but a class by itself isn't an object, the same way a blueprint for a house isn't a house.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>object</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Object (instance)</strong><br>One actual thing built from a class. <code>ride1</code> and <code>ride2</code> are both objects — both "instances" — of the class <code>Ride</code>, each with its own separate data.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>__init__</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>__init__</strong><br>The setup method that runs automatically every single time a new object is created from a class. Short for "initialize" — its job is to set up that object's starting data.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>self</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>self</strong><br>Inside a class, <code>self</code> refers to whichever specific object is currently being created or used — never to the class as a whole. When Python builds <code>ride2</code>, <code>self</code> means "ride2" for the entire time <code>__init__</code> is running.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>attribute</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Attribute</strong><br>A piece of data stored on an object, written as <code>self.name = value</code> inside <code>__init__</code>. <code>rider</code> and <code>fare</code> are attributes of every <code>Ride</code> object — accessed later as <code>ride1.fare</code>, <code>ride2.fare</code>, and so on.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>instantiate</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Instantiate</strong><br>To actually build an object from a class, by calling the class name like a function: <code>Ride("Amir", 22.50)</code>. Each call to instantiate creates one brand-new, independent object.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Defining the class, line by line</h2>
+<p>Here's the full <code>Ride</code> class from the diagram above, on its own:</p>
+<div class="mlrk-code"><pre>class Ride:
+    def __init__(self, rider, fare):
+        self.rider = rider
+        self.fare = fare</pre></div>
+<p>Reading it line by line: <code>class Ride:</code> names the blueprint. <code>def __init__(self, rider, fare):</code> defines the setup method that runs the instant an object is built — <code>self</code> is always the first parameter of any method defined inside a class, and Python fills it in automatically with whichever object is currently being created; you never pass it yourself. <code>rider</code> and <code>fare</code> are ordinary parameters, just like in a regular function — they hold whatever values get passed in. The two lines underneath are where the actual saving happens: <code>self.rider = rider</code> takes the value that came in through the <code>rider</code> parameter and stores it as an attribute <em>on this specific object</em>, permanently, so it's still there later even after <code>__init__</code> finishes running.</p>
+<p>Building an object from this class — instantiating it — looks like calling a function:</p>
+<div class="mlrk-code"><pre>ride1 = Ride("Amir", 22.50)
+ride2 = Ride("Priya", 14.00)</pre></div>
+<p>Each of those two lines runs <code>__init__</code> once, with <code>self</code> pointing at a brand-new, empty object each time. The first call sets that new object's <code>rider</code> to <code>"Amir"</code> and <code>fare</code> to <code>22.50</code>, then hands it back as <code>ride1</code>. The second call does the same thing on a <em>completely different</em> new object, with completely different values, handed back as <code>ride2</code>. Nothing about building <code>ride2</code> touches <code>ride1</code> at all.</p>
+
+<div class="mlrk-card">
+<p><strong>Predict:</strong> given the two lines above, what does <code>ride1.fare</code> return?</p>
+<div id="cls-predict1">
+  <button type="button" class="mlrk-choice" data-a="22.50">22.50</button>
+  <button type="button" class="mlrk-choice" data-a="14.00">14.00</button>
+  <button type="button" class="mlrk-choice" data-a="None">None</button>
+  <button type="button" class="mlrk-choice" data-a="Error">Error</button>
+</div>
+<div id="cls-predict1fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<p style="margin-top:1.4rem">Now suppose the dispatcher reroutes ride2 and updates its price afterward:</p>
+<div class="mlrk-code"><pre>ride2.fare = 18.00</pre></div>
+<div class="mlrk-card">
+<p><strong>Predict:</strong> after that line runs, what does <code>ride1.fare</code> return now?</p>
+<div id="cls-predict2">
+  <button type="button" class="mlrk-choice" data-a="22.50">22.50</button>
+  <button type="button" class="mlrk-choice" data-a="18.00">18.00</button>
+  <button type="button" class="mlrk-choice" data-a="14.00">14.00</button>
+  <button type="button" class="mlrk-choice" data-a="Error">Error</button>
+</div>
+<div id="cls-predict2fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<p style="margin-top:1.4rem">Now write one of your own. Nimbus Rides also wants a <code>Driver</code> class, so every driver's own <code>name</code> and <code>car_model</code> stay independent from every other driver's:</p>
+<div class="mlrk-card">
+<p><strong>Fill in the blanks</strong> so <code>__init__</code> stores both parameters as attributes on the new object:</p>
+<div class="mlrk-code"><pre>class Driver:
+    def __init__(self, name, car_model):
+        ____________________
+        ____________________</pre></div>
+<div class="cls-twoline">
+  <div class="cls-line"><span>&gt;</span><input type="text" id="cls-driver-line1" autocomplete="off" placeholder="e.g. self.attr = value"></div>
+  <div class="cls-line"><span>&gt;</span><input type="text" id="cls-driver-line2" autocomplete="off" placeholder="e.g. self.attr = value"></div>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="cls-driver-check">Check</button></div>
+<div id="cls-driverfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Each line follows the exact same shape as the <code>Ride</code> class above: <code>self.</code> followed by the attribute name, <code>=</code>, then the parameter holding the value — once for <code>name</code>, once for <code>car_model</code>. Order between the two lines doesn't matter.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Two objects, two independent worlds</h2>
+<p>It's tempting to picture <code>self.rider = rider</code> as setting some single, shared box called <code>rider</code> that every <code>Ride</code> object peeks into. That's backwards. Every time <code>__init__</code> runs, <code>self</code> points at a fresh, separate object, and <code>self.rider = rider</code> stores the value on <em>that one object only</em>. <code>ride1</code> and <code>ride2</code> don't share a <code>rider</code> attribute or a <code>fare</code> attribute at all — they each have their own copy, sitting in their own separate spot in memory, and one can change without the other ever noticing.</p>
+<p>Select every statement below that's actually true about <code>ride1</code> and <code>ride2</code>:</p>
+<div class="mlrk-card">
+<div class="cls-checklist">
+<label><input type="checkbox" class="cls-indep-box" value="a"> <span><code>ride1</code> and <code>ride2</code> store their own separate values for <code>rider</code> and <code>fare</code>, even though both came from the same <code>Ride</code> class.</span></label>
+<label><input type="checkbox" class="cls-indep-box" value="b"> <span>Running <code>ride2.fare = 18.00</code> also changes <code>ride1.fare</code> to <code>18.00</code>, since both are <code>Ride</code> objects.</span></label>
+<label><input type="checkbox" class="cls-indep-box" value="c"> <span>Inside <code>__init__</code>, <code>self</code> refers to whichever specific object is being built at that moment — not to the <code>Ride</code> class as a whole.</span></label>
+<label><input type="checkbox" class="cls-indep-box" value="d"> <span>Every <code>Ride</code> object is required to end up with the exact same <code>fare</code> value, since <code>fare</code> is only assigned once, inside <code>__init__</code>.</span></label>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="cls-indep-check">Check my answers</button></div>
+<div id="cls-indepfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Watch: classes in under four minutes</h2>
+<div class="mlrk-video-wrap"><div id="cls-video"></div></div>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=rJzjDszODTI" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>As you watch, keep an eye out for the same two things this reading just covered: <code>__init__</code> running once per object, and every object it builds keeping attribute values that are entirely its own.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
+<p>Nimbus Rides' bug happened because one set of plain variables was being asked to represent an unlimited number of rides at once. A class fixes that at the root: <code>class Ride:</code> defines the blueprint once, <code>__init__(self, rider, fare)</code> runs automatically every time a new <code>Ride</code> gets built, and <code>self.rider = rider</code> / <code>self.fare = fare</code> save that data onto <em>that one object</em> — never onto some single shared variable. <code>ride1 = Ride("Amir", 22.50)</code> and <code>ride2 = Ride("Priya", 14.00)</code> can now exist at the same time, indefinitely, each fully independent of the other.</p>
+<label for="cls-reflect"><strong>In 2–3 sentences:</strong> think of something else in the real world that Nimbus Rides' app would need to track as many independent copies of at once (drivers, passengers, cars, trips...). What would two attributes on that class be, and why would each object need its own independent copy of them?</label>
+<textarea id="cls-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="cls-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="cls-copy">Copy Plain Text Answers</button>
+<p id="cls-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "classes-objects-reading";
+  const TITLE = "The Fare That Went to the Wrong Ride — Writing Your First Python Class";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.quiz({
+    id: "act-predict1",
+    buttonSelector: "#cls-predict1 .mlrk-choice",
+    feedbackSelector: "#cls-predict1fb",
+    correct: "22.50",
+    feedback: {
+      "22.50": "Right — ride1 was built with Ride(\"Amir\", 22.50), so self.fare was set to 22.50 on that one object.",
+      "14.00": "That's ride2's fare, not ride1's — each object keeps its own separate copy of fare.",
+      "None": "ride1's __init__ already ran and set self.fare = 22.50 — the attribute has a real value.",
+      "Error": "Nothing about accessing ride1.fare is invalid — it's a plain attribute that was set in __init__."
+    }
+  });
+
+  K.quiz({
+    id: "act-predict2",
+    buttonSelector: "#cls-predict2 .mlrk-choice",
+    feedbackSelector: "#cls-predict2fb",
+    correct: "22.50",
+    feedback: {
+      "22.50": "Right — ride2.fare = 18.00 only changes the fare attribute stored on ride2. ride1 is a completely separate object and never sees that change.",
+      "18.00": "That's ride2's new value. ride1 and ride2 don't share a fare attribute, so changing one never changes the other.",
+      "14.00": "14.00 was ride2's fare before the update — but the question is about ride1, which was never 14.00 to begin with.",
+      "Error": "Nothing here raises an error — ride1.fare still holds whatever __init__ originally set it to."
+    }
+  });
+
+  function normalizeExpr(s){ return s.trim().toLowerCase().replace(/\s+/g,""); }
+  const driverBtn = document.getElementById("cls-driver-check");
+  const driverLine1 = document.getElementById("cls-driver-line1");
+  const driverLine2 = document.getElementById("cls-driver-line2");
+  const driverFb = document.getElementById("cls-driverfb");
+  K.Scoring.register("act-driver-fillcode", 1, "quiz");
+  let driverAttempts = 0, driverDone = false;
+  driverBtn.addEventListener("click", function(){
+    if(driverDone) return;
+    driverAttempts++;
+    const vals = [normalizeExpr(driverLine1.value), normalizeExpr(driverLine2.value)];
+    const hasName = vals.some(v => /^self\.name=name$/.test(v));
+    const hasCar = vals.some(v => /^self\.car_model=car_model$/.test(v));
+    const ok = hasName && hasCar;
+    if(ok){
+      K.Scoring.award("act-driver-fillcode", driverAttempts===1?1:0.5);
+      driverFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      driverFb.innerHTML = "<strong>Correct.</strong> <code>self.name = name</code> and <code>self.car_model = car_model</code> save both parameters onto the new object.";
+      driverDone = true;
+    } else if(driverAttempts >= 2){
+      K.Scoring.award("act-driver-fillcode", 0);
+      driverFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      driverFb.innerHTML = "<strong>The answer is:</strong> <code>self.name = name</code> and <code>self.car_model = car_model</code> (either order).";
+      driverDone = true;
+    } else {
+      driverFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      driverFb.innerHTML = "<strong>Not quite.</strong> Each line needs <code>self.</code>, the attribute name, <code>=</code>, then the matching parameter." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    driverFb.setAttribute("tabindex","-1"); driverFb.focus();
+  });
+
+  K.selectAll({
+    id: "act-indep-selectall",
+    boxSelector: ".cls-indep-box",
+    submitSelector: "#cls-indep-check",
+    feedbackSelector: "#cls-indepfb",
+    options: [
+      {value:"a", label:"ride1 and ride2 store their own separate values for rider and fare, even though both came from the same Ride class.", correct:true,
+        explain:"Every object built from a class gets its own independent copy of each attribute set inside __init__."},
+      {value:"b", label:"Running ride2.fare = 18.00 also changes ride1.fare to 18.00, since both are Ride objects.", correct:false,
+        hint:"self.fare = fare inside __init__ stored fare on one specific object, not on some value shared by every Ride.",
+        explain:"ride1 and ride2 never share a fare attribute — changing ride2's copy leaves ride1's completely untouched."},
+      {value:"c", label:"Inside __init__, self refers to whichever specific object is being built at that moment — not to the Ride class as a whole.", correct:true,
+        explain:"That's exactly what makes self.rider = rider land on the right object every time __init__ runs, no matter how many objects already exist."},
+      {value:"d", label:"Every Ride object is required to end up with the exact same fare value, since fare is only assigned once, inside __init__.", correct:false,
+        hint:"__init__ runs once per object, not once total — each run can receive a different argument.",
+        explain:"__init__ runs separately for every object built, and each run can be handed a totally different fare argument."}
+    ]
+  });
+
+  K.video({id:"act-video", elementId:"cls-video", videoId:"rJzjDszODTI"});
+
+  K.freeResponse({id:"act-reflect", selector:"#cls-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#cls-scorechip"); });
+  K.Scoring.renderChip("#cls-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#cls-copy", onDone:function(ok){
+    document.getElementById("cls-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Don't Reach Past the Teller — Encapsulation in Python</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:16rem;font-family:var(--mlrk-font-code)}
+.enc-fillblank-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+.enc-fillblank-row label{font-family:var(--mlrk-font-code);font-size:.95rem}
+.mlrk-snippet{display:block;border:2px solid var(--mlrk-gray-400);border-radius:12px;padding:.7rem;cursor:pointer}
+.mlrk-snippet:hover{border-color:var(--mlrk-bg-brand-deep)}
+.mlrk-snippet input{margin-right:.5rem;transform:translateY(1px)}
+.mlrk-snippet .mlrk-code{margin-top:.5rem}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>Don't Reach Past the Teller</h1>
+<p class="mlrk-lead">PocketVault, a fictional personal-banking app, built its <code>BankAccount</code> class around one rule it exists to guarantee: a balance can never go negative. The class's own <code>withdraw()</code> method checks for that before it changes anything — but Python never actually stops other code from reaching straight past that method and changing the balance directly. When a payout script did exactly that last quarter, skipping the check entirely, several accounts went negative overnight. This reading is about the one naming habit, and the one code habit, that keep a class in control of its own state no matter what code is calling it.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~12 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">Builds on classes &amp; objects</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. The rule the class is supposed to guarantee</h2>
+<p>PocketVault is a fictional personal-banking app built around one class, <code>BankAccount</code>. Every account object keeps track of its own balance in an attribute called <code>_balance</code>, and the class exists to guarantee exactly one rule: that balance can never go negative. Here's the class, roughly as PocketVault's engineers wrote it:</p>
+<div class="mlrk-code"><pre>class BankAccount:
+    def __init__(self, starting_balance):
+        self._balance = starting_balance
+
+    def withdraw(self, amount):
+        if amount <= self._balance:
+            self._balance -= amount
+        else:
+            print("Insufficient funds")</pre></div>
+<p><code>withdraw()</code> checks first, before it changes anything: is there enough money to cover this? Only if that check passes does <code>self._balance</code> actually change. That single <code>if</code> statement is the whole reason the rule holds. Skip it, and there's nothing left protecting the balance at all. (The class also defines a matching <code>deposit()</code> method for adding funds through that same kind of guarded path — this reading focuses on <code>withdraw()</code>, since that's where the rule actually needs protecting.)</p>
+<p>Last quarter, a different engineer wrote a one-off script to process a batch of overnight vendor payouts. Under deadline pressure, instead of calling <code>withdraw()</code> for each payout, the script went straight for the attribute:</p>
+<div class="mlrk-code"><pre>for payout in pending_payouts:
+    account = accounts[payout.account_id]
+    account._balance -= payout.amount</pre></div>
+<p>That line runs perfectly fine in Python every single time, whether or not <code>payout.amount</code> is bigger than whatever is actually in the account. Nothing in the language stops it. By morning, several PocketVault accounts had gone negative — not because of a math error, but because the one line of code that was supposed to check first never ran at all.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>attribute</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Attribute</strong><br>A piece of data stored on an object, like <code>self._balance</code> inside a <code>BankAccount</code> instance.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>underscore convention</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Underscore convention</strong><br>A single leading underscore, like <code>_balance</code>, tells other programmers "treat this as internal — don't set it directly from outside the class." Python never actually enforces this; it relies entirely on everyone respecting the convention.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>encapsulation</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Encapsulation</strong><br>Bundling an object's data together with the methods allowed to change it, so the class — not whatever code happens to be calling it — controls how its own state changes.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>invariant</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Invariant</strong><br>A rule about an object's state that must always stay true, no matter what code touches the object. For a bank account, "balance never goes negative" is the invariant <code>withdraw()</code> exists to protect.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. The underscore isn't a lock</h2>
+<p>The leading underscore in <code>_balance</code> is not decoration. It's Python's naming convention for exactly this situation: a single leading underscore tells any other programmer reading the code, "this is internal to the class — don't set it directly from outside." <code>self._balance</code> could just as easily have been named <code>self.balance</code>, with no underscore at all, and Python would run either version identically. The underscore is a signal aimed at people, not a rule enforced by the interpreter.</p>
+<p>That's exactly the gap the payout script fell into. Nothing about <code>_balance</code> stopped that script from reaching in and changing it directly. The underscore asked politely, and the script ignored it.</p>
+
+<div class="mlrk-card">
+<p><strong>True or false:</strong> if outside code writes <code>account._balance = -500</code>, Python raises an error and refuses the assignment.</p>
+<div id="enc-tf">
+  <button type="button" class="mlrk-choice" data-a="true">True</button>
+  <button type="button" class="mlrk-choice" data-a="false">False</button>
+</div>
+<div id="enc-tffb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<p style="margin-top:1.4rem">Here are the two paths side by side — the same account, the same withdrawal amount, but two very different routes to changing <code>_balance</code>:</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 640 360" role="img" aria-labelledby="encDiagTitle encDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="encDiagTitle">Two paths to changing a bank account's balance, compared</title>
+  <desc id="encDiagDesc">On the left, external code sets the balance attribute directly by writing account underscore balance minus equals 500. No condition runs before the change happens, so the balance can go negative and the rule is broken. On the right, external code calls account.withdraw(500) instead. Inside the method, whether the amount is no more than the current balance is checked first, so the balance only changes when that check passes and the rule holds.</desc>
+  <defs>
+    <marker id="encArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0L10,5L0,10z" fill="#B3BBB0"/>
+    </marker>
+  </defs>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="155" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#C92929">Setting _balance directly</text>
+    <text x="485" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#264326">Calling withdraw() instead</text>
+
+    <rect x="10" y="40" width="290" height="50" rx="10" fill="#FFFFFF" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="155" y="70" text-anchor="middle" font-size="13" fill="#261F1D">External code</text>
+    <rect x="340" y="40" width="290" height="50" rx="10" fill="#FFFFFF" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="485" y="70" text-anchor="middle" font-size="13" fill="#261F1D">External code</text>
+
+    <line x1="155" y1="92" x2="155" y2="112" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+    <line x1="485" y1="92" x2="485" y2="112" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+
+    <rect x="10" y="114" width="290" height="50" rx="10" fill="#261F1D" stroke="#C92929" stroke-width="2.5"/>
+    <text x="155" y="144" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#FFFCF7">account._balance -= 500</text>
+    <rect x="340" y="114" width="290" height="50" rx="10" fill="#261F1D" stroke="#264326" stroke-width="2.5"/>
+    <text x="485" y="144" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#FFFCF7">account.withdraw(500)</text>
+
+    <line x1="155" y1="166" x2="155" y2="186" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+    <line x1="485" y1="166" x2="485" y2="186" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+
+    <rect x="10" y="188" width="290" height="64" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2"/>
+    <text x="155" y="213" text-anchor="middle" font-size="12.5" fill="#261F1D">No condition runs</text>
+    <text x="155" y="234" text-anchor="middle" font-size="12.5" fill="#261F1D">before the change happens</text>
+
+    <rect x="340" y="188" width="290" height="64" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="485" y="213" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">amount &lt;= self._balance</text>
+    <text x="485" y="234" text-anchor="middle" font-size="12.5" fill="#261F1D">is checked first</text>
+
+    <line x1="155" y1="254" x2="155" y2="274" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+    <line x1="485" y1="254" x2="485" y2="274" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+
+    <rect x="10" y="276" width="290" height="64" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="3"/>
+    <text x="155" y="301" text-anchor="middle" font-size="13" font-weight="700" fill="#C92929">Balance can go negative</text>
+    <text x="155" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#C92929">the rule is broken</text>
+
+    <rect x="340" y="276" width="290" height="64" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="3"/>
+    <text x="485" y="301" text-anchor="middle" font-size="13" font-weight="700" fill="#264326">Balance only changes</text>
+    <text x="485" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#264326">when the check passes</text>
+  </g>
+</svg>
+
+<p>The path on the left is exactly what the payout script did: reach the attribute directly, with no check in between. The path on the right is what <code>withdraw()</code> guarantees every single time it's the one making the change.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Write the one sanctioned door in</h2>
+<p>The fix for PocketVault was never a smarter underscore or a stronger warning comment — Python has no setting that makes an attribute truly private. The fix is a habit: every piece of code that changes <code>_balance</code>, including the class's own code, goes through a method that can check something first. <code>withdraw()</code> above is that method already. Fill in the two missing pieces below to complete it yourself.</p>
+
+<div class="mlrk-card">
+<p><strong>Fill in the blanks</strong> to complete <code>withdraw()</code> so it only lets money leave the account when there's enough of it.</p>
+<div class="mlrk-fillblank enc-fillblank-row"><label for="enc-blank1"><code>if amount ____ self._balance:</code></label> <input type="text" id="enc-blank1" autocomplete="off" placeholder="comparison operator"></div>
+<div class="mlrk-fillblank enc-fillblank-row"><label for="enc-blank2">&nbsp;&nbsp;&nbsp;&nbsp;<code>____</code> (the line inside the <code>if</code>)</label> <input type="text" id="enc-blank2" autocomplete="off" placeholder="e.g. self._balance = ..." style="width:18rem"></div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="enc-blank-check">Check my answers</button></div>
+<div id="enc-blank-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Blank 1 is a comparison operator — the withdrawal should only be allowed when <code>amount</code> is no more than the current balance. Blank 2 is the one line that actually changes <code>self._balance</code>, using the same <code>amount</code> the check just approved.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Practice: respects the rule or breaks it?</h2>
+<p>Assume <code>account</code> is a real <code>BankAccount</code> object, already created elsewhere. Select every snippet below that skips the class's own method and reaches straight into <code>_balance</code> instead:</p>
+<div class="mlrk-grid" style="margin-top:1rem">
+<label class="mlrk-snippet"><input type="checkbox" class="enc-classify-box" value="a">Snippet A
+<div class="mlrk-code"><div class="mlrk-screen">account.withdraw(200)</div></div>
+</label>
+<label class="mlrk-snippet"><input type="checkbox" class="enc-classify-box" value="b">Snippet B
+<div class="mlrk-code"><div class="mlrk-screen">account._balance -= 500</div></div>
+</label>
+<label class="mlrk-snippet"><input type="checkbox" class="enc-classify-box" value="c">Snippet C
+<div class="mlrk-code"><div class="mlrk-screen">account.deposit(75)</div></div>
+</label>
+<label class="mlrk-snippet"><input type="checkbox" class="enc-classify-box" value="d">Snippet D
+<div class="mlrk-code"><div class="mlrk-screen">account._balance = 0</div></div>
+</label>
+</div>
+<div class="mlrk-actions" style="margin-top:1rem"><button type="button" class="mlrk-btn" id="enc-classify-submit">Check my answers</button></div>
+<div id="enc-classify-fb" class="mlrk-feedback" tabindex="-1"></div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Look for a method call (a name followed by parentheses) versus a direct assignment straight to <code>_balance</code>. The resulting number doesn't matter here — what matters is whether any method, and therefore any check, ran at all.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Watch: the naming convention itself</h2>
+<div class="mlrk-video-wrap"><div id="enc-video"></div></div>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=yDPbKgzuTEs" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>This one-minute clip from Real Python, a well-known Python tutorials and courses site, names the exact convention section 3 just covered: the difference between a single leading underscore like <code>_balance</code> and a double leading underscore, and why neither one is real enforcement.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary &amp; reflection</h2>
+<p>PocketVault's <code>_balance</code> was never actually locked. The leading underscore only ever asked other code to leave it alone, and the class's real protection lived entirely inside <code>withdraw()</code>'s <code>if</code> check. Any class that needs to guarantee a rule about its own state has to route every change through a method that can enforce that rule, because a naming convention alone stops nothing.</p>
+<label for="enc-reflect"><strong>In 2-3 sentences:</strong> think of a class you've written, or one from an earlier reading in this fellowship, that has an attribute outside code probably shouldn't set directly. What could break if something changed it directly instead of going through a method?</label>
+<textarea id="enc-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="enc-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="enc-copy">Copy Plain Text Answers</button>
+<p id="enc-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "encapsulation-reading";
+  const TITLE = "Don't Reach Past the Teller — Encapsulation in Python";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.quiz({
+    id: "act-tf-underscore",
+    buttonSelector: "#enc-tf .mlrk-choice",
+    feedbackSelector: "#enc-tffb",
+    correct: "false",
+    maxAttempts: 1,
+    answerLabel: "False",
+    feedback: {
+      "false": "False. The leading underscore is only a naming convention — Python never checks it and never blocks the assignment. <code>account._balance = -500</code> runs exactly like any other attribute assignment, which is exactly how the payout script's bug got through.",
+      "true": "Actually false. Python has no built-in privacy lock on _balance — the underscore is a signal to other programmers, not a rule the interpreter enforces."
+    }
+  });
+
+  const blank1 = document.getElementById("enc-blank1");
+  const blank2 = document.getElementById("enc-blank2");
+  const blankBtn = document.getElementById("enc-blank-check");
+  const blankFb = document.getElementById("enc-blank-fb");
+  K.Scoring.register("act-fillcode-withdraw", 1, "quiz");
+  let blankAttempts = 0, blankDone = false;
+  blankBtn.addEventListener("click", function(){
+    if(blankDone) return;
+    blankAttempts++;
+    const v1 = blank1.value.trim();
+    const v2 = blank2.value.trim().replace(/\s+/g,"");
+    const opOk = v1 === "<=";
+    const lineOk = v2 === "self._balance-=amount" || v2 === "self._balance=self._balance-amount";
+    const ok = opOk && lineOk;
+    if(ok){
+      K.Scoring.award("act-fillcode-withdraw", blankAttempts===1?1:0.5);
+      blankFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      blankFb.innerHTML = "<strong>Correct.</strong> <code>if amount <= self._balance:</code> only lets the next line run when there's enough money, and <code>self._balance -= amount</code> is the one line the class trusts to actually change its own balance.";
+      blankDone = true;
+    } else if(blankAttempts>=2){
+      K.Scoring.award("act-fillcode-withdraw", 0);
+      blankFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      blankFb.innerHTML = "<strong>The answers are:</strong> <code>&lt;=</code> for the first blank, <code>self._balance -= amount</code> for the second.";
+      blankDone = true;
+    } else {
+      blankFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      blankFb.innerHTML = "<strong>Not quite.</strong> " + (!opOk
+        ? "Check the comparison — when is there actually enough money to allow the withdrawal?"
+        : "The condition looks right; check the line that changes the balance itself.") +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    blankFb.setAttribute("tabindex","-1"); blankFb.focus();
+  });
+
+  K.selectAll({
+    id: "act-classify-respect",
+    boxSelector: ".enc-classify-box",
+    submitSelector: "#enc-classify-submit",
+    feedbackSelector: "#enc-classify-fb",
+    options: [
+      {value:"a", label:"account.withdraw(200) — calls the class's own method.", correct:false,
+        hint:"This one calls withdraw() itself — that's the path the class built specifically to check first.",
+        explain:"withdraw() runs its own check before ever touching _balance, so calling it never skips the rule."},
+      {value:"b", label:"account._balance -= 500 — reaches into the attribute directly.", correct:true,
+        hint:"No method name appears anywhere in this line — that's worth a second look.",
+        explain:"This line changes _balance with no method, and therefore no check, running at all — exactly what broke PocketVault's accounts."},
+      {value:"c", label:"account.deposit(75) — calls the class's own method.", correct:false,
+        hint:"Look for a method call versus a direct assignment to _balance — which one is this?",
+        explain:"deposit() is the class's own sanctioned method for adding funds, called the way it's meant to be called."},
+      {value:"d", label:"account._balance = 0 — reaches into the attribute directly.", correct:true,
+        hint:"Zero isn't negative, but ask: did any method run here at all?",
+        explain:"Even though 0 isn't a negative balance, this line still overwrites _balance directly, with no method and no check in between."}
+    ]
+  });
+
+  K.video({id:"act-video", elementId:"enc-video", videoId:"yDPbKgzuTEs"});
+
+  K.freeResponse({id:"act-reflect", selector:"#enc-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#enc-scorechip"); });
+  K.Scoring.renderChip("#enc-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#enc-copy", onDone:function(ok){
+    document.getElementById("enc-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

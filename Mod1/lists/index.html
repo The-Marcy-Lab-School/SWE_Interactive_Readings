@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Off By One Song — Python Lists and the Zero-Index Trap</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:700px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:20rem;font-family:var(--mlrk-font-code)}
+.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>Off By One Song</h1>
+<p class="mlrk-lead">QueueUp, a small app one of last year's fellows built for the campus study lounge, lets anyone in the room add songs to a shared queue that plays through one speaker. Its most-used feature is a "skip to song" button, so if a listener wants to jump straight to the third song without waiting, they can. Except for weeks, pressing "skip to song 3" always skipped to song 4 instead — a bug traced back to one line of code that assumed "the 3rd song" and <code>queue[3]</code> meant the same thing. They don't. This reading is about the exact reason why, and about the tool at the center of it: the Python list.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~11 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. The bug: "skip to 3" landed on song 4</h2>
+<p>Here's the actual queue sitting behind QueueUp's bug report, exactly as it would look in Python:</p>
+<div class="mlrk-code"><pre>queue = ["Skyline Drive", "Paper Boats", "Neon Static", "Better Days", "Midnight Coast"]</pre></div>
+<p>Square brackets create a <strong>list</strong>: an ordered, changeable collection, written as comma-separated values between <code>[</code> and <code>]</code>. Order matters here in a way it doesn't for every Python collection — this list remembers that "Skyline Drive" comes before "Paper Boats," and Python gives every item a numbered position, called an <strong>index</strong>, based on exactly where it sits.</p>
+<p>Here's where QueueUp's bug came from. Whoever wrote the "skip to song" feature reached for the everyday way people count (first, second, third) and wrote <code>queue[3]</code> to mean "the 3rd song." But Python doesn't start counting at 1; it starts at 0. So <code>queue[0]</code> is the first song, <code>queue[1]</code> is the second, and <code>queue[2]</code> is the third. That makes <code>queue[3]</code> actually the <em>fourth</em> song, "Better Days." Every single listener who asked for song 3 got song 4 instead, and nobody on the team noticed until a regular in the lounge asked out loud why the app kept skipping ahead.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 680 220" role="img" aria-labelledby="idxDiagTitle idxDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="idxDiagTitle">The QueueUp list shown with both its front-counted and back-counted index numbers</title>
+  <desc id="idxDiagDesc">Five boxes in a row hold the songs Skyline Drive, Paper Boats, Neon Static, Better Days, and Midnight Coast in that order. Above each box is its index counted from the front, starting at 0 for Skyline Drive and ending at 4 for Midnight Coast. Below each box is its index counted from the back, starting at -1 for Midnight Coast and ending at -5 for Skyline Drive. The third song in everyday counting, Neon Static, sits at front-index 2, not 3.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="10" y="55" text-anchor="start" font-size="13" font-weight="700" fill="#264326">front index</text>
+    <text x="115" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">0</text>
+    <text x="221" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">1</text>
+    <text x="327" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">2</text>
+    <text x="433" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">3</text>
+    <text x="539" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">4</text>
+
+    <rect x="67" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="115" y="110" text-anchor="middle" font-size="11" fill="#261F1D">Skyline Drive</text>
+
+    <rect x="173" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="221" y="110" text-anchor="middle" font-size="11" fill="#261F1D">Paper Boats</text>
+
+    <rect x="279" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="327" y="110" text-anchor="middle" font-size="11" fill="#261F1D">Neon Static</text>
+
+    <rect x="385" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="433" y="110" text-anchor="middle" font-size="11" fill="#261F1D">Better Days</text>
+
+    <rect x="491" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="539" y="110" text-anchor="middle" font-size="11" fill="#261F1D">Midnight Coast</text>
+
+    <text x="10" y="185" text-anchor="start" font-size="13" font-weight="700" fill="#83671C">back index</text>
+    <text x="115" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-5</text>
+    <text x="221" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-4</text>
+    <text x="327" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-3</text>
+    <text x="433" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-2</text>
+    <text x="539" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-1</text>
+  </g>
+</svg>
+
+<p>Every box in that row has two valid addresses. Counting from the front, "Neon Static" is <code>queue[2]</code>. Counting from the back, that exact same song is <code>queue[-3]</code>. Negative indexes always count from the end of the list, and <code>queue[-1]</code> is a fast, reliable way to grab the last item without needing to know how long the list is.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>list</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>List</strong><br>An ordered, changeable collection of values, written with square brackets: <code>["a", "b", "c"]</code>. Order is part of what a list remembers.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>index</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Index</strong><br>The numbered position of an item in a list, used inside square brackets to retrieve it: <code>queue[0]</code>. Python indexes start at 0, not 1.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>element</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Element</strong><br>One single value stored inside a list. In <code>queue</code>, "Paper Boats" is one element.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>negative index</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Negative index</strong><br>An index counted from the end of the list instead of the front. <code>queue[-1]</code> is always the last item, no matter how long the list is.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>slice</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Slice</strong><br>A sub-section of a list pulled out with a colon inside the brackets, like <code>queue[1:3]</code> — a new list containing some of the original elements.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>append</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>.append()</strong><br>A list method that adds one new element to the very end of a list, in place: <code>queue.append("new song")</code>.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Predict the output</h2>
+<p>Same <code>queue</code> as above. Type what each line actually returns before checking — this is exactly the mix-up that broke QueueUp's "skip to song" button.</p>
+
+<div class="mlrk-card">
+<p><strong>QueueUp's buggy line:</strong> the code that was supposed to jump to "the 3rd song" was written as <code>queue[3]</code>. What song does that line actually return?</p>
+<div class="mlrk-fillblank"><input type="text" id="lists-idx-input" autocomplete="off" placeholder="Type the song title"> <button type="button" class="mlrk-btn" id="lists-idx-check">Check</button></div>
+<div id="lists-idxfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Count from 0, not 1: <code>queue[0]</code> is the 1st song, <code>queue[1]</code> is the 2nd, <code>queue[2]</code> is the 3rd. Keep counting up to find what <code>queue[3]</code> lands on.</p>
+</details>
+
+<div class="mlrk-card" style="margin-top:1rem">
+<p><strong>Predict:</strong> what does <code>queue[-1]</code> return?</p>
+<div id="lists-neg1">
+  <button type="button" class="mlrk-choice" data-a="Midnight Coast">Midnight Coast</button>
+  <button type="button" class="mlrk-choice" data-a="Skyline Drive">Skyline Drive</button>
+  <button type="button" class="mlrk-choice" data-a="Better Days">Better Days</button>
+  <button type="button" class="mlrk-choice" data-a="IndexError">IndexError — there's no such index</button>
+</div>
+<div id="lists-neg1fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<div class="mlrk-card" style="margin-top:1rem">
+<p><strong>Predict:</strong> a slice, <code>queue[1:3]</code>, pulls out a new list. Type it exactly, as a Python list of strings (e.g. <code>["a", "b"]</code>).</p>
+<div class="mlrk-fillblank"><input type="text" id="lists-slice-input" autocomplete="off" placeholder='e.g. ["a", "b"]'> <button type="button" class="mlrk-btn" id="lists-slice-check">Check</button></div>
+<div id="lists-slicefb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>A slice <code>[start:stop]</code> includes the <code>start</code> index but stops <em>before</em> the <code>stop</code> index — <code>stop</code> itself is never included. So <code>queue[1:3]</code> grabs indexes 1 and 2 only, not 3.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Adding a song: <code>.append()</code></h2>
+<p>Nothing about a list is fixed once it's created. To add a new song to the end of the queue, Python lists have a built-in method, <code>.append()</code>, that adds exactly one new element after everything already there:</p>
+<div class="mlrk-code"><pre>queue.append("Ocean Drive")</pre></div>
+<p>After that line runs, <code>queue</code> has six songs in it, and "Ocean Drive" sits at index <code>5</code> — one past where the last song used to be, because <code>.append()</code> always adds to the end, never the front or the middle.</p>
+
+<div class="mlrk-card">
+<p><strong>Fill in the blank:</strong> a listener wants to add "Static Bloom" to the end of the queue. Complete the line:</p>
+<div class="mlrk-code"><pre>queue = ["Skyline Drive", "Paper Boats", "Neon Static", "Better Days", "Midnight Coast"]
+____________</pre></div>
+<div class="mlrk-fillblank"><input type="text" id="lists-append-input" autocomplete="off" placeholder='e.g. queue.append("Static Bloom")'> <button type="button" class="mlrk-btn" id="lists-append-check">Check</button></div>
+<div id="lists-appendfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Start with the list's name, then a dot, then the method name from the vocabulary above, with the new song title in quotes inside the parentheses.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Practice: index number vs. everyday counting</h2>
+<p>Select every statement below that's actually true about <code>queue</code> as it stood before <code>.append()</code> ran:</p>
+<div class="mlrk-grid" style="margin-top:.6rem">
+<label style="display:flex;gap:.55rem;align-items:flex-start;cursor:pointer"><input type="checkbox" class="lists-truth-box" value="a" style="margin-top:.3rem"> <code>queue[0]</code> refers to the first song in the queue.</label>
+<label style="display:flex;gap:.55rem;align-items:flex-start;cursor:pointer"><input type="checkbox" class="lists-truth-box" value="b" style="margin-top:.3rem"> In a 5-song queue, the last song is <code>queue[5]</code>.</label>
+<label style="display:flex;gap:.55rem;align-items:flex-start;cursor:pointer"><input type="checkbox" class="lists-truth-box" value="c" style="margin-top:.3rem"> <code>queue[-1]</code> refers to the last song, no matter how many songs are in the queue.</label>
+<label style="display:flex;gap:.55rem;align-items:flex-start;cursor:pointer"><input type="checkbox" class="lists-truth-box" value="d" style="margin-top:.3rem"> If a listener asks for "the 3rd song" out loud, the matching Python index is <code>2</code>, not <code>3</code>.</label>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="lists-truth-submit">Check my answers</button></div>
+<div id="lists-truthfb" class="mlrk-feedback" tabindex="-1"></div>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
+<p>A Python list holds items in order, and every item has an index — its position counted from the front, starting at 0, or from the back, starting at -1. QueueUp's bug happened because "the 3rd song" in everyday counting and <code>queue[3]</code> in Python code are two different positions, off by exactly one. Slicing (<code>queue[1:3]</code>) pulls out a range using that same 0-based counting, stopping one short of the second number, and <code>.append()</code> is how a list grows, always at the end.</p>
+<label for="lists-reflect"><strong>In 2–3 sentences:</strong> now that you've seen where QueueUp's bug came from, what's one mental habit you'll use to convert an everyday position ("the 3rd item," "the last one") into the correct Python index before you write the code?</label>
+<textarea id="lists-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="lists-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="lists-copy">Copy Plain Text Answers</button>
+<p id="lists-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "python-lists-reading";
+  const TITLE = "Off By One Song — Python Lists and the Zero-Index Trap";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  function normalizeWord(s){ return s.trim().toLowerCase().replace(/^["']|["']$/g,""); }
+
+  const idxBtn = document.getElementById("lists-idx-check");
+  const idxInput = document.getElementById("lists-idx-input");
+  const idxFb = document.getElementById("lists-idxfb");
+  K.Scoring.register("act-idx-predict", 1, "quiz");
+  let idxAttempts = 0, idxDone = false;
+  idxBtn.addEventListener("click", function(){
+    if(idxDone) return;
+    idxAttempts++;
+    const val = normalizeWord(idxInput.value);
+    const ok = val === "better days";
+    const gotThird = val === "neon static";
+    if(ok){
+      K.Scoring.award("act-idx-predict", idxAttempts===1?1:0.5);
+      idxFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      idxFb.innerHTML = "<strong>Correct.</strong> <code>queue[3]</code> is the 4th song, \"Better Days\" — counting starts at 0, so index 3 is one past where \"the 3rd song\" actually sits (<code>queue[2]</code>, \"Neon Static\").";
+      idxDone = true;
+    } else if(idxAttempts >= 2){
+      K.Scoring.award("act-idx-predict", 0);
+      idxFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      idxFb.innerHTML = "<strong>The answer is:</strong> \"Better Days.\" <code>queue[3]</code> is the 4th song, because indexes start at 0, not 1.";
+      idxDone = true;
+    } else if(gotThird){
+      idxFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      idxFb.innerHTML = "<strong>Not quite — but that's exactly QueueUp's bug.</strong> \"Neon Static\" is the everyday 3rd song, but it actually lives at <code>queue[2]</code>. Re-count from <code>queue[0]</code> to find what <code>queue[3]</code> lands on." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    } else {
+      idxFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      idxFb.innerHTML = "<strong>Not quite.</strong> Count the boxes in the diagram starting from 0, and see which one lines up with the front-index 3." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    idxFb.setAttribute("tabindex","-1"); idxFb.focus();
+  });
+
+  K.quiz({
+    id: "act-neg-predict",
+    buttonSelector: "#lists-neg1 .mlrk-choice",
+    feedbackSelector: "#lists-neg1fb",
+    correct: "Midnight Coast",
+    feedback: {
+      "Midnight Coast": "Right — queue[-1] always means the last item, and \"Midnight Coast\" is last in this 5-song queue.",
+      "Skyline Drive": "That's queue[0] or queue[-5], the first song. Negative indexes count from the back, so -1 is the closest one to the end.",
+      "Better Days": "That's queue[3] or queue[-2], the second-to-last song, not the last one.",
+      "IndexError": "Negative indexes are completely valid in Python — queue[-1] is a normal, reliable way to reach the last item."
+    }
+  });
+
+  function normalizeListAnswer(s){
+    return s.trim().toLowerCase().replace(/'/g,'"')
+      .replace(/\s*([\[\]{}(),:])\s*/g,"$1")
+      .replace(/\s+/g," ");
+  }
+  const sliceBtn = document.getElementById("lists-slice-check");
+  const sliceInput = document.getElementById("lists-slice-input");
+  const sliceFb = document.getElementById("lists-slicefb");
+  K.Scoring.register("act-slice-predict", 1, "quiz");
+  let sliceAttempts = 0, sliceDone = false;
+  const sliceTarget = normalizeListAnswer('["Paper Boats", "Neon Static"]');
+  sliceBtn.addEventListener("click", function(){
+    if(sliceDone) return;
+    sliceAttempts++;
+    const val = normalizeListAnswer(sliceInput.value);
+    const ok = val === sliceTarget;
+    if(ok){
+      K.Scoring.award("act-slice-predict", sliceAttempts===1?1:0.5);
+      sliceFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      sliceFb.innerHTML = '<strong>Correct.</strong> <code>queue[1:3]</code> grabs index 1 and index 2 — "Paper Boats" and "Neon Static" — and stops before index 3.';
+      sliceDone = true;
+    } else if(sliceAttempts >= 2){
+      K.Scoring.award("act-slice-predict", 0);
+      sliceFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      sliceFb.innerHTML = '<strong>The answer is:</strong> <code>["Paper Boats", "Neon Static"]</code> — the stop index in a slice is never included.';
+      sliceDone = true;
+    } else {
+      sliceFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      sliceFb.innerHTML = "<strong>Not quite.</strong> List the titles at index 1 and index 2 only — the number after the colon marks where the slice stops, without including that index." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    sliceFb.setAttribute("tabindex","-1"); sliceFb.focus();
+  });
+
+  const appendBtn = document.getElementById("lists-append-check");
+  const appendInput = document.getElementById("lists-append-input");
+  const appendFb = document.getElementById("lists-appendfb");
+  K.Scoring.register("act-append-fillcode", 1, "quiz");
+  let appendAttempts = 0, appendDone = false;
+  appendBtn.addEventListener("click", function(){
+    if(appendDone) return;
+    appendAttempts++;
+    const val = normalizeListAnswer(appendInput.value);
+    const ok = /^queue\.append\("static bloom"\)$/.test(val);
+    if(ok){
+      K.Scoring.award("act-append-fillcode", appendAttempts===1?1:0.5);
+      appendFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      appendFb.innerHTML = '<strong>Correct.</strong> <code>queue.append("Static Bloom")</code> adds the new song to the end of the list, in place.';
+      appendDone = true;
+    } else if(appendAttempts >= 2){
+      K.Scoring.award("act-append-fillcode", 0);
+      appendFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      appendFb.innerHTML = '<strong>The answer is:</strong> <code>queue.append("Static Bloom")</code>';
+      appendDone = true;
+    } else {
+      appendFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      appendFb.innerHTML = "<strong>Not quite.</strong> Start with the list's name, a dot, then the method from the vocabulary above, with the song title in quotes." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    appendFb.setAttribute("tabindex","-1"); appendFb.focus();
+  });
+
+  K.selectAll({
+    id: "act-truth-selectall",
+    boxSelector: ".lists-truth-box",
+    submitSelector: "#lists-truth-submit",
+    feedbackSelector: "#lists-truthfb",
+    options: [
+      {value:"a", label:"queue[0] refers to the first song in the queue.", correct:true,
+        explain:"Indexes start at 0, so the first element is always queue[0]."},
+      {value:"b", label:"In a 5-song queue, the last song is queue[5].", correct:false,
+        hint:"A 5-song queue only has indexes 0 through 4 — is 5 one of those?",
+        explain:"A 5-song queue only has indexes 0 through 4. queue[5] doesn't exist and would raise an IndexError; the last song is queue[4] or queue[-1]."},
+      {value:"c", label:"queue[-1] refers to the last song, no matter how many songs are in the queue.", correct:true,
+        explain:"Negative indexes always count from the end, so -1 is the last item regardless of the list's length."},
+      {value:"d", label:'If a listener asks for "the 3rd song" out loud, the matching Python index is 2, not 3.', correct:true,
+        explain:"Everyday counting starts at 1, but Python indexing starts at 0, so the 3rd item in a sentence is queue[2] in code."}
+    ]
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#lists-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#lists-scorechip"); });
+  K.Scoring.renderChip("#lists-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#lists-copy", onDone:function(ok){
+    document.getElementById("lists-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

@@ -238,6 +238,61 @@ def check_no_recall_section(text_lower):
     return []
 
 
+def _count_syllables(word):
+    word = word.lower()
+    vowel_groups = re.findall(r"[aeiouy]+", word)
+    count = len(vowel_groups)
+    if word.endswith("e") and not word.endswith("le") and count > 1:
+        count -= 1
+    return max(count, 1)
+
+
+def check_reading_level(html):
+    # Strip anything that isn't real prose the student reads continuously:
+    # code blocks, the technical-vocabulary flip cards (explicitly allowed to
+    # run more technical per the format's own rule), and quiz/button/label UI
+    # chrome, which isn't prose either.
+    no_code = re.sub(r"<(code|pre)\b[^>]*>.*?</\1>", " ", html, flags=re.S | re.I)
+    no_vocab = re.sub(r'<div class="mlrk-grid">.*?</div>\s*</section>', " ", no_code, flags=re.S | re.I)
+    text = visible_text(no_vocab)
+    sentences = [s for s in re.split(r"[.!?]+", text) if s.strip()]
+    words = re.findall(r"[A-Za-z']+", text)
+    if len(sentences) < 3 or len(words) < 50:
+        return []  # not enough real prose to score meaningfully
+    syllables = sum(_count_syllables(w) for w in words)
+    grade = 0.39 * (len(words) / len(sentences)) + 11.8 * (syllables / len(words)) - 15.59
+    if grade > 10.5:
+        return [("WARN", f"Flesch-Kincaid grade level ~{grade:.1f} (target: ~9th grade outside the vocabulary section) — check for long sentences or dense wording in the prose, not just technical terms")]
+    return []
+
+
+AI_TELL_PHRASES = [
+    r"\bin today'?s\b", r"\bin the (?:ever[- ]evolving|fast[- ]paced|digital)\b",
+    r"\bit'?s worth noting\b", r"\blet'?s explore\b", r"\bdive deep(?:er)?\b",
+    r"\bunlock(?:s|ing)?\s+the\b", r"\bpowerful tool\b", r"\bwhether you'?re\b.{0,20}\bor\b",
+    r"\bin conclusion\b", r"\bin summary\b", r"\bplays a (?:crucial|vital|key) role\b",
+]
+
+
+def check_ai_sounding_language(text):
+    findings = []
+    for pat in AI_TELL_PHRASES:
+        for m in re.finditer(pat, text, re.I):
+            findings.append(("WARN", f"AI-tutorial-sounding phrase, reword to something more personable: ...{text[max(0,m.start()-15):m.end()+15]}..."))
+    return findings
+
+
+def check_video_language(html):
+    # No automated way to check the actual spoken language of a video from
+    # its id alone — flag every video for a manual confirmation instead of
+    # silently trusting it, since a non-English pick is otherwise invisible
+    # until someone actually presses play.
+    ids = re.findall(r'videoId\s*:\s*"([A-Za-z0-9_-]{6,})"', html)
+    if ids:
+        return [("WARN", f"reminder: manually confirm the recommended video ({', '.join(ids)}) is in English before shipping — not automatically checkable")]
+    return []
+
+
 def run(path, skip_links=False):
     html = Path(path).read_text(encoding="utf-8")
     text = visible_text(html)
@@ -254,6 +309,9 @@ def run(path, skip_links=False):
     findings += check_copyright(text)
     findings += check_meta_sidecar(path)
     findings += check_no_recall_section(text.lower())
+    findings += check_reading_level(html)
+    findings += check_ai_sounding_language(text)
+    findings += check_video_language(html)
     if not skip_links:
         findings += check_links(html)
     return findings

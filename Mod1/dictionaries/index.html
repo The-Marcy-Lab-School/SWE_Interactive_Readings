@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The City That Wasn't in the Dictionary</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:680px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:22rem;font-family:var(--mlrk-font-code)}
+.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+.dict-checklist{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0}
+.dict-checklist label{display:flex;gap:.55rem;align-items:flex-start;cursor:pointer}
+.dict-checklist input{margin-top:.3rem}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The City That Wasn't in the Dictionary</h1>
+<p class="mlrk-lead">Say you're building a small weather lookup tool. It calls OpenWeatherMap — a widely used web service that returns the current weather for any city as JSON — and to avoid hitting that API every single time someone re-checks a city, the tool saves each temperature it has already looked up into its own local Python dictionary. The first time someone types a city that isn't in that cache yet, the whole program crashes. Not because the weather data is wrong. Because of exactly how the code looked the city up.</p>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~14 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. The lookup that crashes</h2>
+<p>Here's roughly what OpenWeatherMap actually sends back when the tool asks for Brooklyn's weather — real JSON, the same shape you'd get from almost any weather API:</p>
+<div class="mlrk-code"><pre>{
+  "name": "Brooklyn",
+  "main": {
+    "temp": 71.6,
+    "feels_like": 70.9,
+    "humidity": 58
+  },
+  "weather": [
+    {"description": "scattered clouds"}
+  ]
+}</pre></div>
+<p>Once Python parses that response, it's already a dictionary — a <strong>dict</strong>, Python's built-in way to store data as labeled <strong>key/value</strong> pairs instead of a numbered list. Curly braces hold the pairs, each key is a name in quotes, and each value is whatever data lives under that name. Pulling out one field is just <code>response["name"]</code>, which returns <code>"Brooklyn"</code>, or <code>response["main"]["temp"]</code>, which returns <code>71.6</code>. Square brackets plus the key name, and you have exactly the field you asked for. This works every time here because the API always includes these exact keys.</p>
+<p>To avoid calling the API again every time someone re-checks a city, the tool keeps its own smaller dict of temperatures it has already fetched:</p>
+<div class="mlrk-code"><pre>cached_temps = {
+    "Brooklyn": 71.6,
+    "Queens": 68.2,
+    "Bronx": 69.5
+}</pre></div>
+
+<svg class="mlrk-illustration" viewBox="0 0 660 380" role="img" aria-labelledby="dictDiagTitle dictDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="dictDiagTitle">cached_temps as three key/value pairs, plus one key that isn't there</title>
+  <desc id="dictDiagDesc">cached_temps holds three keys, each connected by a line to its own value: Brooklyn to 71.6, Queens to 68.2, and Bronx to 69.5. Below them, a fourth attempted key, Manhattan, sits in a dashed red box with no line reaching any value, because that key was never added to the dict. Text beneath explains that this missing connection is exactly where Python raises a KeyError.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="330" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">cached_temps holds three keys, each mapped to one value</text>
+    <text x="140" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="#261F1D">Keys (already cached)</text>
+    <text x="500" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="#261F1D">Values</text>
+
+    <rect x="40" y="56" width="200" height="42" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="140" y="82" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">"Brooklyn"</text>
+    <rect x="400" y="56" width="200" height="42" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="500" y="82" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">71.6</text>
+    <line x1="240" y1="77" x2="400" y2="77" stroke="#B3BBB0" stroke-width="2"/>
+
+    <rect x="40" y="110" width="200" height="42" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="140" y="136" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">"Queens"</text>
+    <rect x="400" y="110" width="200" height="42" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="500" y="136" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">68.2</text>
+    <line x1="240" y1="131" x2="400" y2="131" stroke="#B3BBB0" stroke-width="2"/>
+
+    <rect x="40" y="164" width="200" height="42" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="140" y="190" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">"Bronx"</text>
+    <rect x="400" y="164" width="200" height="42" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="500" y="190" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">69.5</text>
+    <line x1="240" y1="185" x2="400" y2="185" stroke="#B3BBB0" stroke-width="2"/>
+
+    <rect x="40" y="238" width="200" height="46" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5" stroke-dasharray="7,5"/>
+    <text x="140" y="266" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" font-weight="700" fill="#C92929">"Manhattan"</text>
+    <line x1="240" y1="261" x2="305" y2="261" stroke="#C92929" stroke-width="2" stroke-dasharray="4,4"/>
+    <line x1="300" y1="253" x2="316" y2="269" stroke="#C92929" stroke-width="2.5"/>
+    <line x1="316" y1="253" x2="300" y2="269" stroke="#C92929" stroke-width="2.5"/>
+    <text x="500" y="266" text-anchor="middle" font-size="13" font-weight="700" fill="#C92929">no matching value</text>
+
+    <text x="330" y="330" text-anchor="middle" font-size="13" fill="#C92929" font-weight="700">cached_temps["Manhattan"] has no value to find here —</text>
+    <text x="330" y="350" text-anchor="middle" font-size="13" fill="#C92929" font-weight="700">this is exactly where Python raises a KeyError and stops the program.</text>
+  </g>
+</svg>
+
+<p>That's the crash, exactly. Someone types "Manhattan," the code runs <code>cached_temps["Manhattan"]</code>, and because <code>"Manhattan"</code> was never added as a key, Python raises an error right there:</p>
+<div class="mlrk-code"><pre>&gt;&gt;&gt; cached_temps["Manhattan"]
+Traceback (most recent call last):
+  File "weather_app.py", line 12, in &lt;module&gt;
+KeyError: 'Manhattan'</pre></div>
+<p>Nothing after that line runs — not a friendly "sorry, no data for that city" message, nothing. The program simply stops. Square-bracket lookup is fine when you're sure the key is there. The problem is trusting it when you're not.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card before the practice below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>dict</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Dictionary (dict)</strong><br>Python's built-in way to store data as key/value pairs instead of a numbered sequence. Written with curly braces: <code>{"key": value, "key2": value2}</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>key</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Key</strong><br>The name used to look up one specific piece of data inside a dict, like <code>"Brooklyn"</code> in <code>cached_temps</code>. Keys have to be unique within one dict.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>value</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Value</strong><br>The actual data stored under a key, like <code>71.6</code>, the temperature stored under the key <code>"Brooklyn"</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>KeyError</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>KeyError</strong><br>The error Python raises the instant square brackets look up a key that doesn't exist, e.g. <code>cached_temps["Manhattan"]</code>. It stops the program immediately — nothing after that line runs.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>.get()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>.get(key, default)</strong><br>Looks up a key the safe way. If the key exists, it returns the value, same as square brackets would. If the key doesn't exist, it returns the default you provide instead of crashing.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Writing a safe lookup</h2>
+<p>Compare the two ways of reading the exact same dict:</p>
+<div class="mlrk-grid">
+<div class="mlrk-card">
+<p><strong>Square brackets — crashes on a missing key</strong></p>
+<div class="mlrk-code"><pre>cached_temps = {
+    "Brooklyn": 71.6,
+    "Queens": 68.2
+}
+temp = cached_temps["Manhattan"]
+print(temp)</pre></div>
+<p class="mlrk-small">Line 4 raises <code>KeyError: 'Manhattan'</code> the moment it runs. <code>print(temp)</code> never executes at all.</p>
+</div>
+<div class="mlrk-card">
+<p><strong>.get() — falls back instead of crashing</strong></p>
+<div class="mlrk-code"><pre>cached_temps = {
+    "Brooklyn": 71.6,
+    "Queens": 68.2
+}
+temp = cached_temps.get("Manhattan", 0)
+print(temp)</pre></div>
+<p class="mlrk-small">Line 4 returns <code>0</code> — the default supplied as the second argument — because <code>"Manhattan"</code> isn't a key. The program keeps going and prints <code>0</code>.</p>
+</div>
+</div>
+
+<div class="mlrk-card" style="margin-top:1rem">
+<p><strong>Predict:</strong> given <code>cached_temps = {"Brooklyn": 71.6, "Queens": 68.2, "Bronx": 69.5}</code>, which statement is true?</p>
+<div id="dict-predict1">
+  <button type="button" class="mlrk-choice" data-a="crash-get0">cached_temps["Manhattan"] crashes with a KeyError; cached_temps.get("Manhattan", 0) returns 0 instead.</button>
+  <button type="button" class="mlrk-choice" data-a="both-none">cached_temps["Manhattan"] returns None; cached_temps.get("Manhattan", 0) also returns None.</button>
+  <button type="button" class="mlrk-choice" data-a="both-crash">Both cached_temps["Manhattan"] and cached_temps.get("Manhattan", 0) crash with a KeyError.</button>
+  <button type="button" class="mlrk-choice" data-a="both-zero">Both cached_temps["Manhattan"] and cached_temps.get("Manhattan", 0) return 0.</button>
+</div>
+<div id="dict-predict1fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<p style="margin-top:1.4rem">Now write one yourself. The tool needs a real lookup function — one place every part of the app can call instead of reaching into <code>cached_temps</code> directly. Complete <code>get_temp</code> so it returns the cached temperature for a city, or <code>0</code> if that city hasn't been cached yet:</p>
+<div class="mlrk-card">
+<p><strong>Fill in the blank</strong> so the function returns the cached temperature, or <code>0</code> as a default:</p>
+<div class="mlrk-code"><pre>def get_temp(city):
+    ____________</pre></div>
+<div class="mlrk-fillblank"><input type="text" id="dict-gettemp-input" autocomplete="off" placeholder='e.g. return cached_temps.get(city, 0)'> <button type="button" class="mlrk-btn" id="dict-gettemp-check">Check</button></div>
+<div id="dict-gettempfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>The method that looks up a key the safe way takes two things inside its parentheses: the key you're looking for (here, the <code>city</code> parameter), and the fallback value to use if that key isn't there. Don't forget <code>return</code> — the value still needs to be handed back out of the function.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Watch: dict.get() with a default, in under five minutes</h2>
+<div class="mlrk-video-wrap"><div id="dict-video"></div></div>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=09Y-UX7xgZI" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>Watch for the exact pattern from section 3 above: reaching into a dict with square brackets when a key might be missing turns into a crash, while <code>.get()</code> with a default turns the same situation into a single line of ordinary code.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>5. One more check: reading the dict correctly</h2>
+<div class="mlrk-card">
+<p>Given this code:</p>
+<div class="mlrk-code"><pre>cached_temps = {"Brooklyn": 71.6, "Queens": 68.2}
+print(cached_temps.get("Bronx"))
+print(cached_temps.get("Bronx", 0))
+print(cached_temps["Brooklyn"])</pre></div>
+<p>Select every statement below that's actually true about what happens when this code runs:</p>
+<div class="dict-checklist">
+<label><input type="checkbox" class="dict-read-box" value="a"> <span><code>cached_temps.get("Bronx")</code> prints <code>None</code>, because no default was given and "Bronx" isn't a key.</span></label>
+<label><input type="checkbox" class="dict-read-box" value="b"> <span><code>cached_temps.get("Bronx", 0)</code> prints <code>0</code>, the default supplied since "Bronx" isn't a key.</span></label>
+<label><input type="checkbox" class="dict-read-box" value="c"> <span><code>cached_temps["Brooklyn"]</code> prints <code>71.6</code>, because "Brooklyn" is an existing key.</span></label>
+<label><input type="checkbox" class="dict-read-box" value="d"> <span><code>cached_temps.get("Bronx")</code> raises a KeyError, exactly like <code>cached_temps["Bronx"]</code> would.</span></label>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="dict-read-check">Check my answers</button></div>
+<div id="dict-readfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
+<p>A dict stores data as key/value pairs, which is exactly the shape of most real-world "look something up by name" data — a JSON API response included. <code>dict["key"]</code> is a fine way to read one when you're certain the key exists, but the instant it doesn't, Python raises a <code>KeyError</code> and the program stops cold. <code>dict.get("key", default)</code> asks the same question more carefully: give me this value if you have it, and this fallback if you don't — no crash either way.</p>
+<label for="dict-reflect"><strong>In 2–3 sentences:</strong> think of a real place in an app (a weather tool, a contacts list, a grade lookup, anything) where the data being searched for might not exist yet. Where would <code>.get()</code> with a default be the safer choice than square brackets?</label>
+<textarea id="dict-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="dict-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="dict-copy">Copy Plain Text Answers</button>
+<p id="dict-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "python-dictionaries-reading";
+  const TITLE = "The City That Wasn't in the Dictionary";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.quiz({
+    id: "act-predict1",
+    buttonSelector: "#dict-predict1 .mlrk-choice",
+    feedbackSelector: "#dict-predict1fb",
+    correct: "crash-get0",
+    feedback: {
+      "crash-get0": "Right — square brackets crash on a missing key with a KeyError; .get() catches that same missing key and hands back the default, 0, instead.",
+      "both-none": "Square brackets don't quietly return None on a missing key — they raise a KeyError and stop the program. Only .get() (with no default given) falls back to None.",
+      "both-crash": ".get() is specifically built to never raise a KeyError on its own — that's the entire reason it exists. Only the square-bracket version crashes here.",
+      "both-zero": "Square brackets don't fall back to anything — a missing key there raises a KeyError immediately, so line 4 never finishes running."
+    }
+  });
+
+  function normalizeExpr(s){ return s.trim().toLowerCase().replace(/\s+/g,""); }
+  const gettempBtn = document.getElementById("dict-gettemp-check");
+  const gettempInput = document.getElementById("dict-gettemp-input");
+  const gettempFb = document.getElementById("dict-gettempfb");
+  K.Scoring.register("act-gettemp-fillcode", 1, "quiz");
+  let gettempAttempts = 0, gettempDone = false;
+  gettempBtn.addEventListener("click", function(){
+    if(gettempDone) return;
+    gettempAttempts++;
+    const val = normalizeExpr(gettempInput.value);
+    const ok = /^returncached_temps\.get\(city,0\)$/.test(val);
+    if(ok){
+      K.Scoring.award("act-gettemp-fillcode", gettempAttempts===1?1:0.5);
+      gettempFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      gettempFb.innerHTML = "<strong>Correct.</strong> <code>return cached_temps.get(city, 0)</code> hands back the cached temperature, or 0 if that city was never added as a key.";
+      gettempDone = true;
+    } else if(gettempAttempts >= 2){
+      K.Scoring.award("act-gettemp-fillcode", 0);
+      gettempFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      gettempFb.innerHTML = "<strong>The answer is:</strong> <code>return cached_temps.get(city, 0)</code>";
+      gettempDone = true;
+    } else {
+      gettempFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      gettempFb.innerHTML = "<strong>Not quite.</strong> Start with the keyword that hands a value back, then call the safe-lookup method on cached_temps with the city and a default." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    gettempFb.setAttribute("tabindex","-1"); gettempFb.focus();
+  });
+
+  K.video({id:"act-video", elementId:"dict-video", videoId:"09Y-UX7xgZI"});
+
+  K.selectAll({
+    id: "act-read-selectall",
+    boxSelector: ".dict-read-box",
+    submitSelector: "#dict-read-check",
+    feedbackSelector: "#dict-readfb",
+    options: [
+      {value:"a", label:'cached_temps.get("Bronx") prints None, because no default was given and "Bronx" isn\'t a key.', correct:true,
+        explain:"Right — with no default argument, .get() falls back to None automatically when the key is missing."},
+      {value:"b", label:'cached_temps.get("Bronx", 0) prints 0, the default supplied since "Bronx" isn\'t a key.', correct:true,
+        explain:"Right — the second argument to .get() is exactly what gets returned when the key doesn't exist."},
+      {value:"c", label:'cached_temps["Brooklyn"] prints 71.6, because "Brooklyn" is an existing key.', correct:true,
+        explain:"Right — square brackets work fine on a key that's actually there; they only raise a KeyError when it's missing."},
+      {value:"d", label:'cached_temps.get("Bronx") raises a KeyError, exactly like cached_temps["Bronx"] would.', correct:false,
+        hint:".get() is specifically built to never raise a KeyError on its own — that's the whole reason it exists.",
+        explain:"False — that's the entire point of .get(): it swaps the crash for a safe fallback value (None here, since no default was given)."}
+    ]
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#dict-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#dict-scorechip"); });
+  K.Scoring.renderChip("#dict-scorechip");
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#dict-copy", onDone:function(ok){
+    document.getElementById("dict-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>
