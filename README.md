@@ -5,7 +5,7 @@ Short (10-15 minute, video included), standalone interactive readings for the Ma
 <!-- READINGS_TABLE_START -->
 | Reading | Topic Area | Est. time | Link |
 |---|---|---|---|
-| Know Where You Are — Command Line Navigation & File Systems | Command Line & Environment | 13 min | [Open](https://the-marcy-lab-school.github.io/SWE_Interactive_Readings/Mod0/command-line-file-system/) |
+| Know Where You Are — Command Line Navigation & File Systems | Command Line & Environment | 14 min | [Open](https://the-marcy-lab-school.github.io/SWE_Interactive_Readings/Mod0/command-line-file-system/) |
 | Command Not Found: Running Your First Python Script | Command Line & Environment | 13 min | [Open](https://the-marcy-lab-school.github.io/SWE_Interactive_Readings/Mod0/running-python-files/) |
 | The Missing Terminal — Setting Up WSL | Command Line & Environment | 14 min | [Open](https://the-marcy-lab-school.github.io/SWE_Interactive_Readings/Mod0/wsl-setup/) |
 | When "Yes" Doesn't Mean Yes | Python Fundamentals | 11 min | [Open](https://the-marcy-lab-school.github.io/SWE_Interactive_Readings/Mod1/conditionals-strings/) |
@@ -20,4 +20,5 @@ Short (10-15 minute, video included), standalone interactive readings for the Ma
 | Don't Reach Past the Teller — Encapsulation in Python | Object-Oriented Programming | 12 min | [Open](https://the-marcy-lab-school.github.io/SWE_Interactive_Readings/Mod2/encapsulation/) |
 | One Employee Class, Two Different Paychecks | Object-Oriented Programming | 14 min | [Open](https://the-marcy-lab-school.github.io/SWE_Interactive_Readings/Mod2/inheritance/) |
 | One Call, Three Answers — Polymorphism and Dunder Methods | Object-Oriented Programming | 11 min | [Open](https://the-marcy-lab-school.github.io/SWE_Interactive_Readings/Mod2/polymorphism/) |
+| The Whiteboard Diagram That Kept Two Classes in Sync | Object-Oriented Programming | 13 min | [Open](https://the-marcy-lab-school.github.io/SWE_Interactive_Readings/Mod2/system-design-uml/) |
 <!-- READINGS_TABLE_END -->

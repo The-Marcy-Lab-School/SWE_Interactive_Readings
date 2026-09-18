@@ -34,7 +34,7 @@
 
 <section class="mlrk-section">
 <h2>1. One set of variables, two rides, one bug</h2>
-<p>Here's roughly what Nimbus Rides' dispatch script looked like. A driver named Marcus picked up Amir first, then — before Amir's ride had finished and been billed — picked up Priya for a second ride along the way:</p>
+<p>Nimbus Rides is a ridesharing app, the kind that matches drivers with nearby passengers and bills each ride automatically. Here's roughly what its dispatch script looked like. A driver named Marcus picked up Amir first, then — before Amir's ride had finished and been billed — picked up Priya for a second ride along the way:</p>
 <div class="mlrk-code"><pre># Ride 1 begins
 rider = "Amir"
 fare = 22.50
@@ -59,24 +59,24 @@ print("Charging", rider, "$" + str(fare))</pre></div>
     <text x="250" y="81" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">def __init__(self, rider, fare):</text>
     <text x="270" y="104" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">self.rider = rider</text>
     <text x="270" y="127" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">self.fare = fare</text>
-    <text x="350" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#264326">Not an object yet — just the plan</text>
+    <text x="350" y="158" text-anchor="middle" font-size="13" font-weight="700" fill="#264326">Not an object yet — just the plan</text>
 
     <line x1="350" y1="180" x2="200" y2="215" stroke="#B3BBB0" stroke-width="2"/>
     <line x1="350" y1="180" x2="500" y2="215" stroke="#B3BBB0" stroke-width="2"/>
 
     <rect x="90" y="215" width="220" height="150" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
     <text x="200" y="245" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">ride1</text>
-    <text x="200" y="267" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" fill="#2274B5">Ride("Amir", 22.50)</text>
+    <text x="200" y="267" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#1E659D">Ride("Amir", 22.50)</text>
     <text x="110" y="300" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">rider = "Amir"</text>
     <text x="110" y="323" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">fare  = 22.50</text>
-    <text x="200" y="352" text-anchor="middle" font-size="11" font-weight="700" fill="#2274B5">Its own independent data</text>
+    <text x="200" y="352" text-anchor="middle" font-size="13" font-weight="700" fill="#1E659D">Its own independent data</text>
 
     <rect x="390" y="215" width="220" height="150" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
     <text x="500" y="245" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">ride2</text>
-    <text x="500" y="267" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" fill="#83671C">Ride("Priya", 14.00)</text>
+    <text x="500" y="267" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#675116">Ride("Priya", 14.00)</text>
     <text x="410" y="300" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">rider = "Priya"</text>
     <text x="410" y="323" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">fare  = 14.00</text>
-    <text x="500" y="352" text-anchor="middle" font-size="11" font-weight="700" fill="#83671C">Its own independent data</text>
+    <text x="500" y="352" text-anchor="middle" font-size="13" font-weight="700" fill="#675116">Its own independent data</text>
 
     <text x="350" y="398" text-anchor="middle" font-size="12" fill="#327A5F">Changing ride2's fare never touches ride1's fare — each object keeps its own copy.</text>
   </g>

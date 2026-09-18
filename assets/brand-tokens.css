@@ -20,6 +20,17 @@
   --mlrk-gold-700:#83671C;
   --mlrk-red-700:#C92929;
   --mlrk-red-100:#F7DFDF;
+
+  /* SWE-repo addition, not from the shared token source: darkened text-only
+     variants of the four border tones above. Each border tone is fine as a
+     stroke/border color, but falls short of WCAG AA's 4.5:1 text-contrast
+     minimum when used as text fill on its matching light background (2.7-4.3:1
+     measured). Use these only for text sitting on that specific background;
+     keep the original tone for borders/strokes. */
+  --mlrk-red-700-text:#B72525;      /* on --mlrk-red-100 */
+  --mlrk-gold-700-text:#675116;     /* on --mlrk-gold-300 */
+  --mlrk-blue-700-text:#1E659D;     /* on --mlrk-blue-100 */
+  --mlrk-forest-600-text:#204D3C;   /* on --mlrk-sage-300 */
   --mlrk-pink-300:#F8BAC9;
   --mlrk-ink-900:#261F1D;
   --mlrk-gray-100:#E9EFEB;

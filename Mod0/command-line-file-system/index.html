@@ -14,7 +14,7 @@
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>Know Where You Are</h1>
 <div class="mlrk-meta">
-  <span class="mlrk-pill">~13 minutes</span>
+  <span class="mlrk-pill">~14 minutes</span>
   <span class="mlrk-pill">Interactive</span>
   <span class="mlrk-pill">No setup needed to read</span>
 </div>
@@ -26,8 +26,8 @@
 
 <section class="mlrk-section">
 <h2>1. What actually happened</h2>
-<p>Steam's Linux client kept a variable called <code>STEAMROOT</code> pointing at the folder holding all of Steam's own files, computed each time the app launched by moving into that folder and asking the shell where it had landed. Deep in the uninstall/update logic sat a cleanup line built from that variable: something shaped like <code>rm -rf "$STEAMROOT/"*</code> — delete everything inside this folder. For almost everyone, that folder was a specific, harmless place.</p>
-<p>But if the step that computed <code>STEAMROOT</code> ever silently failed — for a small number of users, a broken folder shortcut (a symlink) made exactly that happen — the variable came back empty instead of a real path. The delete line still ran. With <code>STEAMROOT</code> empty, <code>"$STEAMROOT/"*</code> collapsed into <code>/*</code>: not "everything inside one folder," but "everything inside the root of the entire file system that this user account can reach." The script had no way to tell the difference between the two, because it never confirmed the actual, current, absolute path before acting on it.</p>
+<p>Steam (the video game store and launcher) once had a bug in its app for Linux computers that erased people's entire computers. Steam's uninstall process had a cleanup step: figure out exactly which folder holds Steam's own files, then delete everything inside that one folder to tidy up. For almost everyone, that step worked fine — it found the right folder, and cleanup touched only Steam's own files.</p>
+<p>But for a small number of users, the step that figured out "which folder is this" silently failed. Instead of a real folder location, the app ended up with nothing — an empty answer to "where am I." The delete step ran anyway. And a delete command aimed at "nothing" doesn't do nothing; it lands on the very top of the file system instead of one specific folder deep inside it. So instead of deleting one folder's worth of Steam files, the app deleted everything on the computer that it had permission to touch. Some users lost every personal file they had, just from running an uninstall.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 640 250" role="img" aria-labelledby="fsTreeTitle fsTreeDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="fsTreeTitle">A folder tree with the current location marked, and its absolute path called out</title>
@@ -101,9 +101,9 @@
 </section>
 
 <section class="mlrk-section">
-<h2>5. Watch: the core commands in under 5 minutes</h2>
+<h2>5. Watch: the core commands in action</h2>
 <div class="mlrk-video-wrap"><div id="cli-video"></div></div>
-<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=Z6LN5JjFNuw" target="_blank" rel="noopener">Watch on YouTube</a>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=H5dMLGA9rRo" target="_blank" rel="noopener">Watch on YouTube</a>
 <p>Watch for the same pattern from section 3: <code>pwd</code> to confirm the current absolute path, <code>ls</code> to see what's actually there, then <code>mkdir</code>/<code>touch</code> to build something new — always checked, never assumed.</p>
 </section>
 
@@ -217,7 +217,7 @@
     abspathFb.setAttribute("tabindex","-1"); abspathFb.focus();
   });
 
-  K.video({id:"act-video", elementId:"cli-video", videoId:"Z6LN5JjFNuw"});
+  K.video({id:"act-video", elementId:"cli-video", videoId:"H5dMLGA9rRo"});
 
   K.freeResponse({id:"act-reflect", selector:"#cli-reflect", minWords:10});
 

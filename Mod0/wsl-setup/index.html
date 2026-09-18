@@ -26,8 +26,8 @@
 
 <section class="mlrk-section">
 <h2>1. Why this exists</h2>
-<p>Back before WSL existed, a Windows developer who needed real Linux tools had exactly two bad options. Install a full virtual machine — VirtualBox or VMware, a whole second operating system running inside the first one, its own multi-gigabyte disk image, several GB of RAM permanently reserved just to keep it running in the background. Or dual-boot: partition the hard drive, install Ubuntu alongside Windows, and reboot the entire machine every time the task switched from "write code" to "reply to email." Neither is a small cost, and both were the honest answer for years.</p>
-<p>Microsoft's own developers hit this wall constantly — enough that in 2016 Microsoft partnered with Canonical (the company behind Ubuntu) to ship something new: a real Linux environment that starts in about a second, shares files directly with Windows, and costs nothing to leave running. That's WSL. Not a simulation of Linux commands, and not a full second computer pretending to be one — a real Linux kernel, running alongside Windows on the same machine.</p>
+<p>Before WSL (Windows Subsystem for Linux) existed, a Windows user who needed real Linux tools had two bad options. Option one: install a full virtual machine, like VirtualBox or VMware. That means running a whole second operating system inside the first one — its own multi-gigabyte disk, plus several GB of RAM tied up just to keep it running. Option two: dual-boot. Partition the hard drive, install Ubuntu next to Windows, and reboot the whole machine every time you switch from writing code to replying to email. Neither option was cheap. For years, they were the only real answers.</p>
+<p>Microsoft's own developers hit this same wall, so often that in 2016 Microsoft teamed up with Canonical (the company behind Ubuntu) to build something new. It starts in about a second. It shares files directly with Windows. It costs nothing to leave running. That's WSL. It isn't a simulation of Linux commands, and it isn't a second computer pretending to be one. It's a real Linux kernel, running right alongside Windows on the same machine.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 640 300" role="img" aria-labelledby="cmpTitle cmpDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="cmpTitle">Three ways to get Linux on a Windows machine, compared by weight</title>
@@ -39,7 +39,7 @@
     <text x="105" y="128" text-anchor="middle" font-size="12" fill="#261F1D">machine to switch</text>
     <text x="105" y="146" text-anchor="middle" font-size="12" fill="#261F1D">between Windows</text>
     <text x="105" y="164" text-anchor="middle" font-size="12" fill="#261F1D">and Linux</text>
-    <text x="105" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#C92929">Heaviest switch cost</text>
+    <text x="105" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#B72525">Heaviest switch cost</text>
 
     <rect x="230" y="20" width="180" height="240" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
     <text x="320" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Traditional VM</text>
@@ -47,7 +47,7 @@
     <text x="320" y="128" text-anchor="middle" font-size="12" fill="#261F1D">running on top of</text>
     <text x="320" y="146" text-anchor="middle" font-size="12" fill="#261F1D">Windows, several GB</text>
     <text x="320" y="164" text-anchor="middle" font-size="12" fill="#261F1D">of RAM reserved</text>
-    <text x="320" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#83671C">Heavy, always-on cost</text>
+    <text x="320" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#675116">Heavy, always-on cost</text>
 
     <rect x="445" y="20" width="180" height="240" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
     <text x="535" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">WSL</text>
@@ -59,7 +59,7 @@
   </g>
 </svg>
 
-<p><strong>Where this is headed:</strong> once WSL is running, everything else this fellowship's environment setup asks you to do — installing <code>git</code>, running <code>python3</code>, navigating a real file system — works exactly the way it's written, no Windows-specific workaround needed. This is the one setup step that unlocks all the others.</p>
+<p><strong>Where this is headed:</strong> once WSL is running, every other setup step in this fellowship works exactly as written — installing <code>git</code>, running <code>python3</code>, navigating a real file system. No Windows-specific workaround needed. This one step unlocks all the others.</p>
 </section>
 
 <section class="mlrk-section">
@@ -77,7 +77,7 @@
 <h2>3. Getting it installed</h2>
 <p>The entire install is one command, run from PowerShell or Windows Terminal opened <strong>as Administrator</strong>:</p>
 <div class="mlrk-code"><div class="mlrk-screen">wsl --install</div></div>
-<p>That single command downloads the WSL feature itself, installs a real Linux kernel, and sets Ubuntu as the default distro — all in one pass. After it finishes, Windows asks for a restart. On the first launch after restarting, Ubuntu asks you to create a username and password for that Linux environment specifically — separate from your Windows login, and worth writing down somewhere, since it's what you'll type every time a command needs elevated permission (<code>sudo</code>) from here on.</p>
+<p>That one command downloads the WSL feature, installs a real Linux kernel, and sets Ubuntu as the default distro — all in one pass. When it finishes, Windows asks you to restart. The first time Ubuntu opens after that, it asks you to create a username and password. This login is separate from your Windows account, so write it down somewhere. You'll type it every time a command needs elevated permission (<code>sudo</code>) from here on.</p>
 
 <div class="mlrk-card">
 <p>Referring to the steps above: put them in the order they actually happen.</p>
@@ -115,13 +115,13 @@
 <section class="mlrk-section">
 <h2>5. Watch: WSL, set up start to finish</h2>
 <div class="mlrk-video-wrap"><div id="wsl-video"></div></div>
-<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=Z05cgYgqG2A" target="_blank" rel="noopener">Watch on YouTube</a>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=zZf4YH4WiZo" target="_blank" rel="noopener">Watch on YouTube</a>
 <p>As you watch, notice that every step maps to what section 3 above already walked through — the install command, the restart, then the first-launch username/password prompt.</p>
 </section>
 
 <section class="mlrk-section">
 <h2>6. Summary &amp; reflection</h2>
-<p>WSL exists because Microsoft's own developers needed real Linux tools without the cost of a full virtual machine or a dual boot — and now every Windows-based engineer in this fellowship gets that same real Linux environment for free, built into Windows itself. <code>wsl --install</code>, a restart, and a username/password are the entire setup.</p>
+<p>WSL exists because Microsoft's own developers needed real Linux tools without paying for a full virtual machine or a dual boot. Now every Windows-based engineer in this fellowship gets that same real Linux environment for free, built right into Windows. <code>wsl --install</code>, a restart, and a username/password — that's the entire setup.</p>
 <label for="wsl-reflect"><strong>In 2–3 sentences:</strong> before reading this, what did you assume "installing Linux" meant? How is WSL actually different from that?</label>
 <textarea id="wsl-reflect" class="mlrk-response" data-save></textarea>
 </section>
@@ -196,7 +196,7 @@
     mkdirFb.setAttribute("tabindex","-1"); mkdirFb.focus();
   });
 
-  K.video({id:"act-video", elementId:"wsl-video", videoId:"Z05cgYgqG2A"});
+  K.video({id:"act-video", elementId:"wsl-video", videoId:"zZf4YH4WiZo"});
 
   K.freeResponse({id:"act-reflect", selector:"#wsl-reflect", minWords:10});
 

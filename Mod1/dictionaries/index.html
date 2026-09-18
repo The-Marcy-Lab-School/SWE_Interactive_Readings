@@ -30,7 +30,7 @@
 
 <section class="mlrk-section">
 <h2>1. The lookup that crashes</h2>
-<p>Here's roughly what OpenWeatherMap actually sends back when the tool asks for Brooklyn's weather — real JSON, the same shape you'd get from almost any weather API:</p>
+<p>Weather apps get their numbers from a weather API (Application Programming Interface) — a service you can ask over the internet for data, and it answers back. Here's roughly what OpenWeatherMap's API actually sends when asked for Brooklyn's weather. It's real JSON (JavaScript Object Notation), the standard text format almost every API uses to send structured data back:</p>
 <div class="mlrk-code"><pre>{
   "name": "Brooklyn",
   "main": {
@@ -77,7 +77,7 @@
     <line x1="240" y1="185" x2="400" y2="185" stroke="#B3BBB0" stroke-width="2"/>
 
     <rect x="40" y="238" width="200" height="46" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5" stroke-dasharray="7,5"/>
-    <text x="140" y="266" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" font-weight="700" fill="#C92929">"Manhattan"</text>
+    <text x="140" y="266" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" font-weight="700" fill="#B72525">"Manhattan"</text>
     <line x1="240" y1="261" x2="305" y2="261" stroke="#C92929" stroke-width="2" stroke-dasharray="4,4"/>
     <line x1="300" y1="253" x2="316" y2="269" stroke="#C92929" stroke-width="2.5"/>
     <line x1="316" y1="253" x2="300" y2="269" stroke="#C92929" stroke-width="2.5"/>

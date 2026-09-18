@@ -27,7 +27,7 @@
 
 <section class="mlrk-section">
 <h2>1. The bug: "skip to 3" landed on song 4</h2>
-<p>Here's the actual queue sitting behind QueueUp's bug report, exactly as it would look in Python:</p>
+<p>QueueUp is a small app a coffee shop uses to run its lounge playlist: customers pick songs, and the app plays them in order. Here's the actual queue sitting behind QueueUp's bug report, exactly as it would look in Python:</p>
 <div class="mlrk-code"><pre>queue = ["Skyline Drive", "Paper Boats", "Neon Static", "Better Days", "Midnight Coast"]</pre></div>
 <p>Square brackets create a <strong>list</strong>: an ordered, changeable collection, written as comma-separated values between <code>[</code> and <code>]</code>. Order matters here in a way it doesn't for every Python collection — this list remembers that "Skyline Drive" comes before "Paper Boats," and Python gives every item a numbered position, called an <strong>index</strong>, based on exactly where it sits.</p>
 <p>Here's where QueueUp's bug came from. Whoever wrote the "skip to song" feature reached for the everyday way people count (first, second, third) and wrote <code>queue[3]</code> to mean "the 3rd song." But Python doesn't start counting at 1; it starts at 0. So <code>queue[0]</code> is the first song, <code>queue[1]</code> is the second, and <code>queue[2]</code> is the third. That makes <code>queue[3]</code> actually the <em>fourth</em> song, "Better Days." Every single listener who asked for song 3 got song 4 instead, and nobody on the team noticed until a regular in the lounge asked out loud why the app kept skipping ahead.</p>
@@ -44,19 +44,19 @@
     <text x="539" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">4</text>
 
     <rect x="67" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="115" y="110" text-anchor="middle" font-size="11" fill="#261F1D">Skyline Drive</text>
+    <text x="115" y="110" text-anchor="middle" font-size="13" fill="#261F1D">Skyline Drive</text>
 
     <rect x="173" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="221" y="110" text-anchor="middle" font-size="11" fill="#261F1D">Paper Boats</text>
+    <text x="221" y="110" text-anchor="middle" font-size="13" fill="#261F1D">Paper Boats</text>
 
     <rect x="279" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="327" y="110" text-anchor="middle" font-size="11" fill="#261F1D">Neon Static</text>
+    <text x="327" y="110" text-anchor="middle" font-size="13" fill="#261F1D">Neon Static</text>
 
     <rect x="385" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="433" y="110" text-anchor="middle" font-size="11" fill="#261F1D">Better Days</text>
+    <text x="433" y="110" text-anchor="middle" font-size="13" fill="#261F1D">Better Days</text>
 
     <rect x="491" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="539" y="110" text-anchor="middle" font-size="11" fill="#261F1D">Midnight Coast</text>
+    <text x="539" y="110" text-anchor="middle" font-size="13" fill="#261F1D">Midnight Coast</text>
 
     <text x="10" y="185" text-anchor="start" font-size="13" font-weight="700" fill="#83671C">back index</text>
     <text x="115" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-5</text>

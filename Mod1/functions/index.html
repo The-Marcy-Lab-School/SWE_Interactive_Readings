@@ -30,7 +30,7 @@
 
 <section class="mlrk-section">
 <h2>1. The bug that one function would have prevented</h2>
-<p>Here's the script Roast &amp; Co. was actually running. Someone had written the loyalty-discount math once, for a small order, then copy-pasted that same block twice more for medium and large — changing only the price each time:</p>
+<p>Roast &amp; Co. is a small coffee shop with a simple loyalty program: regulars get a discount on every size. Here's the script an employee wrote to calculate it. They wrote the loyalty-discount math once, for a small order, then copy-pasted that same block twice more for medium and large — changing only the price each time:</p>
 <div class="mlrk-code"><pre># small order
 price = 3.50
 total = price * 0.90
@@ -56,23 +56,23 @@ print(total)</pre></div>
     <rect x="15" y="40" width="210" height="150" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
     <text x="120" y="65" text-anchor="middle" font-size="14" font-weight="700" fill="#261F1D">Small order</text>
     <text x="120" y="95" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">price = 3.50</text>
-    <text x="120" y="117" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#C92929">total = price * 0.90</text>
+    <text x="120" y="117" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#B72525">total = price * 0.90</text>
     <text x="120" y="139" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">print(total)</text>
-    <text x="120" y="170" text-anchor="middle" font-size="11" font-weight="700" fill="#C92929">Still the old rate!</text>
+    <text x="120" y="170" text-anchor="middle" font-size="13" font-weight="700" fill="#B72525">Still the old rate!</text>
 
     <rect x="245" y="40" width="210" height="150" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
     <text x="350" y="65" text-anchor="middle" font-size="14" font-weight="700" fill="#261F1D">Medium order</text>
     <text x="350" y="95" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">price = 4.25</text>
     <text x="350" y="117" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">total = price * 0.85</text>
     <text x="350" y="139" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">print(total)</text>
-    <text x="350" y="170" text-anchor="middle" font-size="11" fill="#2274B5" font-weight="700">Updated</text>
+    <text x="350" y="170" text-anchor="middle" font-size="13" fill="#1E659D" font-weight="700">Updated</text>
 
     <rect x="475" y="40" width="210" height="150" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
     <text x="580" y="65" text-anchor="middle" font-size="14" font-weight="700" fill="#261F1D">Large order</text>
     <text x="580" y="95" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">price = 4.75</text>
     <text x="580" y="117" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">total = price * 0.85</text>
     <text x="580" y="139" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">print(total)</text>
-    <text x="580" y="170" text-anchor="middle" font-size="11" fill="#2274B5" font-weight="700">Updated</text>
+    <text x="580" y="170" text-anchor="middle" font-size="13" fill="#1E659D" font-weight="700">Updated</text>
 
     <text x="350" y="225" text-anchor="middle" font-size="15" font-weight="700" fill="#264326">This becomes one function, called three times:</text>
 

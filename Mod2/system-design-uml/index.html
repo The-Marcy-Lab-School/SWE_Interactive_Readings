@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Whiteboard Diagram That Kept Two Classes in Sync</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:700px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+.uml-choice-code{margin:0;white-space:pre-wrap;font-family:var(--mlrk-font-code);font-size:.95rem;color:var(--mlrk-text-on-light)}
+.uml-recap{background:var(--mlrk-bg-light-alt);border-radius:12px;padding:1rem;margin:.8rem 0;font-family:var(--mlrk-font-code);font-size:.95rem}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The Whiteboard Diagram That Kept Two Classes in Sync</h1>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~13 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. Two engineers, one checkout feature</h2>
+<p>Priya and Diego both work on Marcy Library's app. They're splitting a new checkout feature: Priya is building <code>LibraryItem</code>, the base class every item the library lends will share. Diego is building <code>Book</code>, which needs everything <code>LibraryItem</code> has, plus a few things only books need. If they each start typing Python right now, on separate laptops, there's a real risk they invent two slightly different versions of the same idea — say, Priya calls a field <code>is_checked_out</code> while Diego's code assumes it's called <code>checked_out</code>. Neither notices until they try to merge their code and nothing fits together.</p>
+<p>So before either of them writes a line of Python, they hop on a call and sketch the class structure together on a shared doc. Engineers have a standard way to draw this out called <strong>UML</strong> (Unified Modeling Language) — a shared set of boxes and arrows for sketching a design so two people can agree on it before any code exists. It takes them ten minutes, and it's not code — it's a plan they can both sign off on first.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Vocabulary</h2>
+<p>Flip each card before the walkthrough below.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>UML</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>UML (Unified Modeling Language)</strong><br>A standard, shared way engineers sketch a system's design — classes, and how they relate to each other — using agreed-upon boxes and arrows, before anyone writes a line of code.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>class diagram</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Class diagram</strong><br>A UML diagram that shows one class's shape: what it's called, what data it holds, and what it can do. Two engineers can look at the same class diagram and agree on the plan before either writes any Python.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>compartment</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Compartment</strong><br>One of the three stacked sections inside a UML class box: the class's name on top, its attributes in the middle, its methods on the bottom. Every class box uses this same three-part layout.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>attribute (in UML)</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Attribute (in UML)</strong><br>Written as <code>name: type</code> in the middle compartment, e.g. <code>title: str</code>. It shows what data the class stores and what kind of value it holds, without showing any actual code.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>method signature</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Method signature</strong><br>Written as <code>name(): returnType</code> in the bottom compartment, e.g. <code>check_out(): None</code>. It shows what the class can do and what it hands back, without showing the code inside.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>inheritance arrow</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Inheritance arrow</strong><br>A solid line ending in a hollow, unfilled triangle, drawn from a child class box to its parent class box. The triangle always points at the parent — it means "this class inherits from that one."</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Reading a UML class box</h2>
+<p>Every UML class box has the same three stacked sections, top to bottom: the class's name, then its attributes, then its methods. Here's the <code>LibraryItem</code> class Priya is building, with the <code>Book</code> class Diego is building underneath it, connected by an inheritance arrow:</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 650 420" role="img" aria-labelledby="umlDiagTitle umlDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="umlDiagTitle">UML class diagram: LibraryItem as a parent class, Book as a child class</title>
+  <desc id="umlDiagDesc">Two UML class boxes, each divided into three stacked compartments: name, attributes, and methods. The top box is named LibraryItem, with attributes title: str, item_id: str, and is_checked_out: bool, and methods check_out(): None and return_item(): None. The bottom box is named Book, with attributes author: str and isbn: str, and one method, get_citation(): str. A solid line runs from the top of the Book box up to the bottom of the LibraryItem box, ending in a hollow, unfilled triangle whose tip touches the LibraryItem box. The hollow triangle points at LibraryItem, meaning Book inherits from LibraryItem.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="60" y="30" width="260" height="172" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <line x1="60" y1="64" x2="320" y2="64" stroke="#2274B5" stroke-width="2"/>
+    <line x1="60" y1="138" x2="320" y2="138" stroke="#2274B5" stroke-width="2"/>
+    <text x="190" y="53" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">LibraryItem</text>
+    <text x="76" y="84" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">title: str</text>
+    <text x="76" y="104" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">item_id: str</text>
+    <text x="76" y="124" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">is_checked_out: bool</text>
+    <text x="76" y="158" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">check_out(): None</text>
+    <text x="76" y="180" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">return_item(): None</text>
+
+    <rect x="330" y="250" width="260" height="130" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
+    <line x1="330" y1="284" x2="590" y2="284" stroke="#83671C" stroke-width="2"/>
+    <line x1="330" y1="338" x2="590" y2="338" stroke="#83671C" stroke-width="2"/>
+    <text x="460" y="273" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">Book</text>
+    <text x="346" y="304" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">author: str</text>
+    <text x="346" y="324" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">isbn: str</text>
+    <text x="346" y="362" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">get_citation(): str</text>
+
+    <line x1="460" y1="250" x2="209.7" y2="205.5" stroke="#261F1D" stroke-width="2.5"/>
+    <polygon points="190,202 211.1,197.6 208.3,213.4" fill="#FFFCF7" stroke="#261F1D" stroke-width="2.5"/>
+
+    <text x="325" y="405" text-anchor="middle" font-size="12.5" fill="#327A5F">The hollow triangle points up at LibraryItem, the parent — it means "Book inherits from LibraryItem."</text>
+  </g>
+</svg>
+
+<p>Reading the top box: <code>LibraryItem</code> is the class name, sitting alone in the top compartment. The middle compartment lists its <strong>attributes</strong> — each one written as <code>name: type</code>, so <code>title: str</code> means every <code>LibraryItem</code> stores a <code>title</code> that's a string. The bottom compartment lists its <strong>methods</strong> — each one written as <code>name(): returnType</code>, so <code>check_out(): None</code> means calling <code>check_out()</code> takes no listed input and hands nothing back. None of this is code. It's a plan for code that hasn't been written yet.</p>
+<p>The line connecting the two boxes is the <strong>inheritance arrow</strong>. It's drawn as a plain line ending in a triangle with nothing filled in — you can see the diagram's background right through it. That hollow triangle is the whole rule to remember: it always points at the parent. Here it points up at <code>LibraryItem</code>, so the diagram is saying "<code>Book</code> inherits from <code>LibraryItem</code>," never the other way around.</p>
+
+<div class="mlrk-card">
+<p><strong>Predict:</strong> what does the hollow triangle arrow in the diagram above actually mean?</p>
+<div id="uml-arrow-predict">
+  <button type="button" class="mlrk-choice" data-a="book-parent">Book inherits from LibraryItem — the triangle points at the parent.</button>
+  <button type="button" class="mlrk-choice" data-a="library-child">LibraryItem inherits from Book — the triangle points at the child.</button>
+  <button type="button" class="mlrk-choice" data-a="unrelated">Book and LibraryItem are unrelated classes that happen to be near each other.</button>
+  <button type="button" class="mlrk-choice" data-a="calls-method">The arrow means Book calls one of LibraryItem's methods.</button>
+</div>
+<div id="uml-arrow-predictfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<p style="margin-top:1.4rem">Now practice reading the box itself. Drag each line from <code>LibraryItem</code>'s box into the compartment it actually belongs in:</p>
+<div class="mlrk-card" id="uml-classify-activity">
+<div class="mlrk-drag-source" id="uml-classify-chips">
+  <span class="mlrk-draggable" id="uml-chip-1"><code>LibraryItem</code></span>
+  <span class="mlrk-draggable" id="uml-chip-2"><code>title: str</code></span>
+  <span class="mlrk-draggable" id="uml-chip-3"><code>item_id: str</code></span>
+  <span class="mlrk-draggable" id="uml-chip-4"><code>is_checked_out: bool</code></span>
+  <span class="mlrk-draggable" id="uml-chip-5"><code>check_out(): None</code></span>
+  <span class="mlrk-draggable" id="uml-chip-6"><code>return_item(): None</code></span>
+</div>
+<div class="mlrk-grid">
+  <div class="mlrk-dropzone" id="uml-zone-name"><strong>Class name</strong></div>
+  <div class="mlrk-dropzone" id="uml-zone-attrs"><strong>Attributes</strong></div>
+  <div class="mlrk-dropzone" id="uml-zone-methods"><strong>Methods</strong></div>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="uml-classify-check">Check my answers</button></div>
+<div id="uml-classifyfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Anything written as <code>name: type</code> is an attribute. Anything written as <code>name(): returnType</code>, with parentheses, is a method. There's only one class name, and it's the one line with no colon-and-type after it.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Watch: drawing an inheritance diagram</h2>
+<div class="mlrk-video-wrap"><div id="uml-video"></div></div>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=NRKPdMyDPts" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>As you watch, keep an eye on the same rule this reading just covered: the hollow triangle sits on the line pointing at the parent class, no matter how many child classes share that same parent.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Match the box to the code</h2>
+<p>Diego is about to write <code>Book</code> in Python. Here's its box from the diagram again, as a quick recap:</p>
+<div class="uml-recap">Book<br>&nbsp;&nbsp;author: str<br>&nbsp;&nbsp;isbn: str<br>&nbsp;&nbsp;get_citation(): str<br>(inherits from LibraryItem)</div>
+<p>Which of these four attempts at <code>Book</code> actually matches that box?</p>
+<div class="mlrk-card">
+<div id="uml-codematch">
+<button type="button" class="mlrk-choice" data-a="a"><pre class="uml-choice-code">class Book(LibraryItem):
+    def __init__(self, title, item_id, author, isbn):
+        super().__init__(title, item_id)
+        self.author = author
+        self.isbn = isbn
+
+    def get_citation(self):
+        return f"{self.author}, {self.title}"</pre></button>
+<button type="button" class="mlrk-choice" data-a="b"><pre class="uml-choice-code">class Book:
+    def __init__(self, title, item_id, author, isbn):
+        self.title = title
+        self.item_id = item_id
+        self.author = author
+        self.isbn = isbn
+
+    def get_citation(self):
+        return f"{self.author}, {self.title}"</pre></button>
+<button type="button" class="mlrk-choice" data-a="c"><pre class="uml-choice-code">class Book(LibraryItem):
+    def __init__(self, title, item_id, author, isbn, genre):
+        super().__init__(title, item_id)
+        self.author = author
+        self.isbn = isbn
+        self.genre = genre
+
+    def get_citation(self):
+        return f"{self.author}, {self.title}"</pre></button>
+<button type="button" class="mlrk-choice" data-a="d"><pre class="uml-choice-code">class Book(LibraryItem):
+    def __init__(self, title, item_id, author, isbn):
+        super().__init__(title, item_id)
+        self.author = author
+        self.isbn = isbn</pre></button>
+</div>
+<div id="uml-codematchfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Check three things against the box: does it inherit from <code>LibraryItem</code>, does it have exactly the attributes the box lists (no more, no fewer), and does it have the one method the box lists?</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
+<p>A UML class box always stacks the same three things: name on top, attributes in the middle, methods on the bottom. An inheritance arrow is a line ending in a hollow triangle that points at the parent class. Priya and Diego didn't need to write any Python to agree that <code>Book</code> inherits from <code>LibraryItem</code>, adds <code>author</code> and <code>isbn</code>, and defines <code>get_citation()</code> — the diagram said all of that on its own, before either of them opened an editor.</p>
+<label for="uml-reflect"><strong>In 2–3 sentences:</strong> think of a real pair of classes you might build for a project (two kinds of user, two kinds of game character, two kinds of vehicle). Sketch it in words: what would the parent's box list, and what would the child's box add?</label>
+<textarea id="uml-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<div id="uml-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="uml-copy">Copy Plain Text Answers</button>
+<p id="uml-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "system-design-uml-reading";
+  const TITLE = "The Whiteboard Diagram That Kept Two Classes in Sync";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  K.quiz({
+    id: "act-arrow-predict",
+    buttonSelector: "#uml-arrow-predict .mlrk-choice",
+    feedbackSelector: "#uml-arrow-predictfb",
+    correct: "book-parent",
+    feedback: {
+      "book-parent": "Right — the hollow triangle always points at the parent. Book is the one inheriting, so the arrow runs from Book up to LibraryItem.",
+      "library-child": "Backwards — the triangle points at the parent, not the child. LibraryItem is the parent here, so the arrow points at LibraryItem.",
+      "unrelated": "They're related — that's exactly what this arrow is drawn to show. An inheritance arrow only ever connects a child class to its parent.",
+      "calls-method": "That's not what this arrow means. An inheritance arrow shows \"is a version of\" between two classes — it says nothing about one method calling another."
+    }
+  });
+
+  K.dragDrop("#uml-classify-activity", "act-classify-dragdrop");
+  K.selfCheck({
+    buttonSelector: "#uml-classify-check",
+    feedbackSelector: "#uml-classifyfb",
+    mapping: {
+      "uml-chip-1": {expectedId: "uml-zone-name", label: "LibraryItem", expectedLabel: "Class name"},
+      "uml-chip-2": {expectedId: "uml-zone-attrs", label: "title: str", expectedLabel: "Attributes"},
+      "uml-chip-3": {expectedId: "uml-zone-attrs", label: "item_id: str", expectedLabel: "Attributes"},
+      "uml-chip-4": {expectedId: "uml-zone-attrs", label: "is_checked_out: bool", expectedLabel: "Attributes"},
+      "uml-chip-5": {expectedId: "uml-zone-methods", label: "check_out(): None", expectedLabel: "Methods"},
+      "uml-chip-6": {expectedId: "uml-zone-methods", label: "return_item(): None", expectedLabel: "Methods"}
+    }
+  });
+
+  K.video({id:"act-video", elementId:"uml-video", videoId:"NRKPdMyDPts"});
+
+  K.quiz({
+    id: "act-codematch",
+    buttonSelector: "#uml-codematch .mlrk-choice",
+    feedbackSelector: "#uml-codematchfb",
+    correct: "a",
+    feedback: {
+      "a": "Correct. This matches the box exactly: it inherits from LibraryItem, adds only author and isbn, and defines exactly one new method, get_citation().",
+      "b": "Not quite — this Book never inherits from LibraryItem at all (no (LibraryItem) after the class name, no super().__init__() call). The box shows an inheritance arrow, so the real class needs to actually inherit.",
+      "c": "Close, but this Book adds a genre attribute that isn't anywhere on the diagram. The box only lists author and isbn — an extra attribute here isn't a match.",
+      "d": "This Book inherits correctly and has the right attributes, but it's missing get_citation() entirely — the box's method compartment lists it as part of the class."
+    }
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#uml-reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#uml-scorechip"); });
+  K.Scoring.renderChip("#uml-scorechip");
+
+  K.copyPlainText({readingId: READING_ID, title: TITLE, buttonSelector: "#uml-copy", onDone: function(ok){
+    document.getElementById("uml-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

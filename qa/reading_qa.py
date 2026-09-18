@@ -28,6 +28,13 @@ BRAND_HEXES = {
     "#EF541E","#EEBC32","#FECC5B","#83671C","#C92929","#F7DFDF","#F8BAC9","#261F1D",
     "#E9EFEB","#E4E7EB","#E1E3E0","#CFD9E3","#B3BBB0","#DEEAF4","#FFFFFF","#FFF","#000",
     "#FFBF47",  # focus ring
+    # Darkened text-only variants of border tones, for WCAG AA (4.5:1) text contrast on
+    # their matching light fill — the border tones themselves (#C92929/#83671C/#2274B5/
+    # #327A5F) are fine for strokes/borders but fall short (2.7-4.3:1) when used as text.
+    "#B72525",  # red-700 text-safe, on #F7DFDF
+    "#675116",  # gold-700 text-safe, on #FECC5B
+    "#1E659D",  # blue-700 text-safe, on #DEEAF4
+    "#204D3C",  # forest-600 text-safe, on #A6C2B4
 }
 
 BANNED_PHRASES = [
