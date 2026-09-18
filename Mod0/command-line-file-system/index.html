@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-illustration{width:100%;max-width:700px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:22rem;max-width:100%;font-family:var(--mlrk-font-code)}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
 </style>
@@ -14,7 +14,7 @@
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>Know Where You Are</h1>
 <div class="mlrk-meta">
-  <span class="mlrk-pill">~14 minutes</span>
+  <span class="mlrk-pill">~9 minutes</span>
   <span class="mlrk-pill">Interactive</span>
   <span class="mlrk-pill">No setup needed to read</span>
 </div>
@@ -29,29 +29,29 @@
 <p>Steam (the video game store and launcher) once had a bug in its app for Linux computers that erased people's entire computers. Steam's uninstall process had a cleanup step: figure out exactly which folder holds Steam's own files, then delete everything inside that one folder to tidy up. For almost everyone, that step worked fine — it found the right folder, and cleanup touched only Steam's own files.</p>
 <p>But for a small number of users, the step that figured out "which folder is this" silently failed. Instead of a real folder location, the app ended up with nothing — an empty answer to "where am I." The delete step ran anyway. And a delete command aimed at "nothing" doesn't do nothing; it lands on the very top of the file system instead of one specific folder deep inside it. So instead of deleting one folder's worth of Steam files, the app deleted everything on the computer that it had permission to touch. Some users lost every personal file they had, just from running an uninstall.</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 640 250" role="img" aria-labelledby="fsTreeTitle fsTreeDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 700 310" role="img" aria-labelledby="fsTreeTitle fsTreeDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="fsTreeTitle">A folder tree with the current location marked, and its absolute path called out</title>
   <desc id="fsTreeDesc">Starting at the home folder fellow, which contains notes.txt and a projects folder. Inside projects is weather-app, highlighted as the current working directory. Weather-app contains README.md, a src folder holding main.py, and a tests folder holding test_main.py. A callout box gives the absolute path to the current location as slash home slash fellow slash projects slash weather-app — the same location no matter which folder you started navigating from.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <rect x="8" y="10" width="352" height="222" rx="12" fill="#FFFFFF" stroke="#CFD9E3" stroke-width="2"/>
-    <g font-family="Menlo, Consolas, monospace" font-size="14" fill="#261F1D">
-      <text x="24" y="34">fellow/</text>
-      <text x="24" y="56">├── notes.txt</text>
-      <text x="24" y="78">└── projects/</text>
-      <rect x="52" y="88" width="186" height="22" rx="4" fill="#A6C2B4" stroke="#264326" stroke-width="1.5"/>
-      <text x="58" y="100">└── weather-app/</text>
-      <text x="92" y="122">├── README.md</text>
-      <text x="92" y="144">├── src/</text>
-      <text x="126" y="166">└── main.py</text>
-      <text x="92" y="188">└── tests/</text>
-      <text x="126" y="210">└── test_main.py</text>
+    <rect x="10" y="14" width="400" height="280" rx="12" fill="#FFFFFF" stroke="#CFD9E3" stroke-width="2"/>
+    <g font-family="Menlo, Consolas, monospace" font-size="18" fill="#261F1D">
+      <text x="26" y="42">fellow/</text>
+      <text x="26" y="70">├── notes.txt</text>
+      <text x="26" y="98">└── projects/</text>
+      <rect x="56" y="108" width="234" height="30" rx="4" fill="#A6C2B4" stroke="#264326" stroke-width="1.5"/>
+      <text x="64" y="129">└── weather-app/</text>
+      <text x="100" y="157">├── README.md</text>
+      <text x="100" y="185">├── src/</text>
+      <text x="138" y="213">└── main.py</text>
+      <text x="100" y="241">└── tests/</text>
+      <text x="138" y="269">└── test_main.py</text>
     </g>
-    <polygon points="360,99 388,88 388,110" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
-    <rect x="388" y="60" width="234" height="78" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
-    <text x="400" y="82" font-size="14" font-weight="700" fill="#261F1D">You are here</text>
-    <text x="400" y="102" font-size="12" fill="#261F1D">Absolute path:</text>
-    <text x="400" y="120" font-family="Menlo, Consolas, monospace" font-size="12" fill="#2F5A8B">/home/fellow/projects/</text>
-    <text x="400" y="134" font-family="Menlo, Consolas, monospace" font-size="12" fill="#2F5A8B">weather-app</text>
+    <polygon points="410,123 434,108 434,138" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <rect x="430" y="70" width="260" height="120" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="446" y="96" font-size="18" font-weight="700" fill="#261F1D">You are here</text>
+    <text x="446" y="122" font-size="16" fill="#261F1D">Absolute path:</text>
+    <text x="446" y="146" font-family="Menlo, Consolas, monospace" font-size="16" fill="#2F5A8B">/home/fellow/projects/</text>
+    <text x="446" y="166" font-family="Menlo, Consolas, monospace" font-size="16" fill="#2F5A8B">weather-app</text>
   </g>
 </svg>
 
@@ -78,7 +78,20 @@
   <div class="mlrk-terminal-log" aria-live="polite"></div>
   <div class="mlrk-terminal-row"><span class="mlrk-terminal-prompt"></span><input class="mlrk-terminal-input" type="text" aria-label="Terminal input" autocomplete="off" spellcheck="false"></div>
 </div>
-<p class="mlrk-small">Try, in order: <code>pwd</code>, <code>ls</code>, <code>mkdir weather-app</code>, <code>cd weather-app</code>, <code>mkdir src</code>, <code>mkdir tests</code>, <code>touch README.md</code>, <code>cd src</code>, <code>touch main.py</code>, <code>cd ..</code>, <code>pwd</code>.</p>
+<p class="mlrk-small">Type these commands into the terminal above, one at a time, in this order:</p>
+<ol class="mlrk-small mlrk-steplist">
+  <li><code>pwd</code> — confirm where you're starting from</li>
+  <li><code>ls</code> — confirm the folder is empty</li>
+  <li><code>mkdir weather-app</code> — create the project folder</li>
+  <li><code>cd weather-app</code> — move into it</li>
+  <li><code>mkdir src</code> — create the <code>src</code> folder</li>
+  <li><code>mkdir tests</code> — create the <code>tests</code> folder</li>
+  <li><code>touch README.md</code> — create the README file</li>
+  <li><code>cd src</code> — move into <code>src</code></li>
+  <li><code>touch main.py</code> — create the script file</li>
+  <li><code>cd ..</code> — move back up to <code>weather-app</code></li>
+  <li><code>pwd</code> — confirm you landed back where you expect</li>
+</ol>
 
 <details class="mlrk-hint"><summary>Need a hint?</summary>
 <p><code>mkdir</code> makes the folder, but you still have to <code>cd</code> into it afterward before anything you build next lands inside it instead of next to it.</p>
@@ -87,7 +100,29 @@
 
 <section class="mlrk-section">
 <h2>4. Quick check: predict the output</h2>
-<p>Say you're inside <code>/home/fellow/projects/weather-app/src</code> — one level deeper than the terminal above ever takes you, but the same tree as the diagram in section 1. You run <code>cd ..</code>, then <code>ls</code>.</p>
+<p><strong>You are currently inside <code>/home/fellow/projects/weather-app/src</code></strong> — shown in the diagram below (one level deeper than the terminal above ever takes you, but the same folder tree). <strong>You type <code>cd ..</code>, then <code>ls</code>. What does <code>ls</code> print?</strong></p>
+<svg class="mlrk-illustration" viewBox="0 0 700 250" role="img" aria-labelledby="fsTreeTitle2 fsTreeDesc2" xmlns="http://www.w3.org/2000/svg">
+  <title id="fsTreeTitle2">The same folder tree from section 1, repeated here for reference</title>
+  <desc id="fsTreeDesc2">Starting at the home folder fellow, which contains notes.txt and a projects folder. Inside projects is weather-app. Weather-app contains README.md, a src folder holding main.py, and a tests folder holding test_main.py. The src folder is marked as the current location.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="10" y="14" width="400" height="220" rx="12" fill="#FFFFFF" stroke="#CFD9E3" stroke-width="2"/>
+    <g font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">
+      <text x="26" y="40">fellow/</text>
+      <text x="26" y="66">├── notes.txt</text>
+      <text x="26" y="92">└── projects/</text>
+      <text x="64" y="118">└── weather-app/</text>
+      <text x="100" y="144">├── README.md</text>
+      <rect x="94" y="155" width="150" height="26" rx="4" fill="#FFEECA" stroke="#83671C" stroke-width="1.5"/>
+      <text x="100" y="170">├── src/</text>
+      <text x="138" y="199">└── main.py</text>
+      <text x="100" y="222">└── tests/</text>
+    </g>
+    <polygon points="410,168 434,155 434,181" fill="#FFF6E4" stroke="#83671C" stroke-width="2"/>
+    <rect x="430" y="140" width="250" height="60" rx="10" fill="#FFF6E4" stroke="#83671C" stroke-width="2"/>
+    <text x="446" y="164" font-size="17" font-weight="700" fill="#261F1D">You are here</text>
+    <text x="446" y="186" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">inside src/</text>
+  </g>
+</svg>
 <div class="mlrk-card" id="cli-predict-quiz">
 <button type="button" class="mlrk-choice" data-a="a">README.md, src, tests</button>
 <button type="button" class="mlrk-choice" data-a="b">main.py</button>
@@ -96,20 +131,32 @@
 <div id="cli-predict-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p><code>cd ..</code> moves up exactly one level from <code>src</code>. Which folder is that, and what does the diagram in section 1 say lives inside it?</p>
+<p><code>cd ..</code> moves up exactly one level from <code>src</code>. Which folder is that, and what does the diagram above say lives inside it?</p>
 </details>
 </section>
 
 <section class="mlrk-section">
-<h2>5. Watch: the core commands in action</h2>
-<div class="mlrk-video-wrap"><div id="cli-video"></div></div>
-<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=H5dMLGA9rRo" target="_blank" rel="noopener">Watch on YouTube</a>
-<p>Watch for the same pattern from section 3: <code>pwd</code> to confirm the current absolute path, <code>ls</code> to see what's actually there, then <code>mkdir</code>/<code>touch</code> to build something new — always checked, never assumed.</p>
-</section>
-
-<section class="mlrk-section">
-<h2>6. One more check: absolute path practice</h2>
-<p>Using the diagram in section 1, type the full absolute path to <code>test_main.py</code> — starting from the root, <code>/</code>.</p>
+<h2>5. One more check: absolute path practice</h2>
+<p><strong>Using the diagram below, type the full absolute path to <code>test_main.py</code></strong> — starting from the root, <code>/</code>.</p>
+<svg class="mlrk-illustration" viewBox="0 0 700 310" role="img" aria-labelledby="fsTreeTitle3 fsTreeDesc3" xmlns="http://www.w3.org/2000/svg">
+  <title id="fsTreeTitle3">The same folder tree from section 1, repeated here for reference</title>
+  <desc id="fsTreeDesc3">Starting at the home folder fellow, which contains notes.txt and a projects folder. Inside projects is weather-app. Weather-app contains README.md, a src folder holding main.py, and a tests folder holding test_main.py.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="10" y="14" width="400" height="280" rx="12" fill="#FFFFFF" stroke="#CFD9E3" stroke-width="2"/>
+    <g font-family="Menlo, Consolas, monospace" font-size="18" fill="#261F1D">
+      <text x="26" y="42">fellow/</text>
+      <text x="26" y="70">├── notes.txt</text>
+      <text x="26" y="98">└── projects/</text>
+      <text x="64" y="126">└── weather-app/</text>
+      <text x="100" y="154">├── README.md</text>
+      <text x="100" y="182">├── src/</text>
+      <text x="138" y="210">└── main.py</text>
+      <text x="100" y="238">└── tests/</text>
+      <rect x="132" y="248" width="230" height="30" rx="4" fill="#F7DFDF" stroke="#C92929" stroke-width="1.5"/>
+      <text x="138" y="269">└── test_main.py</text>
+    </g>
+  </g>
+</svg>
 <div class="mlrk-card">
 <div class="mlrk-fillblank"><input type="text" id="cli-abspath-input" autocomplete="off" placeholder="e.g. /home/fellow/..."> <button type="button" class="mlrk-btn" id="cli-abspath-check">Check</button></div>
 <div id="cli-abspathfb" class="mlrk-feedback" tabindex="-1"></div>
@@ -117,7 +164,7 @@
 </section>
 
 <section class="mlrk-section">
-<h2>7. Summary &amp; reflection</h2>
+<h2>6. Summary &amp; reflection</h2>
 <p>A file system is a tree: one root, folders branching off it, files and more folders branching off those. <code>pwd</code> tells you exactly where you are in that tree right now. <code>ls</code> tells you what's actually around you before you act. <code>cd</code> moves you through it — relative to where you stand, or by absolute path regardless of where you stand. <code>mkdir</code> and <code>touch</code> build new branches and leaves. The Steam bug happened because one script skipped the first two and trusted a path it never confirmed.</p>
 <label for="cli-reflect"><strong>In 2–3 sentences:</strong> now that you've practiced building out a real folder structure by hand, what's one habit — checking <code>pwd</code>, running <code>ls</code> before a command that changes anything, something else — you'd want to build into your own command-line work to avoid a mistake like Steam's?</label>
 <textarea id="cli-reflect" class="mlrk-response" data-save></textarea>
@@ -126,7 +173,10 @@
 <section class="mlrk-section">
 <div id="cli-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
 <button type="button" class="mlrk-btn mlrk-btn-primary" id="cli-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="cli-download">Download as .txt</button>
+</div>
 <p id="cli-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
@@ -217,12 +267,12 @@
     abspathFb.setAttribute("tabindex","-1"); abspathFb.focus();
   });
 
-  K.video({id:"act-video", elementId:"cli-video", videoId:"H5dMLGA9rRo"});
-
   K.freeResponse({id:"act-reflect", selector:"#cli-reflect", minWords:10});
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#cli-scorechip"); });
   K.Scoring.renderChip("#cli-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#cli-download"});
 
   K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#cli-copy", onDone:function(ok){
     document.getElementById("cli-copyfb").textContent = ok

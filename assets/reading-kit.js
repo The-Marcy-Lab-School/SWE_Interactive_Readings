@@ -365,6 +365,13 @@
     const log=$(".mlrk-terminal-log",el);
     const input=$(".mlrk-terminal-input",el);
     const promptEl=$(".mlrk-terminal-prompt",el);
+    input.placeholder=input.placeholder||"Click here to type…";
+    if(!$(".mlrk-terminal-hint",el)){
+      const hint=document.createElement("p");
+      hint.className="mlrk-terminal-hint";
+      hint.textContent="No Tab-completion here — type each command out in full. (That's on purpose: it builds real muscle memory.)";
+      el.insertBefore(hint,el.firstChild);
+    }
     Scoring.register(opts.id,1,"activity");
     const mark=activity(opts.id,()=>state.ranCount>=(opts.minCommands||3));
     state.ranCount=0;
@@ -413,7 +420,12 @@
       let out;
       const custom=(opts.commands||{})[cmd];
       out = custom ? custom(args,state) : (builtins[cmd] ? builtins[cmd](args) : cmd+": command not found");
-      const line=(state.cwd+" $ "+raw+"\n"+(out==null?"":out+"\n"));
+      // Distinguish a real "no output" result (out==="", e.g. a successful cd/mkdir,
+      // or ls on an empty folder) from clear()'s intentional null, which wipes the
+      // log and should print nothing extra. Empty output shown as "(no output)" so
+      // it never reads as the simulator being broken or unresponsive.
+      const shown=out==null?"":(out===""?"(no output)":out);
+      const line=(state.cwd+" $ "+raw+"\n"+(shown?shown+"\n":""));
       log.textContent += (log.textContent?"\n":"") + line;
       log.scrollTop=log.scrollHeight;
       state.ranCount++;
@@ -472,6 +484,28 @@
     });
   }
 
+  /* Downloads the same plain-text snapshot copyPlainText() copies, as a .txt
+     file — a second, non-clipboard way to get answers off the page, for
+     browsers/contexts where clipboard access is blocked or a saved file is
+     just more convenient than a paste. */
+  function downloadPlainText(opts){
+    // opts:{readingId, title, buttonSelector}
+    const btn=$(opts.buttonSelector);
+    if(!btn) return;
+    btn.addEventListener("click",()=>{
+      const text=toText(snapshot(opts.readingId,opts.title));
+      const blob=new Blob([text],{type:"text/plain"});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url;
+      a.download=(opts.title||"reading-answers").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"")+".txt";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    });
+  }
+
   /* ---------- persistence tick ---------- */
   let currentReadingId=null,currentTitle=null;
   function persist(){
@@ -502,6 +536,6 @@
   global.ReadingKit={
     init, quiz, selectAll, flipCards, orderSteps, dragDrop, video, freeResponse,
     activity, terminal, selfCheck, traceStepper, Scoring, Storage,
-    snapshot, toText, restore, copyPlainText
+    snapshot, toText, restore, copyPlainText, downloadPlainText
   };
 })(window);

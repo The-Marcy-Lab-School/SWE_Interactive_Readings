@@ -6,8 +6,9 @@
    inline if truly needed. */
 
 *{box-sizing:border-box}
-code{overflow-wrap:break-word;word-break:break-word}
-html{-webkit-text-size-adjust:100%}
+code{overflow-wrap:break-word;word-break:break-word;font-family:var(--mlrk-font-code);font-weight:700}
+html{-webkit-text-size-adjust:100%;font-size:125%} /* 20px root — scales every rem-based size (body, headings,
+  pills, cards, code blocks) up together so nothing on the page stays small by accident */
 body{
   margin:0;
   font-family:var(--mlrk-font-body);
@@ -73,6 +74,11 @@ main.mlrk-main{padding:2rem 1.2rem 5rem}
 .mlrk-feedback.mlrk-reveal{background:var(--mlrk-callout-gold-fill);border-left:5px solid var(--mlrk-callout-gold-border)}
 .mlrk-attempt-note{font-size:.9rem;color:var(--mlrk-text-on-light-muted)}
 
+/* numbered step lists — for "do these terminal commands in order" instructions
+   and similar, so steps read as a real ordered list, not a run-on sentence */
+.mlrk-steplist{padding-left:1.4rem;margin:.6rem 0}
+.mlrk-steplist li{margin:.35rem 0}
+
 /* flip cards */
 .mlrk-term{min-height:150px;text-align:left;display:block;width:100%;border:2px solid var(--mlrk-gray-400);
   border-radius:14px;background:var(--mlrk-white);padding:1rem;cursor:pointer}
@@ -96,6 +102,12 @@ main.mlrk-main{padding:2rem 1.2rem 5rem}
   background:var(--mlrk-white);display:flex;align-items:center;gap:.6rem;cursor:grab}
 .mlrk-orderitem .mlrk-order-num{font-weight:800;color:var(--mlrk-forest-600);min-width:1.4rem}
 
+/* diagrams — centered as a block within the wider text column, not left-stuck.
+   Every reading also declares this selector inline for its own max-width; that
+   inline copy must not repeat a non-auto "margin" or it will win by source
+   order and re-break centering — see the SKILL.md rule for the exact pattern. */
+.mlrk-illustration{margin-left:auto;margin-right:auto}
+
 /* code / terminal */
 .mlrk-code{background:var(--mlrk-bg-dark);color:var(--mlrk-text-on-dark);border-radius:14px;padding:1rem;
   font-family:var(--mlrk-font-code);font-size:.95rem;overflow-x:auto}
@@ -107,6 +119,7 @@ main.mlrk-main{padding:2rem 1.2rem 5rem}
 .mlrk-terminal-log{white-space:pre-wrap;min-height:80px;margin:0 0 .6rem}
 .mlrk-terminal-row{display:flex;gap:.4rem;align-items:center}
 .mlrk-terminal-prompt{color:var(--mlrk-gold-500)}
+.mlrk-terminal-hint{color:var(--mlrk-text-on-dark);opacity:.7;font-size:.8em;font-style:italic;margin:0 0 .6rem}
 .mlrk-terminal-input{flex:1;background:transparent;border:none;color:var(--mlrk-text-on-dark);
   font-family:var(--mlrk-font-code);font-size:.95rem}
 .mlrk-terminal-input:focus-visible{outline:2px solid var(--mlrk-focus-ring)}

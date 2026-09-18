@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-illustration{width:100%;max-width:700px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:16rem;font-family:var(--mlrk-font-code)}
 .mlrk-code{margin:.9rem 0}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
@@ -27,36 +27,36 @@
 
 <section class="mlrk-section">
 <h2>1. A deadline that still breaks old tutorials</h2>
-<p>The Python Software Foundation didn't quietly stop supporting Python 2 — it announced a real, fixed retirement date years in advance, and on January 1, 2020, Python 2 stopped receiving updates for good. No more security patches, no more bug fixes, nothing. That's ancient history in software terms, but it left a huge mess behind: millions of blog posts, Stack Overflow answers, and README files written before 2020 that all say the same thing: run <code>python filename.py</code>.</p>
-<p>The problem is that <code>python</code> was never a fixed promise about which Python you'd get. Some older Linux systems still alias <code>python</code> to that retired Python 2 install for backward compatibility. Ubuntu 20.04 and newer ship with no <code>python</code> command at all by default — only <code>python3</code> — specifically because Ubuntu's maintainers decided it was safer to make the command missing than to guess wrong. macOS has never shipped a <code>python</code> command that reliably points at Python 3 either; today it only ships <code>python3</code>. So typing the exact command an old tutorial gives you either does nothing, or silently runs the wrong language version.</p>
+<p>Python, the programming language you're learning, actually comes in two major versions: the older Python 2 and the newer Python 3. Python 2 isn't just old — it's officially retired. The team that maintains Python announced a fixed shutoff date years in advance, and on January 1, 2020, Python 2 stopped getting updates for good: no more security patches, no more bug fixes, nothing. That's old news by now, but it left a mess behind. Millions of blog posts, Stack Overflow answers, and tutorials written before 2020 all say the same thing: run your file with the command <code>python filename.py</code>.</p>
+<p>Here's the problem: on most computers today, typing <code>python</code> either does nothing at all, or quietly runs the retired Python 2 instead of the Python 3 you actually installed. Ubuntu (a common Linux system) and macOS both stopped shipping a plain <code>python</code> command that reliably means Python 3 — today, both only ship <code>python3</code>. So an old tutorial's exact command either fails outright, or silently runs the wrong version of the language.</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 640 300" role="img" aria-labelledby="runTitle runDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 700 300" role="img" aria-labelledby="runTitle runDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="runTitle">Three ways people try to run Python, and which one to trust</title>
   <desc id="runDesc">python often still points to a retired Python 2 install, or to nothing at all — Python 2 reached its real end of life on January 1, 2020, so this command should not be relied on. python3 with no filename opens the REPL: type one line, see the result immediately, nothing is saved. python3 followed by a filename runs a saved script: the interpreter reads the whole file and executes it top to bottom, the same way every time.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <rect x="15" y="20" width="180" height="240" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
-    <text x="105" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">python</text>
-    <text x="105" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Can point to Python</text>
-    <text x="105" y="128" text-anchor="middle" font-size="12" fill="#261F1D">2, retired for good</text>
-    <text x="105" y="146" text-anchor="middle" font-size="12" fill="#261F1D">on January 1, 2020,</text>
-    <text x="105" y="164" text-anchor="middle" font-size="12" fill="#261F1D">or missing entirely</text>
-    <text x="105" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#B72525">Don't rely on this</text>
+    <rect x="20" y="20" width="200" height="260" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="120" y="56" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">python</text>
+    <text x="120" y="120" text-anchor="middle" font-size="16" fill="#261F1D">Can point to Python</text>
+    <text x="120" y="144" text-anchor="middle" font-size="16" fill="#261F1D">2, retired for good</text>
+    <text x="120" y="168" text-anchor="middle" font-size="16" fill="#261F1D">on January 1, 2020,</text>
+    <text x="120" y="192" text-anchor="middle" font-size="16" fill="#261F1D">or missing entirely</text>
+    <text x="120" y="250" text-anchor="middle" font-size="16" font-weight="700" fill="#B72525">Don't rely on this</text>
 
-    <rect x="230" y="20" width="180" height="240" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="320" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">python3 REPL</text>
-    <text x="320" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Type python3 alone</text>
-    <text x="320" y="128" text-anchor="middle" font-size="12" fill="#261F1D">to get a &gt;&gt;&gt; prompt</text>
-    <text x="320" y="146" text-anchor="middle" font-size="12" fill="#261F1D">and run one line at</text>
-    <text x="320" y="164" text-anchor="middle" font-size="12" fill="#261F1D">a time, instantly</text>
-    <text x="320" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#1E659D">Nothing saved</text>
+    <rect x="250" y="20" width="200" height="260" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="350" y="56" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">python3 REPL</text>
+    <text x="350" y="120" text-anchor="middle" font-size="16" fill="#261F1D">Type python3 alone</text>
+    <text x="350" y="144" text-anchor="middle" font-size="16" fill="#261F1D">to get a &gt;&gt;&gt; prompt</text>
+    <text x="350" y="168" text-anchor="middle" font-size="16" fill="#261F1D">and run one line at</text>
+    <text x="350" y="192" text-anchor="middle" font-size="16" fill="#261F1D">a time, instantly</text>
+    <text x="350" y="250" text-anchor="middle" font-size="16" font-weight="700" fill="#1E659D">Nothing saved</text>
 
-    <rect x="445" y="20" width="180" height="240" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
-    <text x="535" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">python3 script</text>
-    <text x="535" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Save code in a .py</text>
-    <text x="535" y="128" text-anchor="middle" font-size="12" fill="#261F1D">file, then run</text>
-    <text x="535" y="146" text-anchor="middle" font-size="12" fill="#261F1D">python3 file.py to</text>
-    <text x="535" y="164" text-anchor="middle" font-size="12" fill="#261F1D">run it top to bottom</text>
-    <text x="535" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#264326">Reliable, repeatable</text>
+    <rect x="480" y="20" width="200" height="260" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="580" y="56" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">python3 script</text>
+    <text x="580" y="120" text-anchor="middle" font-size="16" fill="#261F1D">Save code in a .py</text>
+    <text x="580" y="144" text-anchor="middle" font-size="16" fill="#261F1D">file, then run</text>
+    <text x="580" y="168" text-anchor="middle" font-size="16" fill="#261F1D">python3 file.py to</text>
+    <text x="580" y="192" text-anchor="middle" font-size="16" fill="#261F1D">run it top to bottom</text>
+    <text x="580" y="250" text-anchor="middle" font-size="16" font-weight="700" fill="#264326">Reliable, repeatable</text>
   </g>
 </svg>
 
@@ -71,19 +71,31 @@
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>REPL</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>REPL (Read-Eval-Print Loop)</strong><br>The interactive mode you get by typing <code>python3</code> with no filename: type one line, see its result immediately, nothing is saved anywhere.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>script</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Script</strong><br>Python code saved in a <code>.py</code> file so it can be run the same way every time with <code>python3 filename.py</code>, instead of retyped by hand.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>module</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Module</strong><br>Any <code>.py</code> file, looked at from the perspective of another file that <code>import</code>s it instead of running it directly.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>__main__</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>__main__</strong><br>The special value Python gives a file's built-in <code>__name__</code> variable only when that file is the one being run directly — not when it's imported.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>__name__</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>__name__</strong><br>A variable Python automatically creates inside every file it runs. Its value tells that file how it was started: run directly, or imported by another file.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>__main__</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>__main__</strong><br>The exact value Python stores in <code>__name__</code> only when that file is the one being run directly — not when it's imported.</span></button>
 </div>
 </section>
 
 <section class="mlrk-section">
 <h2>3. What actually happens when you run a script</h2>
-<p>When you run <code>python3 hello.py</code>, the interpreter opens that file, reads it from the top, and executes each line in order — defining functions as it reaches them, running any code that isn't inside a function immediately, top to bottom, exactly once. That's different from the REPL, where you control the pace one line at a time and nothing is saved once you close it. A script is the same code, saved, so it runs identically every time.</p>
-<p><code>hello.py</code> already exists below in a simulated home directory, next to <code>importer.py</code>, which imports it instead of running it. Try <code>cat hello.py</code> to see the source, then <code>python hello.py</code>, then <code>python3 hello.py</code>, then <code>python3 importer.py</code> — and watch what changes each time.</p>
+<p>When you run <code>python3 hello.py</code>, the interpreter does the same three things every time, in order:</p>
+<ol class="mlrk-steplist">
+  <li>Opens the file and reads it from the very top.</li>
+  <li>Goes line by line, top to bottom, exactly once. Any code sitting outside a function runs immediately, the moment the interpreter reaches it.</li>
+  <li>Any function definition it passes is stored for later — its own body doesn't run yet, only the act of defining it.</li>
+</ol>
+<p>That's different from the REPL, where you control the pace one line at a time and nothing is saved once you close it. A script is the same code, saved, so it runs identically every time.</p>
+<p><code>hello.py</code> already exists below in a simulated home directory, next to <code>importer.py</code>, which imports it instead of running it. Type each command into the terminal below, in this order, and watch what changes each time:</p>
 <div class="mlrk-terminal" id="run-terminal">
   <div class="mlrk-terminal-log" aria-live="polite"></div>
   <div class="mlrk-terminal-row"><span class="mlrk-terminal-prompt"></span><input class="mlrk-terminal-input" type="text" aria-label="Terminal input" autocomplete="off" spellcheck="false"></div>
 </div>
-<p class="mlrk-small">Try: <code>cat hello.py</code>, <code>python hello.py</code>, <code>python3 hello.py</code>, <code>python3 importer.py</code></p>
+<ol class="mlrk-small mlrk-steplist">
+  <li><code>cat hello.py</code> — see the source before running it</li>
+  <li><code>python hello.py</code> — try the command this reading is warning you about</li>
+  <li><code>python3 hello.py</code> — run it directly, the reliable way</li>
+  <li><code>python3 importer.py</code> — import it from another file instead</li>
+</ol>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
 <p>Every real command here starts with <code>python3</code>. Plain <code>python</code> is the one this reading is warning you about — try it anyway and see what it says.</p>
 </details>
@@ -91,7 +103,7 @@
 
 <section class="mlrk-section">
 <h2>4. Why <code>if __name__ == "__main__":</code> exists</h2>
-<p><code>hello.py</code> defines a function called <code>main()</code>, but doesn't just call it directly at the bottom of the file — it wraps that call in a check: <code>if __name__ == "__main__":</code>. Here's the problem that guard solves. Python sets every file's built-in <code>__name__</code> variable automatically, and what it sets it to depends entirely on how the file got run. Run <code>hello.py</code> directly, and Python sets its <code>__name__</code> to the literal string <code>"__main__"</code>. Import <code>hello.py</code> from another file instead, the way <code>importer.py</code> does, and Python sets its <code>__name__</code> to <code>"hello"</code>, its own module name, instead.</p>
+<p>After trying <code>python3 hello.py</code> and <code>python3 importer.py</code> in the terminal above, you saw them print different things, even though <code>importer.py</code> runs <code>hello.py</code>'s code too, through the import. Here's why. <code>hello.py</code> defines a function called <code>main()</code>, but doesn't just call it directly at the bottom of the file. It wraps that call in a check: <code>if __name__ == "__main__":</code>. Run <code>hello.py</code> directly, and Python sets its <code>__name__</code> to <code>"__main__"</code>. Import <code>hello.py</code> from another file instead, the way <code>importer.py</code> does, and Python sets its <code>__name__</code> to <code>"hello"</code> instead, its own module name.</p>
 <p>Without that guard, <code>main()</code> would fire the instant anything, anywhere, imported <code>hello.py</code> — even a file that only wanted to reuse one small piece of it. The guard means <code>hello.py</code> can be both a working script on its own <em>and</em> a safe, reusable module for something else, without those two jobs ever conflicting.</p>
 <div class="mlrk-card">
 <p><strong>Fill in the blank:</strong> the line that keeps <code>main()</code> from running automatically whenever <code>hello.py</code> is imported elsewhere is:</p>
@@ -146,7 +158,10 @@ import hello</pre></div>
 <section class="mlrk-section">
 <div id="run-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
 <button type="button" class="mlrk-btn mlrk-btn-primary" id="run-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="run-download">Download as .txt</button>
+</div>
 <p id="run-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
@@ -237,6 +252,8 @@ import hello</pre></div>
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#run-scorechip"); });
   K.Scoring.renderChip("#run-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#run-download"});
 
   K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#run-copy", onDone:function(ok){
     document.getElementById("run-copyfb").textContent = ok

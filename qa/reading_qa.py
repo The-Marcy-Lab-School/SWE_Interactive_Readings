@@ -110,6 +110,15 @@ def check_font_sizes(text):
         px = val if unit == "px" else val*16 if unit == "rem" else val*1.333
         if px < 14:
             findings.append(("ERROR", f"font-size below 14px floor: {m.group(0)} (~{px:.1f}px)"))
+    # SVG presentation-attribute form: font-size="12" (no colon, not caught above).
+    # Diagram text has its own, lower preferred floor (16px) since it sits inside a
+    # fixed viewBox next to much larger surrounding body text.
+    for m in re.finditer(r'font-size="([\d.]+)"', text):
+        px = float(m.group(1))
+        if px < 14:
+            findings.append(("ERROR", f'SVG font-size below 14px floor: {m.group(0)} (~{px:.1f}px)'))
+        elif px < 16:
+            findings.append(("WARN", f'SVG font-size below the preferred 16px floor for diagram text: {m.group(0)}'))
     return findings
 
 
@@ -289,15 +298,87 @@ def check_ai_sounding_language(text):
     return findings
 
 
-def check_video_language(html):
-    # No automated way to check the actual spoken language of a video from
-    # its id alone — flag every video for a manual confirmation instead of
-    # silently trusting it, since a non-English pick is otherwise invisible
-    # until someone actually presses play.
+_VIDEO_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (reading-qa)"
+
+
+def _urlopen_relaxed(req):
+    try:
+        return urllib.request.urlopen(req, timeout=8)
+    except urllib.error.URLError as e:
+        if isinstance(getattr(e, "reason", None), ssl.SSLError):
+            return urllib.request.urlopen(req, timeout=8, context=_INSECURE_CTX)
+        raise
+
+
+def _fetch_watch_page(video_id):
+    req = urllib.request.Request(f"https://www.youtube.com/watch?v={video_id}", headers={"User-Agent": _VIDEO_UA})
+    with _urlopen_relaxed(req) as resp:
+        return resp.read().decode("utf-8", errors="ignore")
+
+
+def check_video_language(html, skip_network=False):
+    # A video's title/channel name being in English is not proof its spoken
+    # audio is — a real bug shipped this way (English title, Hindi audio).
+    # The reliable signal is the watch page's default (first) caption track.
     ids = re.findall(r'videoId\s*:\s*"([A-Za-z0-9_-]{6,})"', html)
-    if ids:
-        return [("WARN", f"reminder: manually confirm the recommended video ({', '.join(ids)}) is in English before shipping — not automatically checkable")]
-    return []
+    if not ids:
+        return []
+    if skip_network:
+        return [("WARN", f"reminder: manually confirm the recommended video ({', '.join(ids)}) is in English before shipping — network checks skipped")]
+    findings = []
+    for vid in ids:
+        try:
+            body = _fetch_watch_page(vid)
+        except Exception as e:
+            findings.append(("WARN", f"could not verify language of video {vid} ({e}) — confirm manually via its caption track"))
+            continue
+        m = re.search(r'"captionTracks":\[\{"baseUrl":"[^"]*","name":\{"simpleText":"[^"]*"\},"vssId":"[^"]*","languageCode":"([a-z-]+)"', body)
+        if not m:
+            findings.append(("WARN", f"could not find a caption track for video {vid} to verify language — confirm manually"))
+        elif not m.group(1).startswith("en"):
+            findings.append(("ERROR", f"video {vid}'s default caption track is language '{m.group(1)}', not English — its audio likely isn't English either, swap this video"))
+    return findings
+
+
+def check_video_embeddable(html, skip_network=False):
+    ids = re.findall(r'videoId\s*:\s*"([A-Za-z0-9_-]{6,})"', html)
+    if not ids or skip_network:
+        return []
+    findings = []
+    for vid in ids:
+        req = urllib.request.Request(
+            f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={vid}&format=json",
+            headers={"User-Agent": _VIDEO_UA},
+        )
+        try:
+            _urlopen_relaxed(req)
+        except urllib.error.HTTPError as e:
+            if e.code == 401:
+                findings.append(("ERROR", f"video {vid} returns 401 from oEmbed — its owner has disabled embedding (shows as Error 153 in the player), swap this video"))
+        except Exception as e:
+            findings.append(("WARN", f"could not verify embeddability of video {vid} ({e}) — confirm manually"))
+    return findings
+
+
+def check_video_duration(html, skip_network=False):
+    ids = re.findall(r'videoId\s*:\s*"([A-Za-z0-9_-]{6,})"', html)
+    if not ids or skip_network:
+        return []
+    findings = []
+    for vid in ids:
+        try:
+            body = _fetch_watch_page(vid)
+        except Exception as e:
+            findings.append(("WARN", f"could not verify duration of video {vid} ({e}) — confirm manually it's under 5 minutes"))
+            continue
+        m = re.search(r'"lengthSeconds":"(\d+)"', body)
+        if not m:
+            findings.append(("WARN", f"could not read duration of video {vid} — confirm manually it's under 5 minutes"))
+            continue
+        secs = int(m.group(1))
+        if secs > 300:
+            findings.append(("ERROR", f"video {vid} is {secs//60}:{secs%60:02d} — exceeds this format's 5-minute video cap; find a shorter one, or drop the video section (not every reading needs one)"))
+    return findings
 
 
 def run(path, skip_links=False):
@@ -318,7 +399,9 @@ def run(path, skip_links=False):
     findings += check_no_recall_section(text.lower())
     findings += check_reading_level(html)
     findings += check_ai_sounding_language(text)
-    findings += check_video_language(html)
+    findings += check_video_language(html, skip_network=skip_links)
+    findings += check_video_embeddable(html, skip_network=skip_links)
+    findings += check_video_duration(html, skip_network=skip_links)
     if not skip_links:
         findings += check_links(html)
     return findings
