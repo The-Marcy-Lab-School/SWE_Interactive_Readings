@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-illustration{width:100%;max-width:760px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:16rem;font-family:var(--mlrk-font-code)}
 .mlrk-snippet{display:block;border:2px solid var(--mlrk-gray-400);border-radius:12px;padding:.7rem;cursor:pointer}
@@ -74,33 +74,34 @@
 
 <p>It would be tempting to skip naming <code>ValueError</code> at all and just write <code>except:</code> by itself, catching everything. That's a real, well-known anti-pattern, and it's worse than it looks. A bare <code>except:</code> doesn't just catch the bad age you expected. It also catches a typo in your own code, like <code>form["agee"]</code> instead of <code>form["age"]</code>, which would raise a <code>KeyError</code>, or a network call that failed for a reason you never anticipated, or any other bug entirely unrelated to bad user input. All of it gets swallowed the same way, silently, and the loop just keeps going as if nothing happened. That's not resilience, it's a program lying to you about how well it's working. Naming the exact exception you expect means real bugs still crash loudly enough that someone notices and fixes them, while the one failure you planned for gets handled gracefully.</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 640 300" role="img" aria-labelledby="excCmpTitle excCmpDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 760 300" role="img" aria-labelledby="excCmpTitle excCmpDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="excCmpTitle">Three ways to handle one bad row in a batch of five signups</title>
   <desc id="excCmpDesc">With no try or except, the ValueError from the bad row crashes the whole function, so zero of five signups are saved. A bare except catches that error but also silently swallows real bugs like typos, hiding problems instead of fixing them. Catching except ValueError specifically logs and skips only the one bad row, so four of five signups are saved, and any other kind of failure still crashes loudly enough to notice.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <rect x="15" y="20" width="180" height="240" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
-    <text x="105" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">No try/except</text>
-    <text x="105" y="110" text-anchor="middle" font-size="12" fill="#261F1D">int() raises ValueError</text>
-    <text x="105" y="128" text-anchor="middle" font-size="12" fill="#261F1D">on the bad row</text>
-    <text x="105" y="146" text-anchor="middle" font-size="12" fill="#261F1D">Nothing catches it,</text>
-    <text x="105" y="164" text-anchor="middle" font-size="12" fill="#261F1D">so the batch stops</text>
-    <text x="105" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#B72525">0 of 5 saved</text>
+    <rect x="10" y="20" width="230" height="260" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="125" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">No try/except</text>
+    <text x="125" y="122" text-anchor="middle" font-size="16" fill="#261F1D">int() raises ValueError</text>
+    <text x="125" y="146" text-anchor="middle" font-size="16" fill="#261F1D">on the bad row</text>
+    <text x="125" y="170" text-anchor="middle" font-size="16" fill="#261F1D">Nothing catches it,</text>
+    <text x="125" y="194" text-anchor="middle" font-size="16" fill="#261F1D">so the batch stops</text>
+    <text x="125" y="248" text-anchor="middle" font-size="16" font-weight="700" fill="#B72525">0 of 5 saved</text>
 
-    <rect x="230" y="20" width="180" height="240" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
-    <text x="320" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">except: (bare)</text>
-    <text x="320" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Catches the bad row,</text>
-    <text x="320" y="128" text-anchor="middle" font-size="12" fill="#261F1D">but also catches typos</text>
-    <text x="320" y="146" text-anchor="middle" font-size="12" fill="#261F1D">and other real bugs,</text>
-    <text x="320" y="164" text-anchor="middle" font-size="12" fill="#261F1D">silently, every time</text>
-    <text x="320" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#675116">Bugs hidden, not fixed</text>
+    <rect x="265" y="20" width="230" height="260" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
+    <text x="380" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">except: (bare)</text>
+    <text x="380" y="122" text-anchor="middle" font-size="16" fill="#261F1D">Catches the bad row,</text>
+    <text x="380" y="146" text-anchor="middle" font-size="16" fill="#261F1D">but also catches typos</text>
+    <text x="380" y="170" text-anchor="middle" font-size="16" fill="#261F1D">and other real bugs,</text>
+    <text x="380" y="194" text-anchor="middle" font-size="16" fill="#261F1D">silently, every time</text>
+    <text x="380" y="240" text-anchor="middle" font-size="16" font-weight="700" fill="#675116">Bugs hidden,</text>
+    <text x="380" y="262" text-anchor="middle" font-size="16" font-weight="700" fill="#675116">not fixed</text>
 
-    <rect x="445" y="20" width="180" height="240" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
-    <text x="535" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">except ValueError:</text>
-    <text x="535" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Catches only the</text>
-    <text x="535" y="128" text-anchor="middle" font-size="12" fill="#261F1D">expected problem</text>
-    <text x="535" y="146" text-anchor="middle" font-size="12" fill="#261F1D">Bad row logged,</text>
-    <text x="535" y="164" text-anchor="middle" font-size="12" fill="#261F1D">everything else finishes</text>
-    <text x="535" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#264326">4 of 5 saved</text>
+    <rect x="520" y="20" width="230" height="260" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="635" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">except ValueError:</text>
+    <text x="635" y="122" text-anchor="middle" font-size="16" fill="#261F1D">Catches only the</text>
+    <text x="635" y="146" text-anchor="middle" font-size="16" fill="#261F1D">expected problem</text>
+    <text x="635" y="170" text-anchor="middle" font-size="16" fill="#261F1D">Bad row logged,</text>
+    <text x="635" y="194" text-anchor="middle" font-size="16" fill="#261F1D">everything else finishes</text>
+    <text x="635" y="248" text-anchor="middle" font-size="16" font-weight="700" fill="#264326">4 of 5 saved</text>
   </g>
 </svg>
 
@@ -126,8 +127,8 @@
 <section class="mlrk-section">
 <h2>4. Watch: exception handling, start to finish</h2>
 <div class="mlrk-video-wrap"><div id="exc-video"></div></div>
-<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=V_NXT2-QIlE" target="_blank" rel="noopener">Watch on YouTube</a>
-<p>As you watch, notice the specific exception types it names, like <code>ValueError</code>, <code>ZeroDivisionError</code>, and <code>TypeError</code>. Section 3 above is the exact same idea: catch the one you actually expect, by name.</p>
+<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=MImAiZIzzd4" target="_blank" rel="noopener">Watch on YouTube</a>
+<p>As you watch, notice how it wraps risky code in <code>try</code>/<code>except</code> and names a specific exception type rather than catching everything. Section 3 above is the exact same idea: catch the one you actually expect, by name.</p>
 </section>
 
 <section class="mlrk-section">
@@ -164,7 +165,10 @@
 <section class="mlrk-section">
 <div id="exc-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
 <button type="button" class="mlrk-btn mlrk-btn-primary" id="exc-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="exc-download">Download as .txt</button>
+</div>
 <p id="exc-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
@@ -214,7 +218,7 @@
     blankFb.setAttribute("tabindex", "-1"); blankFb.focus();
   });
 
-  K.video({id:"act-video", elementId:"exc-video", videoId:"V_NXT2-QIlE"});
+  K.video({id:"act-video", elementId:"exc-video", videoId:"MImAiZIzzd4"});
 
   K.selectAll({
     id: "act-exc-classify",
@@ -242,6 +246,8 @@
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#exc-scorechip"); });
   K.Scoring.renderChip("#exc-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#exc-download"});
 
   K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#exc-copy", onDone:function(ok){
     document.getElementById("exc-copyfb").textContent = ok

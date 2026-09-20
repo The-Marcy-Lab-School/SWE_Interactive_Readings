@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:680px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-illustration{width:100%;max-width:860px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:14rem;font-family:var(--mlrk-font-code)}
 .cs-fillblank-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
 .cs-fillblank-row label{font-family:var(--mlrk-font-code);font-size:.95rem}
@@ -56,73 +56,73 @@ else:
 <h2>3. Cleaning input before comparing it</h2>
 <p>The standard fix is to normalize the text first: call <code>.strip()</code> to drop stray whitespace, then <code>.lower()</code> to make capitalization stop mattering, and only compare the result. Both methods return a brand-new string rather than changing the original, so they can be chained back-to-back on the same line: <code>raw.strip().lower()</code>.</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 650 400" role="img" aria-labelledby="csDiagTitle csDiagDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 860 450" role="img" aria-labelledby="csDiagTitle csDiagDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="csDiagTitle">Comparing input with and without normalizing it first</title>
   <desc id="csDiagDesc">The same raw input, two spaces then "Yes" then a trailing space, run through two different paths. In the top path, step 2 calls .strip() to remove the extra spaces and step 3 calls .lower() to make the text lowercase, so step 4's if check for "yes" matches and the correct branch runs: Ticket opened. In the bottom path, .strip() and .lower() are never called, so step 3's if check compares the raw text exactly as typed, it does not match "yes", and step 4 falls through to the wrong branch: Sorry, I didn't understand that.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <text x="10" y="20" font-size="14" font-weight="700" fill="#264326">With .strip().lower() first</text>
+    <text x="10" y="20" font-size="17" font-weight="700" fill="#264326">With .strip().lower() first</text>
 
-    <rect x="10" y="33" width="140" height="140" rx="10" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
-    <text x="18" y="55" font-size="12" font-weight="700" fill="#261F1D">1  Raw input</text>
-    <text x="18" y="75" font-size="13" fill="#261F1D">input() returns:</text>
-    <text x="18" y="91" font-size="13" fill="#261F1D">"  Yes "</text>
-    <text x="18" y="107" font-size="13" fill="#261F1D">(extra spaces,</text>
-    <text x="18" y="123" font-size="13" fill="#261F1D">capital Y)</text>
+    <rect x="10" y="35" width="195" height="175" rx="10" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="22" y="65" font-size="17" font-weight="700" fill="#261F1D">1  Raw input</text>
+    <text x="22" y="93" font-size="16" fill="#261F1D">input() returns:</text>
+    <text x="22" y="117" font-size="16" fill="#261F1D">"  Yes "</text>
+    <text x="22" y="141" font-size="16" fill="#261F1D">(extra spaces,</text>
+    <text x="22" y="165" font-size="16" fill="#261F1D">capital Y)</text>
 
-    <line x1="150" y1="103" x2="165" y2="103" stroke="#B3BBB0" stroke-width="2"/>
-    <rect x="165" y="33" width="140" height="140" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
-    <text x="173" y="55" font-size="12" font-weight="700" fill="#261F1D">2  .strip()</text>
-    <text x="173" y="75" font-size="13" fill="#261F1D">removes the</text>
-    <text x="173" y="91" font-size="13" fill="#261F1D">leading/trailing</text>
-    <text x="173" y="107" font-size="13" fill="#261F1D">spaces</text>
-    <text x="173" y="123" font-size="13" fill="#261F1D">result: "Yes"</text>
+    <line x1="205" y1="122" x2="223" y2="122" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="223" y="35" width="195" height="175" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="235" y="65" font-size="17" font-weight="700" fill="#261F1D">2  .strip()</text>
+    <text x="235" y="93" font-size="16" fill="#261F1D">removes the</text>
+    <text x="235" y="117" font-size="16" fill="#261F1D">leading/trailing</text>
+    <text x="235" y="141" font-size="16" fill="#261F1D">spaces</text>
+    <text x="235" y="165" font-size="16" fill="#261F1D">result: "Yes"</text>
 
-    <line x1="305" y1="103" x2="320" y2="103" stroke="#B3BBB0" stroke-width="2"/>
-    <rect x="320" y="33" width="140" height="140" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
-    <text x="328" y="55" font-size="12" font-weight="700" fill="#261F1D">3  .lower()</text>
-    <text x="328" y="75" font-size="13" fill="#261F1D">makes every</text>
-    <text x="328" y="91" font-size="13" fill="#261F1D">letter lowercase</text>
-    <text x="328" y="107" font-size="13" fill="#261F1D">result: "yes"</text>
+    <line x1="418" y1="122" x2="436" y2="122" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="436" y="35" width="195" height="175" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="448" y="65" font-size="17" font-weight="700" fill="#261F1D">3  .lower()</text>
+    <text x="448" y="93" font-size="16" fill="#261F1D">makes every</text>
+    <text x="448" y="117" font-size="16" fill="#261F1D">letter lowercase</text>
+    <text x="448" y="141" font-size="16" fill="#261F1D">result: "yes"</text>
 
-    <line x1="460" y1="103" x2="475" y2="103" stroke="#B3BBB0" stroke-width="2"/>
-    <rect x="475" y="33" width="140" height="140" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
-    <text x="483" y="55" font-size="12" font-weight="700" fill="#261F1D">4  if check</text>
-    <text x="483" y="75" font-size="13" fill="#261F1D">"yes" == "yes"</text>
-    <text x="483" y="91" font-size="13" fill="#261F1D">matches</text>
-    <text x="483" y="111" font-size="13" font-weight="700" fill="#264326">Correct branch:</text>
-    <text x="483" y="127" font-size="13" font-weight="700" fill="#264326">"Ticket opened."</text>
+    <line x1="631" y1="122" x2="649" y2="122" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="649" y="35" width="195" height="175" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="661" y="65" font-size="17" font-weight="700" fill="#261F1D">4  if check</text>
+    <text x="661" y="93" font-size="16" fill="#261F1D">"yes" == "yes"</text>
+    <text x="661" y="117" font-size="16" fill="#261F1D">matches</text>
+    <text x="661" y="141" font-size="16" font-weight="700" fill="#264326">Correct branch:</text>
+    <text x="661" y="165" font-size="16" font-weight="700" fill="#264326">"Ticket opened."</text>
 
-    <text x="10" y="198" font-size="14" font-weight="700" fill="#C92929">Skipping .strip().lower()</text>
+    <text x="10" y="248" font-size="17" font-weight="700" fill="#C92929">Skipping .strip().lower()</text>
 
-    <rect x="10" y="211" width="140" height="140" rx="10" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
-    <text x="18" y="233" font-size="12" font-weight="700" fill="#261F1D">1  Raw input</text>
-    <text x="18" y="253" font-size="13" fill="#261F1D">input() returns:</text>
-    <text x="18" y="269" font-size="13" fill="#261F1D">"  Yes "</text>
-    <text x="18" y="285" font-size="13" fill="#261F1D">(extra spaces,</text>
-    <text x="18" y="301" font-size="13" fill="#261F1D">capital Y)</text>
+    <rect x="10" y="263" width="195" height="175" rx="10" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="22" y="293" font-size="17" font-weight="700" fill="#261F1D">1  Raw input</text>
+    <text x="22" y="321" font-size="16" fill="#261F1D">input() returns:</text>
+    <text x="22" y="345" font-size="16" fill="#261F1D">"  Yes "</text>
+    <text x="22" y="369" font-size="16" fill="#261F1D">(extra spaces,</text>
+    <text x="22" y="393" font-size="16" fill="#261F1D">capital Y)</text>
 
-    <line x1="150" y1="281" x2="165" y2="281" stroke="#B3BBB0" stroke-width="2"/>
-    <rect x="165" y="211" width="140" height="140" rx="10" fill="#E4E7EB" stroke="#B3BBB0" stroke-width="2" stroke-dasharray="5,4"/>
-    <text x="173" y="233" font-size="12" font-weight="700" fill="#261F1D">2  no cleanup</text>
-    <text x="173" y="253" font-size="13" fill="#261F1D">.strip()/.lower()</text>
-    <text x="173" y="269" font-size="13" fill="#261F1D">never called</text>
-    <text x="173" y="285" font-size="13" fill="#261F1D">text stays exactly</text>
-    <text x="173" y="301" font-size="13" fill="#261F1D">as typed</text>
+    <line x1="205" y1="350" x2="223" y2="350" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="223" y="263" width="195" height="175" rx="10" fill="#E4E7EB" stroke="#B3BBB0" stroke-width="2" stroke-dasharray="5,4"/>
+    <text x="235" y="293" font-size="17" font-weight="700" fill="#261F1D">2  no cleanup</text>
+    <text x="235" y="321" font-size="16" fill="#261F1D">.strip()/.lower()</text>
+    <text x="235" y="345" font-size="16" fill="#261F1D">never called</text>
+    <text x="235" y="369" font-size="16" fill="#261F1D">text stays exactly</text>
+    <text x="235" y="393" font-size="16" fill="#261F1D">as typed</text>
 
-    <line x1="305" y1="281" x2="320" y2="281" stroke="#B3BBB0" stroke-width="2"/>
-    <rect x="320" y="211" width="140" height="140" rx="10" fill="#FFEECA" stroke="#83671C" stroke-width="2"/>
-    <text x="328" y="233" font-size="12" font-weight="700" fill="#261F1D">3  if check</text>
-    <text x="328" y="253" font-size="13" fill="#261F1D">"  Yes " == "yes"</text>
-    <text x="328" y="269" font-size="13" fill="#261F1D">not equal</text>
-    <text x="328" y="285" font-size="13" fill="#261F1D">no match</text>
+    <line x1="418" y1="350" x2="436" y2="350" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="436" y="263" width="195" height="175" rx="10" fill="#FFEECA" stroke="#83671C" stroke-width="2"/>
+    <text x="448" y="293" font-size="17" font-weight="700" fill="#261F1D">3  if check</text>
+    <text x="448" y="321" font-size="16" fill="#261F1D">"  Yes " == "yes"</text>
+    <text x="448" y="345" font-size="16" fill="#261F1D">not equal</text>
+    <text x="448" y="369" font-size="16" fill="#261F1D">no match</text>
 
-    <line x1="460" y1="281" x2="475" y2="281" stroke="#B3BBB0" stroke-width="2"/>
-    <rect x="475" y="211" width="140" height="140" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
-    <text x="483" y="233" font-size="12" font-weight="700" fill="#261F1D">4  else</text>
-    <text x="483" y="253" font-size="13" fill="#261F1D">falls through</text>
-    <text x="483" y="273" font-size="13" font-weight="700" fill="#B72525">Wrong branch:</text>
-    <text x="483" y="289" font-size="13" font-weight="700" fill="#B72525">"Sorry, I didn't</text>
-    <text x="483" y="305" font-size="13" font-weight="700" fill="#B72525">understand that."</text>
+    <line x1="631" y1="350" x2="649" y2="350" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="649" y="263" width="195" height="175" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="661" y="293" font-size="17" font-weight="700" fill="#261F1D">4  else</text>
+    <text x="661" y="321" font-size="16" fill="#261F1D">falls through</text>
+    <text x="661" y="345" font-size="16" font-weight="700" fill="#B72525">Wrong branch:</text>
+    <text x="661" y="369" font-size="16" font-weight="700" fill="#B72525">"Sorry, I didn't</text>
+    <text x="661" y="393" font-size="16" font-weight="700" fill="#B72525">understand that."</text>
   </g>
 </svg>
 
@@ -229,7 +229,10 @@ else:
 <section class="mlrk-section">
 <div id="cs-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
 <button type="button" class="mlrk-btn mlrk-btn-primary" id="cs-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="cs-download">Download as .txt</button>
+</div>
 <p id="cs-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
@@ -319,6 +322,8 @@ else:
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#cs-scorechip"); });
   K.Scoring.renderChip("#cs-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#cs-download"});
 
   K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#cs-copy", onDone:function(ok){
     document.getElementById("cs-copyfb").textContent = ok

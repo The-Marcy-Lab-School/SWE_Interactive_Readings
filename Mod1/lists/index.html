@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:700px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-illustration{width:100%;max-width:700px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:20rem;font-family:var(--mlrk-font-code)}
 .mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
@@ -32,38 +32,38 @@
 <p>Square brackets create a <strong>list</strong>: an ordered, changeable collection, written as comma-separated values between <code>[</code> and <code>]</code>. Order matters here in a way it doesn't for every Python collection — this list remembers that "Skyline Drive" comes before "Paper Boats," and Python gives every item a numbered position, called an <strong>index</strong>, based on exactly where it sits.</p>
 <p>Here's where QueueUp's bug came from. Whoever wrote the "skip to song" feature reached for the everyday way people count (first, second, third) and wrote <code>queue[3]</code> to mean "the 3rd song." But Python doesn't start counting at 1; it starts at 0. So <code>queue[0]</code> is the first song, <code>queue[1]</code> is the second, and <code>queue[2]</code> is the third. That makes <code>queue[3]</code> actually the <em>fourth</em> song, "Better Days." Every single listener who asked for song 3 got song 4 instead, and nobody on the team noticed until a regular in the lounge asked out loud why the app kept skipping ahead.</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 680 220" role="img" aria-labelledby="idxDiagTitle idxDiagDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 880 225" role="img" aria-labelledby="idxDiagTitle idxDiagDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="idxDiagTitle">The QueueUp list shown with both its front-counted and back-counted index numbers</title>
   <desc id="idxDiagDesc">Five boxes in a row hold the songs Skyline Drive, Paper Boats, Neon Static, Better Days, and Midnight Coast in that order. Above each box is its index counted from the front, starting at 0 for Skyline Drive and ending at 4 for Midnight Coast. Below each box is its index counted from the back, starting at -1 for Midnight Coast and ending at -5 for Skyline Drive. The third song in everyday counting, Neon Static, sits at front-index 2, not 3.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <text x="10" y="55" text-anchor="start" font-size="13" font-weight="700" fill="#264326">front index</text>
-    <text x="115" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">0</text>
-    <text x="221" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">1</text>
-    <text x="327" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">2</text>
-    <text x="433" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">3</text>
-    <text x="539" y="55" text-anchor="middle" font-size="17" font-weight="800" fill="#264326">4</text>
+    <text x="10" y="55" text-anchor="start" font-size="16" font-weight="700" fill="#264326">front index</text>
+    <text x="145" y="55" text-anchor="middle" font-size="18" font-weight="800" fill="#264326">0</text>
+    <text x="305" y="55" text-anchor="middle" font-size="18" font-weight="800" fill="#264326">1</text>
+    <text x="465" y="55" text-anchor="middle" font-size="18" font-weight="800" fill="#264326">2</text>
+    <text x="625" y="55" text-anchor="middle" font-size="18" font-weight="800" fill="#264326">3</text>
+    <text x="785" y="55" text-anchor="middle" font-size="18" font-weight="800" fill="#264326">4</text>
 
-    <rect x="67" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="115" y="110" text-anchor="middle" font-size="13" fill="#261F1D">Skyline Drive</text>
+    <rect x="70" y="72" width="150" height="90" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="145" y="123" text-anchor="middle" font-size="16" fill="#261F1D">Skyline Drive</text>
 
-    <rect x="173" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="221" y="110" text-anchor="middle" font-size="13" fill="#261F1D">Paper Boats</text>
+    <rect x="230" y="72" width="150" height="90" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="305" y="123" text-anchor="middle" font-size="16" fill="#261F1D">Paper Boats</text>
 
-    <rect x="279" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="327" y="110" text-anchor="middle" font-size="13" fill="#261F1D">Neon Static</text>
+    <rect x="390" y="72" width="150" height="90" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="465" y="123" text-anchor="middle" font-size="16" fill="#261F1D">Neon Static</text>
 
-    <rect x="385" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="433" y="110" text-anchor="middle" font-size="13" fill="#261F1D">Better Days</text>
+    <rect x="550" y="72" width="150" height="90" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="625" y="123" text-anchor="middle" font-size="16" fill="#261F1D">Better Days</text>
 
-    <rect x="491" y="70" width="96" height="70" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="539" y="110" text-anchor="middle" font-size="13" fill="#261F1D">Midnight Coast</text>
+    <rect x="710" y="72" width="150" height="90" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="785" y="123" text-anchor="middle" font-size="16" fill="#261F1D">Midnight Coast</text>
 
-    <text x="10" y="185" text-anchor="start" font-size="13" font-weight="700" fill="#83671C">back index</text>
-    <text x="115" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-5</text>
-    <text x="221" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-4</text>
-    <text x="327" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-3</text>
-    <text x="433" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-2</text>
-    <text x="539" y="185" text-anchor="middle" font-size="17" font-weight="800" fill="#83671C">-1</text>
+    <text x="10" y="200" text-anchor="start" font-size="16" font-weight="700" fill="#83671C">back index</text>
+    <text x="145" y="200" text-anchor="middle" font-size="18" font-weight="800" fill="#83671C">-5</text>
+    <text x="305" y="200" text-anchor="middle" font-size="18" font-weight="800" fill="#83671C">-4</text>
+    <text x="465" y="200" text-anchor="middle" font-size="18" font-weight="800" fill="#83671C">-3</text>
+    <text x="625" y="200" text-anchor="middle" font-size="18" font-weight="800" fill="#83671C">-2</text>
+    <text x="785" y="200" text-anchor="middle" font-size="18" font-weight="800" fill="#83671C">-1</text>
   </g>
 </svg>
 
@@ -158,7 +158,10 @@ ____________</pre></div>
 <section class="mlrk-section">
 <div id="lists-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
 <button type="button" class="mlrk-btn mlrk-btn-primary" id="lists-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="lists-download">Download as .txt</button>
+</div>
 <p id="lists-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
@@ -309,6 +312,8 @@ ____________</pre></div>
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#lists-scorechip"); });
   K.Scoring.renderChip("#lists-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#lists-download"});
 
   K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#lists-copy", onDone:function(ok){
     document.getElementById("lists-copyfb").textContent = ok

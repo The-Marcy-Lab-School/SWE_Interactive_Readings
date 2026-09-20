@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-illustration{width:100%;max-width:640px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:16rem;font-family:var(--mlrk-font-code)}
 .enc-fillblank-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
 .enc-fillblank-row label{font-family:var(--mlrk-font-code);font-size:.95rem}
@@ -77,7 +77,7 @@
 
 <p style="margin-top:1.4rem">Here are the two paths side by side — the same account, the same withdrawal amount, but two very different routes to changing <code>_balance</code>:</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 640 360" role="img" aria-labelledby="encDiagTitle encDiagDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 680 380" role="img" aria-labelledby="encDiagTitle encDiagDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="encDiagTitle">Two paths to changing a bank account's balance, compared</title>
   <desc id="encDiagDesc">On the left, external code sets the balance attribute directly by writing account underscore balance minus equals 500. No condition runs before the change happens, so the balance can go negative and the rule is broken. On the right, external code calls account.withdraw(500) instead. Inside the method, whether the amount is no more than the current balance is checked first, so the balance only changes when that check passes and the rule holds.</desc>
   <defs>
@@ -86,43 +86,43 @@
     </marker>
   </defs>
   <g font-family="Helvetica, Arial, sans-serif">
-    <text x="155" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#C92929">Setting _balance directly</text>
-    <text x="485" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#264326">Calling withdraw() instead</text>
+    <text x="160" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#C92929">Setting _balance directly</text>
+    <text x="520" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#264326">Calling withdraw() instead</text>
 
-    <rect x="10" y="40" width="290" height="50" rx="10" fill="#FFFFFF" stroke="#B3BBB0" stroke-width="2"/>
-    <text x="155" y="70" text-anchor="middle" font-size="13" fill="#261F1D">External code</text>
-    <rect x="340" y="40" width="290" height="50" rx="10" fill="#FFFFFF" stroke="#B3BBB0" stroke-width="2"/>
-    <text x="485" y="70" text-anchor="middle" font-size="13" fill="#261F1D">External code</text>
+    <rect x="10" y="40" width="300" height="54" rx="10" fill="#FFFFFF" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="160" y="72" text-anchor="middle" font-size="16" fill="#261F1D">External code</text>
+    <rect x="370" y="40" width="300" height="54" rx="10" fill="#FFFFFF" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="520" y="72" text-anchor="middle" font-size="16" fill="#261F1D">External code</text>
 
-    <line x1="155" y1="92" x2="155" y2="112" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
-    <line x1="485" y1="92" x2="485" y2="112" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+    <line x1="160" y1="94" x2="160" y2="118" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+    <line x1="520" y1="94" x2="520" y2="118" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
 
-    <rect x="10" y="114" width="290" height="50" rx="10" fill="#261F1D" stroke="#C92929" stroke-width="2.5"/>
-    <text x="155" y="144" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#FFFCF7">account._balance -= 500</text>
-    <rect x="340" y="114" width="290" height="50" rx="10" fill="#261F1D" stroke="#264326" stroke-width="2.5"/>
-    <text x="485" y="144" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#FFFCF7">account.withdraw(500)</text>
+    <rect x="10" y="118" width="300" height="54" rx="10" fill="#261F1D" stroke="#C92929" stroke-width="2.5"/>
+    <text x="160" y="150" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#FFFCF7">account._balance -= 500</text>
+    <rect x="370" y="118" width="300" height="54" rx="10" fill="#261F1D" stroke="#264326" stroke-width="2.5"/>
+    <text x="520" y="150" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#FFFCF7">account.withdraw(500)</text>
 
-    <line x1="155" y1="166" x2="155" y2="186" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
-    <line x1="485" y1="166" x2="485" y2="186" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+    <line x1="160" y1="172" x2="160" y2="196" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+    <line x1="520" y1="172" x2="520" y2="196" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
 
-    <rect x="10" y="188" width="290" height="64" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2"/>
-    <text x="155" y="213" text-anchor="middle" font-size="12.5" fill="#261F1D">No condition runs</text>
-    <text x="155" y="234" text-anchor="middle" font-size="12.5" fill="#261F1D">before the change happens</text>
+    <rect x="10" y="196" width="300" height="70" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2"/>
+    <text x="160" y="226" text-anchor="middle" font-size="16" fill="#261F1D">No condition runs</text>
+    <text x="160" y="250" text-anchor="middle" font-size="16" fill="#261F1D">before the change happens</text>
 
-    <rect x="340" y="188" width="290" height="64" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
-    <text x="485" y="213" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">amount &lt;= self._balance</text>
-    <text x="485" y="234" text-anchor="middle" font-size="12.5" fill="#261F1D">is checked first</text>
+    <rect x="370" y="196" width="300" height="70" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="520" y="226" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">amount &lt;= self._balance</text>
+    <text x="520" y="250" text-anchor="middle" font-size="16" fill="#261F1D">is checked first</text>
 
-    <line x1="155" y1="254" x2="155" y2="274" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
-    <line x1="485" y1="254" x2="485" y2="274" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+    <line x1="160" y1="266" x2="160" y2="290" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
+    <line x1="520" y1="266" x2="520" y2="290" stroke="#B3BBB0" stroke-width="2.5" marker-end="url(#encArrow)"/>
 
-    <rect x="10" y="276" width="290" height="64" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="3"/>
-    <text x="155" y="301" text-anchor="middle" font-size="13" font-weight="700" fill="#B72525">Balance can go negative</text>
-    <text x="155" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#B72525">the rule is broken</text>
+    <rect x="10" y="290" width="300" height="70" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="3"/>
+    <text x="160" y="320" text-anchor="middle" font-size="17" font-weight="700" fill="#B72525">Balance can go negative</text>
+    <text x="160" y="344" text-anchor="middle" font-size="17" font-weight="700" fill="#B72525">the rule is broken</text>
 
-    <rect x="340" y="276" width="290" height="64" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="3"/>
-    <text x="485" y="301" text-anchor="middle" font-size="13" font-weight="700" fill="#264326">Balance only changes</text>
-    <text x="485" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#264326">when the check passes</text>
+    <rect x="370" y="290" width="300" height="70" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="3"/>
+    <text x="520" y="320" text-anchor="middle" font-size="17" font-weight="700" fill="#264326">Balance only changes</text>
+    <text x="520" y="344" text-anchor="middle" font-size="17" font-weight="700" fill="#264326">when the check passes</text>
   </g>
 </svg>
 
@@ -186,7 +186,10 @@
 <section class="mlrk-section">
 <div id="enc-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
 <button type="button" class="mlrk-btn mlrk-btn-primary" id="enc-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="enc-download">Download as .txt</button>
+</div>
 <p id="enc-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
@@ -279,6 +282,8 @@
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#enc-scorechip"); });
   K.Scoring.renderChip("#enc-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#enc-download"});
 
   K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#enc-copy", onDone:function(ok){
     document.getElementById("enc-copyfb").textContent = ok

@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-illustration{width:100%;max-width:640px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 .mlrk-fillblank{display:flex;align-items:center;gap:.5rem;margin:.5rem 0}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:14rem;font-family:var(--mlrk-font-code)}
 .var-predict-row{margin:.9rem 0 0.2rem}
@@ -62,7 +62,7 @@
 <p>It's tempting to picture <code>x = 5</code> as "a box called <code>x</code> with a 5 inside it." That mental model breaks the moment you write <code>x = "hello"</code> right after — did the 5 turn into text? It didn't. Python never changes a value in place like that. What actually happened both times is simpler: the name <code>x</code> got pointed at a value somewhere in memory. The first line points it at the integer 5. The second line points that same name at a completely different value, the string <code>"hello"</code>, and the 5 is left with nothing pointing at it at all. A variable is a name attached to a value, not a container that becomes the value.</p>
 <p>This matters because two values can look identical on the page and behave nothing alike, depending only on their type. <code>count = 5</code> and <code>code = "5"</code> print the same single character. But <code>count</code> points at an integer, and <code>code</code> points at a string — and the exact same <code>+</code> operator does something different to each one:</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 640 380" role="img" aria-labelledby="varTitle varDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 660 430" role="img" aria-labelledby="varTitle varDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="varTitle">The same operator behaving differently depending on type</title>
   <desc id="varDesc">count is a name pointing at the integer value 5. code is a name pointing at the string value 5, written in quotes. Adding count to itself with the plus operator produces 10, integer addition. Adding code to itself with the plus operator produces the two characters 55, string concatenation, because plus means something different for text than it does for numbers.</desc>
   <defs>
@@ -71,31 +71,31 @@
     </marker>
   </defs>
   <g font-family="Helvetica, Arial, sans-serif">
-    <rect x="85" y="30" width="160" height="46" rx="23" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
-    <text x="165" y="58" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">count</text>
-    <line x1="165" y1="76" x2="165" y2="115" stroke="#261F1D" stroke-width="2.5" marker-end="url(#varArrow)"/>
-    <rect x="105" y="118" width="120" height="56" rx="12" fill="#FFFFFF" stroke="#261F1D" stroke-width="2"/>
-    <text x="165" y="151" text-anchor="middle" font-size="20" font-weight="800" fill="#261F1D">5</text>
-    <text x="165" y="167" text-anchor="middle" font-size="12" fill="#327A5F">int</text>
+    <rect x="80" y="30" width="180" height="54" rx="27" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="170" y="64" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">count</text>
+    <line x1="170" y1="84" x2="170" y2="126" stroke="#261F1D" stroke-width="2.5" marker-end="url(#varArrow)"/>
+    <rect x="100" y="131" width="140" height="70" rx="12" fill="#FFFFFF" stroke="#261F1D" stroke-width="2"/>
+    <text x="170" y="172" text-anchor="middle" font-size="24" font-weight="800" fill="#261F1D">5</text>
+    <text x="170" y="192" text-anchor="middle" font-size="16" fill="#327A5F">int</text>
 
-    <rect x="395" y="30" width="160" height="46" rx="23" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="475" y="58" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">code</text>
-    <line x1="475" y1="76" x2="475" y2="115" stroke="#261F1D" stroke-width="2.5" marker-end="url(#varArrow)"/>
-    <rect x="415" y="118" width="120" height="56" rx="12" fill="#FFFFFF" stroke="#261F1D" stroke-width="2"/>
-    <text x="475" y="151" text-anchor="middle" font-size="20" font-weight="800" fill="#261F1D">"5"</text>
-    <text x="475" y="167" text-anchor="middle" font-size="12" fill="#2274B5">str</text>
+    <rect x="400" y="30" width="180" height="54" rx="27" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="490" y="64" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">code</text>
+    <line x1="490" y1="84" x2="490" y2="126" stroke="#261F1D" stroke-width="2.5" marker-end="url(#varArrow)"/>
+    <rect x="420" y="131" width="140" height="70" rx="12" fill="#FFFFFF" stroke="#261F1D" stroke-width="2"/>
+    <text x="490" y="172" text-anchor="middle" font-size="24" font-weight="800" fill="#261F1D">"5"</text>
+    <text x="490" y="192" text-anchor="middle" font-size="16" fill="#2274B5">str</text>
 
-    <text x="320" y="205" text-anchor="middle" font-size="13" fill="#261F1D">Same-looking value, different type underneath</text>
+    <text x="330" y="230" text-anchor="middle" font-size="16" fill="#261F1D">Same-looking value, different type underneath</text>
 
-    <rect x="30" y="225" width="270" height="140" rx="14" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
-    <text x="165" y="263" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">count + count</text>
-    <text x="165" y="290" text-anchor="middle" font-size="12" fill="#204D3C">int addition</text>
-    <text x="165" y="333" text-anchor="middle" font-size="26" font-weight="800" fill="#264326">10</text>
+    <rect x="20" y="255" width="300" height="160" rx="14" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="170" y="295" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">count + count</text>
+    <text x="170" y="325" text-anchor="middle" font-size="16" fill="#204D3C">int addition</text>
+    <text x="170" y="380" text-anchor="middle" font-size="28" font-weight="800" fill="#264326">10</text>
 
-    <rect x="340" y="225" width="270" height="140" rx="14" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="475" y="263" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">code + code</text>
-    <text x="475" y="290" text-anchor="middle" font-size="12" fill="#1E659D">str concatenation</text>
-    <text x="475" y="333" text-anchor="middle" font-size="26" font-weight="800" fill="#2F5A8B">"55"</text>
+    <rect x="340" y="255" width="300" height="160" rx="14" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="490" y="295" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">code + code</text>
+    <text x="490" y="325" text-anchor="middle" font-size="16" fill="#1E659D">str concatenation</text>
+    <text x="490" y="380" text-anchor="middle" font-size="28" font-weight="800" fill="#2F5A8B">"55"</text>
   </g>
 </svg>
 
@@ -177,7 +177,10 @@ print(is_ready)</div></div>
 <section class="mlrk-section">
 <div id="var-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
 <button type="button" class="mlrk-btn mlrk-btn-primary" id="var-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="var-download">Download as .txt</button>
+</div>
 <p id="var-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
@@ -269,6 +272,8 @@ print(is_ready)</div></div>
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#var-scorechip"); });
   K.Scoring.renderChip("#var-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#var-download"});
 
   K.copyPlainText({readingId: READING_ID, title: TITLE, buttonSelector: "#var-copy", onDone: function(ok){
     document.getElementById("var-copyfb").textContent = ok

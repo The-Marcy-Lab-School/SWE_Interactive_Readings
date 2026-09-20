@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:700px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-illustration{width:100%;max-width:760px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 .mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
 .uml-choice-code{margin:0;white-space:pre-wrap;font-family:var(--mlrk-font-code);font-size:.95rem;color:var(--mlrk-text-on-light)}
 .uml-recap{background:var(--mlrk-bg-light-alt);border-radius:12px;padding:1rem;margin:.8rem 0;font-family:var(--mlrk-font-code);font-size:.95rem}
@@ -49,32 +49,32 @@
 <h2>3. Reading a UML class box</h2>
 <p>Every UML class box has the same three stacked sections, top to bottom: the class's name, then its attributes, then its methods. Here's the <code>LibraryItem</code> class Priya is building, with the <code>Book</code> class Diego is building underneath it, connected by an inheritance arrow:</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 650 420" role="img" aria-labelledby="umlDiagTitle umlDiagDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 760 490" role="img" aria-labelledby="umlDiagTitle umlDiagDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="umlDiagTitle">UML class diagram: LibraryItem as a parent class, Book as a child class</title>
   <desc id="umlDiagDesc">Two UML class boxes, each divided into three stacked compartments: name, attributes, and methods. The top box is named LibraryItem, with attributes title: str, item_id: str, and is_checked_out: bool, and methods check_out(): None and return_item(): None. The bottom box is named Book, with attributes author: str and isbn: str, and one method, get_citation(): str. A solid line runs from the top of the Book box up to the bottom of the LibraryItem box, ending in a hollow, unfilled triangle whose tip touches the LibraryItem box. The hollow triangle points at LibraryItem, meaning Book inherits from LibraryItem.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <rect x="60" y="30" width="260" height="172" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <line x1="60" y1="64" x2="320" y2="64" stroke="#2274B5" stroke-width="2"/>
-    <line x1="60" y1="138" x2="320" y2="138" stroke="#2274B5" stroke-width="2"/>
-    <text x="190" y="53" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">LibraryItem</text>
-    <text x="76" y="84" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">title: str</text>
-    <text x="76" y="104" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">item_id: str</text>
-    <text x="76" y="124" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">is_checked_out: bool</text>
-    <text x="76" y="158" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">check_out(): None</text>
-    <text x="76" y="180" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">return_item(): None</text>
+    <rect x="60" y="30" width="300" height="210" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <line x1="60" y1="72" x2="360" y2="72" stroke="#2274B5" stroke-width="2"/>
+    <line x1="60" y1="168" x2="360" y2="168" stroke="#2274B5" stroke-width="2"/>
+    <text x="210" y="58" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">LibraryItem</text>
+    <text x="76" y="96" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">title: str</text>
+    <text x="76" y="120" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">item_id: str</text>
+    <text x="76" y="144" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">is_checked_out: bool</text>
+    <text x="76" y="194" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">check_out(): None</text>
+    <text x="76" y="218" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">return_item(): None</text>
 
-    <rect x="330" y="250" width="260" height="130" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
-    <line x1="330" y1="284" x2="590" y2="284" stroke="#83671C" stroke-width="2"/>
-    <line x1="330" y1="338" x2="590" y2="338" stroke="#83671C" stroke-width="2"/>
-    <text x="460" y="273" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">Book</text>
-    <text x="346" y="304" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">author: str</text>
-    <text x="346" y="324" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">isbn: str</text>
-    <text x="346" y="362" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#261F1D">get_citation(): str</text>
+    <rect x="380" y="260" width="300" height="170" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
+    <line x1="380" y1="302" x2="680" y2="302" stroke="#83671C" stroke-width="2"/>
+    <line x1="380" y1="374" x2="680" y2="374" stroke="#83671C" stroke-width="2"/>
+    <text x="530" y="288" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">Book</text>
+    <text x="396" y="326" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">author: str</text>
+    <text x="396" y="350" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">isbn: str</text>
+    <text x="396" y="402" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">get_citation(): str</text>
 
-    <line x1="460" y1="250" x2="209.7" y2="205.5" stroke="#261F1D" stroke-width="2.5"/>
-    <polygon points="190,202 211.1,197.6 208.3,213.4" fill="#FFFCF7" stroke="#261F1D" stroke-width="2.5"/>
+    <line x1="530" y1="260" x2="226" y2="241" stroke="#261F1D" stroke-width="2.5"/>
+    <polygon points="210,240 229,233 228,249" fill="#FFFCF7" stroke="#261F1D" stroke-width="2.5"/>
 
-    <text x="325" y="405" text-anchor="middle" font-size="12.5" fill="#327A5F">The hollow triangle points up at LibraryItem, the parent — it means "Book inherits from LibraryItem."</text>
+    <text x="380" y="465" text-anchor="middle" font-size="16" fill="#327A5F">The hollow triangle points up at LibraryItem, the parent — it means "Book inherits from LibraryItem."</text>
   </g>
 </svg>
 
@@ -178,7 +178,10 @@
 <section class="mlrk-section">
 <div id="uml-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
 <button type="button" class="mlrk-btn mlrk-btn-primary" id="uml-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="uml-download">Download as .txt</button>
+</div>
 <p id="uml-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
@@ -243,6 +246,8 @@
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#uml-scorechip"); });
   K.Scoring.renderChip("#uml-scorechip");
+
+  K.downloadPlainText({readingId: READING_ID, title: TITLE, buttonSelector: "#uml-download"});
 
   K.copyPlainText({readingId: READING_ID, title: TITLE, buttonSelector: "#uml-copy", onDone: function(ok){
     document.getElementById("uml-copyfb").textContent = ok

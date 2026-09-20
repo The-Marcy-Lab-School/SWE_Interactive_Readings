@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:700px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-illustration{width:100%;max-width:700px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:20rem;font-family:var(--mlrk-font-code)}
 .mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
 .cls-checklist{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0}
@@ -48,37 +48,37 @@ print("Charging", rider, "$" + str(fare))</pre></div>
 <p>That last line was supposed to bill Amir $22.50. Instead it printed <code>Charging Priya $14.0</code> — because there was only ever <em>one</em> <code>rider</code> variable and <em>one</em> <code>fare</code> variable in the whole script. The moment Ride 2 started, it silently overwrote Ride 1's data, and Ride 1 had no memory of its own left to bill correctly. Amir was never charged. Priya's ride looked like it billed twice.</p>
 <p>Renaming the variables (<code>rider1</code>, <code>rider2</code>, <code>fare1</code>, <code>fare2</code>...) would buy a little time, but it falls apart the moment Nimbus wants a third simultaneous ride, or a tenth. What Nimbus actually needs is a way to say: <strong>every ride gets its own separate, independent copy of this data</strong> — automatically, no matter how many rides exist at once. That's exactly what a Python <strong>class</strong> is for: a blueprint that produces as many independent objects as you need, each one holding its own values.</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 700 420" role="img" aria-labelledby="clsDiagTitle clsDiagDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 800 460" role="img" aria-labelledby="clsDiagTitle clsDiagDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="clsDiagTitle">One Ride class producing two completely independent Ride objects</title>
   <desc id="clsDiagDesc">At the top, the class Ride defines a blueprint with an __init__ method that sets a rider attribute and a fare attribute on whichever object is being created. Below it, two separate objects are built from that same blueprint: ride1 holds rider "Amir" and fare 22.50, while ride2 holds rider "Priya" and fare 14.00. The two objects came from the exact same class, but each stores its own independent values — changing one never changes the other.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <text x="350" y="16" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">class Ride — defines the blueprint</text>
+    <text x="400" y="24" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">class Ride — defines the blueprint</text>
 
-    <rect x="210" y="30" width="280" height="150" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
-    <text x="230" y="58" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">class Ride:</text>
-    <text x="250" y="81" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">def __init__(self, rider, fare):</text>
-    <text x="270" y="104" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">self.rider = rider</text>
-    <text x="270" y="127" font-family="Menlo, Consolas, monospace" font-size="12" fill="#261F1D">self.fare = fare</text>
-    <text x="350" y="158" text-anchor="middle" font-size="13" font-weight="700" fill="#264326">Not an object yet — just the plan</text>
+    <rect x="150" y="38" width="500" height="170" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="175" y="70" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">class Ride:</text>
+    <text x="205" y="98" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">def __init__(self, rider, fare):</text>
+    <text x="235" y="126" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">self.rider = rider</text>
+    <text x="235" y="154" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">self.fare = fare</text>
+    <text x="400" y="190" text-anchor="middle" font-size="16" font-weight="700" fill="#264326">Not an object yet — just the plan</text>
 
-    <line x1="350" y1="180" x2="200" y2="215" stroke="#B3BBB0" stroke-width="2"/>
-    <line x1="350" y1="180" x2="500" y2="215" stroke="#B3BBB0" stroke-width="2"/>
+    <line x1="400" y1="208" x2="220" y2="240" stroke="#B3BBB0" stroke-width="2"/>
+    <line x1="400" y1="208" x2="580" y2="240" stroke="#B3BBB0" stroke-width="2"/>
 
-    <rect x="90" y="215" width="220" height="150" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="200" y="245" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">ride1</text>
-    <text x="200" y="267" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#1E659D">Ride("Amir", 22.50)</text>
-    <text x="110" y="300" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">rider = "Amir"</text>
-    <text x="110" y="323" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">fare  = 22.50</text>
-    <text x="200" y="352" text-anchor="middle" font-size="13" font-weight="700" fill="#1E659D">Its own independent data</text>
+    <rect x="80" y="240" width="280" height="170" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="220" y="270" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">ride1</text>
+    <text x="220" y="298" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#1E659D">Ride("Amir", 22.50)</text>
+    <text x="100" y="330" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">rider = "Amir"</text>
+    <text x="100" y="356" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">fare  = 22.50</text>
+    <text x="220" y="390" text-anchor="middle" font-size="16" font-weight="700" fill="#1E659D">Its own independent data</text>
 
-    <rect x="390" y="215" width="220" height="150" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
-    <text x="500" y="245" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">ride2</text>
-    <text x="500" y="267" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="13" fill="#675116">Ride("Priya", 14.00)</text>
-    <text x="410" y="300" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">rider = "Priya"</text>
-    <text x="410" y="323" font-family="Menlo, Consolas, monospace" font-size="13" fill="#261F1D">fare  = 14.00</text>
-    <text x="500" y="352" text-anchor="middle" font-size="13" font-weight="700" fill="#675116">Its own independent data</text>
+    <rect x="440" y="240" width="280" height="170" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
+    <text x="580" y="270" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">ride2</text>
+    <text x="580" y="298" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#675116">Ride("Priya", 14.00)</text>
+    <text x="460" y="330" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">rider = "Priya"</text>
+    <text x="460" y="356" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">fare  = 14.00</text>
+    <text x="580" y="390" text-anchor="middle" font-size="16" font-weight="700" fill="#675116">Its own independent data</text>
 
-    <text x="350" y="398" text-anchor="middle" font-size="12" fill="#327A5F">Changing ride2's fare never touches ride1's fare — each object keeps its own copy.</text>
+    <text x="400" y="440" text-anchor="middle" font-size="16" fill="#327A5F">Changing ride2's fare never touches ride1's fare — each object keeps its own copy.</text>
   </g>
 </svg>
 
@@ -122,10 +122,10 @@ ride2 = Ride("Priya", 14.00)</pre></div>
 <div id="cls-predict1fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 
-<p style="margin-top:1.4rem">Now suppose the dispatcher reroutes ride2 and updates its price afterward:</p>
+<p style="margin-top:1.4rem"><strong>Now this line runs, changing only ride2:</strong></p>
 <div class="mlrk-code"><pre>ride2.fare = 18.00</pre></div>
 <div class="mlrk-card">
-<p><strong>Predict:</strong> after that line runs, what does <code>ride1.fare</code> return now?</p>
+<p><strong>What does <code>ride1.fare</code> return now?</strong></p>
 <div id="cls-predict2">
   <button type="button" class="mlrk-choice" data-a="22.50">22.50</button>
   <button type="button" class="mlrk-choice" data-a="18.00">18.00</button>
@@ -187,7 +187,10 @@ ride2 = Ride("Priya", 14.00)</pre></div>
 <section class="mlrk-section">
 <div id="cls-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
 <button type="button" class="mlrk-btn mlrk-btn-primary" id="cls-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="cls-download">Download as .txt</button>
+</div>
 <p id="cls-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
@@ -289,6 +292,8 @@ ride2 = Ride("Priya", 14.00)</pre></div>
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#cls-scorechip"); });
   K.Scoring.renderChip("#cls-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#cls-download"});
 
   K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#cls-copy", onDone:function(ok){
     document.getElementById("cls-copyfb").textContent = ok

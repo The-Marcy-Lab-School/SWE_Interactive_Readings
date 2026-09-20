@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:640px;height:auto;margin:1.1rem 0;display:block}
+.mlrk-illustration{width:100%;max-width:720px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:16rem;font-family:var(--mlrk-font-code)}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
 </style>
@@ -29,33 +29,33 @@
 <p>Before WSL (Windows Subsystem for Linux) existed, a Windows user who needed real Linux tools had two bad options. Option one: install a full virtual machine, like VirtualBox or VMware. That means running a whole second operating system inside the first one — its own multi-gigabyte disk, plus several GB of RAM tied up just to keep it running. Option two: dual-boot. Partition the hard drive, install Ubuntu next to Windows, and reboot the whole machine every time you switch from writing code to replying to email. Neither option was cheap. For years, they were the only real answers.</p>
 <p>Microsoft's own developers hit this same wall, so often that in 2016 Microsoft teamed up with Canonical (the company behind Ubuntu) to build something new. It starts in about a second. It shares files directly with Windows. It costs nothing to leave running. That's WSL. It isn't a simulation of Linux commands, and it isn't a second computer pretending to be one. It's a real Linux kernel, running right alongside Windows on the same machine.</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 640 300" role="img" aria-labelledby="cmpTitle cmpDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 720 300" role="img" aria-labelledby="cmpTitle cmpDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="cmpTitle">Three ways to get Linux on a Windows machine, compared by weight</title>
   <desc id="cmpDesc">Dual boot requires a full disk partition and a reboot to switch. A traditional virtual machine runs a whole second operating system on top of Windows, using several gigabytes of RAM at all times. WSL runs a real Linux kernel directly alongside Windows, starting in about a second and using memory only while it's actually being used.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <rect x="15" y="20" width="180" height="240" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
-    <text x="105" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Dual boot</text>
-    <text x="105" y="110" text-anchor="middle" font-size="12" fill="#261F1D">Reboot the whole</text>
-    <text x="105" y="128" text-anchor="middle" font-size="12" fill="#261F1D">machine to switch</text>
-    <text x="105" y="146" text-anchor="middle" font-size="12" fill="#261F1D">between Windows</text>
-    <text x="105" y="164" text-anchor="middle" font-size="12" fill="#261F1D">and Linux</text>
-    <text x="105" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#B72525">Heaviest switch cost</text>
+    <rect x="10" y="20" width="220" height="260" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
+    <text x="120" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">Dual boot</text>
+    <text x="120" y="122" text-anchor="middle" font-size="16" fill="#261F1D">Reboot the whole</text>
+    <text x="120" y="146" text-anchor="middle" font-size="16" fill="#261F1D">machine to switch</text>
+    <text x="120" y="170" text-anchor="middle" font-size="16" fill="#261F1D">between Windows</text>
+    <text x="120" y="194" text-anchor="middle" font-size="16" fill="#261F1D">and Linux</text>
+    <text x="120" y="248" text-anchor="middle" font-size="16" font-weight="700" fill="#B72525">Heaviest switch cost</text>
 
-    <rect x="230" y="20" width="180" height="240" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
-    <text x="320" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">Traditional VM</text>
-    <text x="320" y="110" text-anchor="middle" font-size="12" fill="#261F1D">A whole second OS,</text>
-    <text x="320" y="128" text-anchor="middle" font-size="12" fill="#261F1D">running on top of</text>
-    <text x="320" y="146" text-anchor="middle" font-size="12" fill="#261F1D">Windows, several GB</text>
-    <text x="320" y="164" text-anchor="middle" font-size="12" fill="#261F1D">of RAM reserved</text>
-    <text x="320" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#675116">Heavy, always-on cost</text>
+    <rect x="250" y="20" width="220" height="260" rx="12" fill="#FECC5B" stroke="#83671C" stroke-width="2.5"/>
+    <text x="360" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">Traditional VM</text>
+    <text x="360" y="122" text-anchor="middle" font-size="16" fill="#261F1D">A whole second OS,</text>
+    <text x="360" y="146" text-anchor="middle" font-size="16" fill="#261F1D">running on top of</text>
+    <text x="360" y="170" text-anchor="middle" font-size="16" fill="#261F1D">Windows, several GB</text>
+    <text x="360" y="194" text-anchor="middle" font-size="16" fill="#261F1D">of RAM reserved</text>
+    <text x="360" y="248" text-anchor="middle" font-size="16" font-weight="700" fill="#675116">Heavy, always-on cost</text>
 
-    <rect x="445" y="20" width="180" height="240" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
-    <text x="535" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#261F1D">WSL</text>
-    <text x="535" y="110" text-anchor="middle" font-size="12" fill="#261F1D">A real Linux kernel,</text>
-    <text x="535" y="128" text-anchor="middle" font-size="12" fill="#261F1D">alongside Windows,</text>
-    <text x="535" y="146" text-anchor="middle" font-size="12" fill="#261F1D">starts in ~1 second,</text>
-    <text x="535" y="164" text-anchor="middle" font-size="12" fill="#261F1D">shares files directly</text>
-    <text x="535" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#264326">Lightest, on demand</text>
+    <rect x="490" y="20" width="220" height="260" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="600" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">WSL</text>
+    <text x="600" y="122" text-anchor="middle" font-size="16" fill="#261F1D">A real Linux kernel,</text>
+    <text x="600" y="146" text-anchor="middle" font-size="16" fill="#261F1D">alongside Windows,</text>
+    <text x="600" y="170" text-anchor="middle" font-size="16" fill="#261F1D">starts in ~1 second,</text>
+    <text x="600" y="194" text-anchor="middle" font-size="16" fill="#261F1D">shares files directly</text>
+    <text x="600" y="248" text-anchor="middle" font-size="16" font-weight="700" fill="#264326">Lightest, on demand</text>
   </g>
 </svg>
 
@@ -103,7 +103,13 @@
   <div class="mlrk-terminal-log" aria-live="polite"></div>
   <div class="mlrk-terminal-row"><span class="mlrk-terminal-prompt"></span><input class="mlrk-terminal-input" type="text" aria-label="Terminal input" autocomplete="off" spellcheck="false"></div>
 </div>
-<p class="mlrk-small">Try: <code>pwd</code>, then <code>ls</code>, then <code>mkdir fellowship</code>, then <code>cd fellowship</code>.</p>
+<p class="mlrk-small">Type these commands into the terminal above, one at a time, in this order:</p>
+<ol class="mlrk-small mlrk-steplist">
+  <li><code>pwd</code> — confirm where you're starting from</li>
+  <li><code>ls</code> — see what's already in this folder</li>
+  <li><code>mkdir fellowship</code> — create a new folder</li>
+  <li><code>cd fellowship</code> — move into it</li>
+</ol>
 
 <div class="mlrk-card" style="margin-top:1rem">
 <p><strong>Fill in the blank:</strong> the command that creates a new folder called <code>fellowship</code> is:</p>
@@ -129,7 +135,10 @@
 <section class="mlrk-section">
 <div id="wsl-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
 <button type="button" class="mlrk-btn mlrk-btn-primary" id="wsl-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="wsl-download">Download as .txt</button>
+</div>
 <p id="wsl-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
@@ -202,6 +211,8 @@
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#wsl-scorechip"); });
   K.Scoring.renderChip("#wsl-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#wsl-download"});
 
   K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#wsl-copy", onDone:function(ok){
     document.getElementById("wsl-copyfb").textContent = ok
