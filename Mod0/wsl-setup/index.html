@@ -14,7 +14,7 @@
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>The Missing Terminal</h1>
 <div class="mlrk-meta">
-  <span class="mlrk-pill">~13–14 minutes</span>
+  <span class="mlrk-pill">~9 minutes</span>
   <span class="mlrk-pill">Interactive</span>
   <span class="mlrk-pill">No setup needed to read</span>
 </div>
@@ -66,6 +66,7 @@
 <h2>2. Technical vocabulary</h2>
 <p>Flip each card before the practice below.</p>
 <div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Linux</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Linux</strong><br>A free, open-source operating system, like Windows or macOS but built and maintained by a huge community instead of one company. Most of the software world's servers run on it, so most professional command-line and coding work happens on it too.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>WSL</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>WSL (Windows Subsystem for Linux)</strong><br>A Windows feature that runs a real Linux environment directly alongside Windows, without a traditional virtual machine or a separate boot.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>distro</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Distribution (distro)</strong><br>A specific packaged version of Linux — Ubuntu is the most common default for WSL, but Debian, Fedora, and others are also available.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>kernel</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Kernel</strong><br>The core of an operating system that talks directly to the hardware. WSL2 runs a genuine Linux kernel, not an imitation of one.</span></button>
@@ -119,21 +120,14 @@
 </section>
 
 <section class="mlrk-section">
-<h2>5. Watch: WSL, set up start to finish</h2>
-<div class="mlrk-video-wrap"><div id="wsl-video"></div></div>
-<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=zZf4YH4WiZo" target="_blank" rel="noopener">Watch on YouTube</a>
-<p>As you watch, notice the same steps from section 3: the install command, the restart, then the username and password on first launch.</p>
-</section>
-
-<section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
+<h2>5. Summary &amp; reflection</h2>
 <p>WSL exists because Microsoft's own developers needed real Linux tools, without paying for a full virtual machine or a dual boot. Now every Windows-based engineer here gets that same real Linux setup for free, built right into Windows. Run <code>wsl --install</code>, restart, and set a username and password. That's the whole setup.</p>
 <label for="wsl-reflect"><strong>In 2–3 sentences:</strong> before reading this, what did you assume "installing Linux" meant? How is WSL actually different from that?</label>
 <textarea id="wsl-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
 <section class="mlrk-section">
-<h2>7. Go further (optional)</h2>
+<h2>6. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
   <li><a href="https://overthewire.org/wargames/bandit/" target="_blank" rel="noopener">OverTheWire: Bandit</a> — a free browser-based wargame that connects you to a real Linux server and has you navigate it with real commands to find each level's password, good practice once WSL gives you a real shell.</li>
@@ -213,8 +207,6 @@
     }
     mkdirFb.setAttribute("tabindex","-1"); mkdirFb.focus();
   });
-
-  K.video({id:"act-video", elementId:"wsl-video", videoId:"zZf4YH4WiZo"});
 
   K.freeResponse({id:"act-reflect", selector:"#wsl-reflect", minWords:10});
 
