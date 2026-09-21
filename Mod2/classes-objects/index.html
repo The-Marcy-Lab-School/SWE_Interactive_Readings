@@ -105,7 +105,7 @@ print("Charging", rider, "$" + str(fare))</pre></div>
     def __init__(self, rider, fare):
         self.rider = rider
         self.fare = fare</pre></div>
-<p>Reading it line by line: <code>class Ride:</code> names the blueprint. <code>def __init__(self, rider, fare):</code> defines the setup method that runs the instant an object is built — <code>self</code> is always the first parameter of any method defined inside a class, and Python fills it in automatically with whichever object is currently being created; you never pass it yourself. <code>rider</code> and <code>fare</code> are ordinary parameters, just like in a regular function — they hold whatever values get passed in. The two lines underneath are where the actual saving happens: <code>self.rider = rider</code> takes the value that came in through the <code>rider</code> parameter and stores it as an attribute <em>on this specific object</em>, permanently, so it's still there later even after <code>__init__</code> finishes running.</p>
+<p>Reading it line by line: <code>class Ride:</code> names the blueprint. <code>def __init__(self, rider, fare):</code> defines the setup method that runs the instant an object is built — <code>self</code> is always the first parameter of any method defined inside a class, and Python fills it in automatically with whichever object is currently being created. <code>rider</code> and <code>fare</code> are ordinary parameters, just like in a regular function — they hold whatever values get passed in. The two lines underneath are where the actual saving happens: <code>self.rider = rider</code> takes the value that came in through the <code>rider</code> parameter and stores it as an attribute <em>on this specific object</em>, so it's still there even after <code>__init__</code> finishes running.</p>
 <p>Building an object from this class — instantiating it — looks like calling a function:</p>
 <div class="mlrk-code"><pre>ride1 = Ride("Amir", 22.50)
 ride2 = Ride("Priya", 14.00)</pre></div>
@@ -156,7 +156,7 @@ ride2 = Ride("Priya", 14.00)</pre></div>
 
 <section class="mlrk-section">
 <h2>4. Two objects, two independent worlds</h2>
-<p>It's tempting to picture <code>self.rider = rider</code> as setting some single, shared box called <code>rider</code> that every <code>Ride</code> object peeks into. That's backwards. Every time <code>__init__</code> runs, <code>self</code> points at a fresh, separate object, and <code>self.rider = rider</code> stores the value on <em>that one object only</em>. <code>ride1</code> and <code>ride2</code> don't share a <code>rider</code> attribute or a <code>fare</code> attribute at all — they each have their own copy, sitting in their own separate spot in memory, and one can change without the other ever noticing.</p>
+<p>It's tempting to picture <code>self.rider = rider</code> as setting some single, shared box called <code>rider</code> that every <code>Ride</code> object peeks into. That's backwards. Every time <code>__init__</code> runs, <code>self</code> points at a fresh, separate object, and <code>self.rider = rider</code> stores the value on <em>that one object only</em>. <code>ride1</code> and <code>ride2</code> don't share a <code>rider</code> attribute or a <code>fare</code> attribute at all — they each have their own copy, and one can change without the other ever noticing.</p>
 <p>Select every statement below that's actually true about <code>ride1</code> and <code>ride2</code>:</p>
 <div class="mlrk-card">
 <div class="cls-checklist">
@@ -178,7 +178,16 @@ ride2 = Ride("Priya", 14.00)</pre></div>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
+<h2>6. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>Ride</code> class and build a couple of objects from it, then watch the tool draw exactly the kind of "each object gets its own box" diagram this reading uses.</li>
+  <li><a href="https://www.youtube.com/watch?v=f0TrMH9s-VE" target="_blank" rel="noopener">Python Classes and Objects — Python Simplified</a> — a second, ~8-minute explanation of classes and objects, distinct from the video above, from a well-known Python teaching channel.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary &amp; reflection</h2>
 <p>Nimbus Rides' bug happened because one set of plain variables was being asked to represent an unlimited number of rides at once. A class fixes that at the root: <code>class Ride:</code> defines the blueprint once, <code>__init__(self, rider, fare)</code> runs automatically every time a new <code>Ride</code> gets built, and <code>self.rider = rider</code> / <code>self.fare = fare</code> save that data onto <em>that one object</em> — never onto some single shared variable. <code>ride1 = Ride("Amir", 22.50)</code> and <code>ride2 = Ride("Priya", 14.00)</code> can now exist at the same time, indefinitely, each fully independent of the other.</p>
 <label for="cls-reflect"><strong>In 2–3 sentences:</strong> think of something else in the real world that Nimbus Rides' app would need to track as many independent copies of at once (drivers, passengers, cars, trips...). What would two attributes on that class be, and why would each object need its own independent copy of them?</label>
 <textarea id="cls-reflect" class="mlrk-response" data-save></textarea>

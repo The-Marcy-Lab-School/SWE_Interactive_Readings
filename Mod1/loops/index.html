@@ -52,7 +52,7 @@
 <div class="mlrk-code"><div class="mlrk-screen">orders = ["A-101", "A-102", "A-103"]
 for order_id in orders:
     ship(order_id)</div></div>
-<p>Python walks the list <code>orders</code> once per item, in order, and stops automatically the moment the list runs out. There's no manual counting, and no way to accidentally skip the stop — running out of items to walk through <em>is</em> the stop.</p>
+<p>Python walks the list <code>orders</code> once per item, in order, and stops automatically the moment the list runs out. There's no manual counting, and no way to accidentally skip that stop.</p>
 
 <p>Use a <code>while</code> loop when you don't know in advance how many times you'll repeat, only the condition that should eventually end it:</p>
 <div class="mlrk-code"><div class="mlrk-screen">queue_size = 3
@@ -132,7 +132,16 @@ while balance > 0:
 </section>
 
 <section class="mlrk-section">
-<h2>5. Summary &amp; reflection</h2>
+<h2>5. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in a <code>for</code> or <code>while</code> loop and step through it one pass at a time, watching its variables change live instead of picturing it in your head.</li>
+  <li><a href="https://www.youtube.com/watch?v=6iF8Xb7Z3wQ" target="_blank" rel="noopener">Loops and Iterations — Corey Schafer</a> — a ~10-minute walkthrough of both loop types from a well-known Python teaching channel, covering the same for/while distinction as this reading.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary &amp; reflection</h2>
 <p>A <code>for</code> loop is for something you can count out in advance: a list, a range, a string's characters. A <code>while</code> loop is for something that depends on a condition changing while the program runs, and it only stops if the code inside its body actually changes that condition. Forgetting that one update is a small, easy mistake, and it happens to beginners and to Wall Street trading systems alike.</p>
 <label for="loop-reflect"><strong>In 2–3 sentences:</strong> pick one <code>while</code> loop you could imagine writing for a real project. What's the one line you'd double-check for, every time, so it doesn't turn into another version of Knight Capital's forty-five minutes?</label>
 <textarea id="loop-reflect" class="mlrk-response" data-save></textarea>

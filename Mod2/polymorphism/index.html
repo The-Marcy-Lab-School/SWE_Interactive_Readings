@@ -60,7 +60,7 @@ for employee in staff:
 <div class="mlrk-code"><pre>Ana is a barista who pulls the espresso shots.
 Jordan is a shift lead who counts the register at closing.
 Priya is a manager who handles payroll and scheduling.</pre></div>
-<p>The loop never checks anyone's job title. It calls <code>.describe()</code> on whatever object happens to be sitting in <code>employee</code> that time through the loop, and each object answers with its own class's version — because Python looks up which <code>describe()</code> to run based on the object's actual class, not based on the line of code doing the calling. That's <strong>polymorphism</strong>: the same method name, called the same way, taking a different, correct form depending on which object it's actually called on.</p>
+<p>The loop never checks anyone's job title. It calls <code>.describe()</code> on whatever object is sitting in <code>employee</code> that time through the loop, and each object answers with its own class's version, because Python picks the method based on the object's actual class, not the line of code calling it. That's <strong>polymorphism</strong>: one method name, called the same way, producing a different, correct result depending on the object it's called on.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 860 430" role="img" aria-labelledby="polyDiagTitle polyDiagDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="polyDiagTitle">One method call fanning out into three different behaviors based on each object's own class</title>
@@ -218,7 +218,16 @@ Employee: Priya</pre></div>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
+<h2>6. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://pythontutor.com/python-compiler.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>Employee</code>/<code>Barista</code>/<code>ShiftLead</code>/<code>Manager</code> classes and watch <code>employee.describe()</code> jump to a different method body depending on which object is actually calling it.</li>
+  <li><a href="https://www.youtube.com/watch?v=AfBc7yyigl4" target="_blank" rel="noopener">What is Polymorphism in Python?</a> — another short explanation of the same "one call, many behaviors" idea, with its own set of examples.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary &amp; reflection</h2>
 <p>Kettle &amp; Co.'s report worked because <code>Barista</code>, <code>ShiftLead</code>, and <code>Manager</code> each overrode <code>describe()</code> with their own version — one call, three correct answers, with no type-checking anywhere. <code>__str__</code> runs on the same rule, except <code>print()</code> calls it for you automatically, which is what makes it a dunder method instead of an ordinary one.</p>
 <label for="poly-reflect"><strong>In 2–3 sentences:</strong> have you ever seen, or written, code that used a chain of <code>if</code>/<code>elif</code> checks to decide what to do based on what type of thing it was looking at? How would overriding one method name per class, the way <code>describe()</code> does here, change that code?</label>
 <textarea id="poly-reflect" class="mlrk-response" data-save></textarea>

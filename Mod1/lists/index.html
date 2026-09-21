@@ -113,7 +113,7 @@
 <div id="lists-slicefb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>A slice <code>[start:stop]</code> includes the <code>start</code> index but stops <em>before</em> the <code>stop</code> index — <code>stop</code> itself is never included. So <code>queue[1:3]</code> grabs indexes 1 and 2 only, not 3.</p>
+<p>A slice <code>[start:stop]</code> includes the <code>start</code> index but stops <em>before</em> the <code>stop</code> index. So <code>queue[1:3]</code> grabs indexes 1 and 2 only, not 3.</p>
 </details>
 </section>
 
@@ -149,7 +149,16 @@ ____________</pre></div>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
+<h2>6. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>queue</code> code from this reading and step through it one line at a time, watching exactly which index each song sits at as Python runs.</li>
+  <li><a href="https://codingbat.com/python/List-1" target="_blank" rel="noopener">CodingBat: List-1</a> — short, auto-graded list practice problems, a good way to drill index and slice thinking beyond this reading's own examples.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary &amp; reflection</h2>
 <p>A Python list holds items in order, and every item has an index — its position counted from the front, starting at 0, or from the back, starting at -1. QueueUp's bug happened because "the 3rd song" in everyday counting and <code>queue[3]</code> in Python code are two different positions, off by exactly one. Slicing (<code>queue[1:3]</code>) pulls out a range using that same 0-based counting, stopping one short of the second number, and <code>.append()</code> is how a list grows, always at the end.</p>
 <label for="lists-reflect"><strong>In 2–3 sentences:</strong> now that you've seen where QueueUp's bug came from, what's one mental habit you'll use to convert an everyday position ("the 3rd item," "the last one") into the correct Python index before you write the code?</label>
 <textarea id="lists-reflect" class="mlrk-response" data-save></textarea>

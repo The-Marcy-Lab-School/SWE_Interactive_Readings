@@ -179,7 +179,16 @@ Priya (ID E-104)
 </section>
 
 <section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
+<h2>6. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://pythontutor.com/python-compiler.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>Employee</code>/<code>HourlyEmployee</code> classes and step through <code>super().__init__(...)</code> to watch exactly which attributes get set and when.</li>
+  <li><a href="https://www.youtube.com/watch?v=u1be7Vele5o" target="_blank" rel="noopener">Python INHERITANCE in 6 minutes!</a> — a short, beginner-friendly walkthrough of parent/child classes and overriding, using its own example code.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary &amp; reflection</h2>
 <p><code>class Child(Parent):</code> gets every attribute and method the parent defines without retyping any of it. A child overrides a method only when its behavior genuinely needs to differ, and calls <code>super().__init__(...)</code> to still run the parent's setup instead of duplicating it. Northgate's two employee classes went from two full copies of the same setup code to one shared parent and two small, honest differences.</p>
 <label for="inh-reflect"><strong>In 2–3 sentences:</strong> think of another real pair of things that share a lot but aren't identical (two kinds of app users, two kinds of vehicles, two kinds of game characters). What would the shared parent class hold, and what's the one method each child would need to override?</label>
 <textarea id="inh-reflect" class="mlrk-response" data-save></textarea>

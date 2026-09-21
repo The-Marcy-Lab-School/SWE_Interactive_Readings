@@ -36,7 +36,7 @@ elif answer == "no":
     print("Cancelled.")
 else:
     print("Sorry, I didn't understand that.")</pre></div>
-<p>It works every time the person typing is the person who wrote it, because that person always types <code>yes</code> in lowercase with nothing extra, since they already know exactly what the code is checking for. A real student might hit the spacebar by accident before typing, capitalize the first letter out of habit, or add an exclamation point for emphasis. Every one of <code>"&nbsp; yes"</code>, <code>"Yes"</code>, <code>"YES"</code>, and <code>"yes!"</code> is obviously a "yes" to a human reading it. To Python, comparing two strings with <code>==</code> checks for an exact match, character for character &mdash; so none of those equal the literal text <code>"yes"</code>, and every single one falls straight through to the <code>else</code> branch. DeskBot ends up telling a room full of students who answered perfectly reasonably that it doesn't understand them.</p>
+<p>It works whenever the person typing is the person who wrote it, since they already type exactly what the code checks for. A real student might hit the spacebar by accident, capitalize the first letter out of habit, or add an exclamation point for emphasis. Every one of <code>"&nbsp; yes"</code>, <code>"Yes"</code>, <code>"YES"</code>, and <code>"yes!"</code> is obviously a "yes" to a human reading it. But comparing strings with <code>==</code> checks for an exact match, character for character, so none of those equal the literal text <code>"yes"</code> &mdash; every one falls straight through to the <code>else</code> branch, and DeskBot tells a room full of students who answered reasonably that it doesn't understand them.</p>
 <p>The fix isn't a smarter <code>if</code> statement. It's cleaning the text up <strong>before</strong> the <code>if</code> statement ever looks at it.</p>
 </section>
 
@@ -220,7 +220,16 @@ else:
 </section>
 
 <section class="mlrk-section">
-<h2>5. Summary and reflection</h2>
+<h2>5. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://codingbat.com/python" target="_blank" rel="noopener">CodingBat (Python)</a> — short, auto-graded practice problems, including a whole String-1 section built around exactly the kind of comparison and method-based logic this reading covers.</li>
+  <li><a href="https://pythontutor.com/python-compiler.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in DeskBot's <code>handle_answer</code> function and step through it with a few different raw inputs to watch <code>.strip()</code> and <code>.lower()</code> change the string one call at a time before the <code>if</code> check ever runs.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Summary and reflection</h2>
 <p>Raw text typed by a real person is not the same thing as the exact string your code is checking for &mdash; extra whitespace and inconsistent capitalization are the norm, not the exception. <code>.strip()</code> and <code>.lower()</code> clean that up before an exact <code>==</code> comparison ever runs. <code>.startswith()</code> and <code>in</code> handle the cases where an exact match was never the right question to begin with.</p>
 <label for="cs-reflect"><strong>In 2-3 sentences:</strong> think of an app or website that made you retype something because of a typo, capitalization, or an extra space it should have handled automatically. What happened, and which of <code>.strip()</code>, <code>.lower()</code>, <code>.startswith()</code>, or <code>in</code> would have prevented it?</label>
 <textarea id="cs-reflect" class="mlrk-response" data-save></textarea>

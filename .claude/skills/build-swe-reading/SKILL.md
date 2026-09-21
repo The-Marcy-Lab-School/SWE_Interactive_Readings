@@ -64,8 +64,20 @@ No numbered "Recall" section, otherwise similar shape to the DA readings:
 4. **Teach the mechanism** — the actual explanation, with a real diagram (inline SVG, screenshot-verified) when the relationship between parts is genuinely hard to hold in your head, plus at least one hands-on activity (fill-in-the-blank code, a terminal simulator, a predict-the-output check, a drag-drop, etc.) woven directly into the explanation rather than bolted on at the end.
 5. **A short video**, only if a genuinely good, verified-short one exists for this exact topic.
 6. **One more practice activity** of a different type than step 4's, to hit the activity-variety bar without padding the reading long.
-7. **Quick close**: 1-2 sentence summary + one real critical-thinking or reflection question (free response, `data-save` so it's captured by "Copy Plain Text Answers"). Never phrase this as a "bridge" to anything else.
-8. **Score chip** (`ReadingKit.Scoring.renderChip`) + **Copy Plain Text Answers** and **Download as .txt** buttons side by side in one `.mlrk-actions` row (`ReadingKit.copyPlainText` + `ReadingKit.downloadPlainText`) + copyright footer.
+7. **"Go further (optional)"**: a short section, immediately before Summary & reflection, linking to exactly 2 external resources that are NOT another written article — a hands-on tool/practice site (Python Tutor, CodingBat, a real code sandbox), a coding game, or a second video distinct from any embedded earlier in the reading. Every link must be verified for real before it ships: fetch it (`curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 ..." "<url>"`, expect 200) and, for a video, run the same duration + caption-language check as the embedded-video rule above (it doesn't have to fit the 5-minute cap since it's optional and outside the timed activities, but it must still genuinely be English and on-topic). Markup:
+   ```html
+   <section class="mlrk-section">
+   <h2>N. Go further (optional)</h2>
+   <p>Want more practice or a different explanation of this? Two places to go next:</p>
+   <ul>
+     <li><a href="https://real-verified-url" target="_blank" rel="noopener">Resource Title</a> — one sentence on what it is and why it's useful here.</li>
+     <li><a href="https://real-verified-url-2" target="_blank" rel="noopener">Resource Title 2</a> — one sentence on what it is and why it's useful here.</li>
+   </ul>
+   </section>
+   ```
+   Doesn't count toward the reading's stated time estimate — it's optional and outside the timed activities.
+8. **Quick close**: 1-2 sentence summary + one real critical-thinking or reflection question (free response, `data-save` so it's captured by "Copy Plain Text Answers"). Never phrase this as a "bridge" to anything else.
+9. **Score chip** (`ReadingKit.Scoring.renderChip`) + **Copy Plain Text Answers** and **Download as .txt** buttons side by side in one `.mlrk-actions` row (`ReadingKit.copyPlainText` + `ReadingKit.downloadPlainText`) + copyright footer.
 
 ## Time estimate methodology (10-15 min ceiling, video included)
 Build the top-of-page time pill from real counts:

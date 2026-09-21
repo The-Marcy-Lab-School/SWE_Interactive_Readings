@@ -42,7 +42,7 @@
             self._balance -= amount
         else:
             print("Insufficient funds")</pre></div>
-<p><code>withdraw()</code> checks first, before it changes anything: is there enough money to cover this? Only if that check passes does <code>self._balance</code> actually change. That single <code>if</code> statement is the whole reason the rule holds. Skip it, and there's nothing left protecting the balance at all. (The class also defines a matching <code>deposit()</code> method for adding funds through that same kind of guarded path — this reading focuses on <code>withdraw()</code>, since that's where the rule actually needs protecting.)</p>
+<p><code>withdraw()</code> checks first, before it changes anything: is there enough money to cover this? Only if that check passes does <code>self._balance</code> change. That single <code>if</code> statement is the whole reason the rule holds — skip it, and nothing protects the balance. (The class also defines a matching <code>deposit()</code> method for adding funds the same guarded way; this reading focuses on <code>withdraw()</code>, since that's where the rule needs protecting.)</p>
 <p>Last quarter, a different engineer wrote a one-off script to process a batch of overnight vendor payouts. Under deadline pressure, instead of calling <code>withdraw()</code> for each payout, the script went straight for the attribute:</p>
 <div class="mlrk-code"><pre>for payout in pending_payouts:
     account = accounts[payout.account_id]
@@ -63,7 +63,7 @@
 
 <section class="mlrk-section">
 <h2>3. The underscore isn't a lock</h2>
-<p>The leading underscore in <code>_balance</code> is not decoration. It's Python's naming convention for exactly this situation: a single leading underscore tells any other programmer reading the code, "this is internal to the class — don't set it directly from outside." <code>self._balance</code> could just as easily have been named <code>self.balance</code>, with no underscore at all, and Python would run either version identically. The underscore is a signal aimed at people, not a rule enforced by the interpreter.</p>
+<p>The leading underscore in <code>_balance</code> is not decoration — it's Python's naming convention for exactly this situation, a signal telling other programmers "this is internal to the class, don't set it directly from outside." <code>self._balance</code> could just as easily have been named <code>self.balance</code>, with no underscore at all, and Python would run either version identically.</p>
 <p>That's exactly the gap the payout script fell into. Nothing about <code>_balance</code> stopped that script from reaching in and changing it directly. The underscore asked politely, and the script ignored it.</p>
 
 <div class="mlrk-card">
@@ -177,7 +177,16 @@
 </section>
 
 <section class="mlrk-section">
-<h2>7. Summary &amp; reflection</h2>
+<h2>7. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://pythontutor.com/python-compiler.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>BankAccount</code> class and step through <code>withdraw()</code> line by line to watch <code>self._balance</code> change (or not) in real time.</li>
+  <li><a href="https://www.youtube.com/watch?v=D1QEYplkiOc" target="_blank" rel="noopener">Python Encapsulation in 3 Minutes</a> — a quick second walkthrough of the same underscore convention, from a different angle than the video above.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<h2>8. Summary &amp; reflection</h2>
 <p>PocketVault's <code>_balance</code> was never actually locked. The leading underscore only ever asked other code to leave it alone, and the class's real protection lived entirely inside <code>withdraw()</code>'s <code>if</code> check. Any class that needs to guarantee a rule about its own state has to route every change through a method that can enforce that rule, because a naming convention alone stops nothing.</p>
 <label for="enc-reflect"><strong>In 2-3 sentences:</strong> think of a class you've written, or one from an earlier reading in this fellowship, that has an attribute outside code probably shouldn't set directly. What could break if something changed it directly instead of going through a method?</label>
 <textarea id="enc-reflect" class="mlrk-response" data-save></textarea>

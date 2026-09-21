@@ -42,7 +42,7 @@
     {"description": "scattered clouds"}
   ]
 }</pre></div>
-<p>Once Python parses that response, it's already a dictionary — a <strong>dict</strong>, Python's built-in way to store data as labeled <strong>key/value</strong> pairs instead of a numbered list. Curly braces hold the pairs, each key is a name in quotes, and each value is whatever data lives under that name. Pulling out one field is just <code>response["name"]</code>, which returns <code>"Brooklyn"</code>, or <code>response["main"]["temp"]</code>, which returns <code>71.6</code>. Square brackets plus the key name, and you have exactly the field you asked for. This works every time here because the API always includes these exact keys.</p>
+<p>Once Python parses that response, it's already a dictionary — a <strong>dict</strong>, Python's built-in way to store data as labeled <strong>key/value</strong> pairs instead of a numbered list. Curly braces hold the pairs, each key is a name in quotes, and each value is whatever data lives under that name. Pulling out one field is just <code>response["name"]</code>, which returns <code>"Brooklyn"</code>, or <code>response["main"]["temp"]</code>, which returns <code>71.6</code>. This works every time here because the API always includes these exact keys.</p>
 <p>To avoid calling the API again every time someone re-checks a city, the tool keeps its own smaller dict of temperatures it has already fetched:</p>
 <div class="mlrk-code"><pre>cached_temps = {
     "Brooklyn": 71.6,
@@ -94,7 +94,7 @@
 Traceback (most recent call last):
   File "weather_app.py", line 12, in &lt;module&gt;
 KeyError: 'Manhattan'</pre></div>
-<p>Nothing after that line runs — not a friendly "sorry, no data for that city" message, nothing. The program simply stops. Square-bracket lookup is fine when you're sure the key is there. The problem is trusting it when you're not.</p>
+<p>Nothing after that line runs — not a friendly "sorry, no data for that city" message, nothing. Square-bracket lookup is fine when you're sure the key is there; the problem is trusting it when you're not.</p>
 </section>
 
 <section class="mlrk-section">
@@ -187,7 +187,16 @@ print(cached_temps["Brooklyn"])</pre></div>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
+<h2>6. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>cached_temps</code> code from this reading and step through it line by line to watch each key/value pair get created, and see exactly where a missing key would raise a <code>KeyError</code>.</li>
+  <li><a href="https://www.youtube.com/watch?v=MZZSMaEAC2g" target="_blank" rel="noopener">Python dictionaries are easy</a> (Bro Code, ~8 min) — a second, differently-paced walkthrough of dicts, keys, values, and <code>.get()</code>, if section 1-3 above didn't fully click yet.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary &amp; reflection</h2>
 <p>A dict stores data as key/value pairs, which is exactly the shape of most real-world "look something up by name" data — a JSON API response included. <code>dict["key"]</code> is a fine way to read one when you're certain the key exists, but the instant it doesn't, Python raises a <code>KeyError</code> and the program stops cold. <code>dict.get("key", default)</code> asks the same question more carefully: give me this value if you have it, and this fallback if you don't — no crash either way.</p>
 <label for="dict-reflect"><strong>In 2–3 sentences:</strong> think of a real place in an app (a weather tool, a contacts list, a grade lookup, anything) where the data being searched for might not exist yet. Where would <code>.get()</code> with a default be the safer choice than square brackets?</label>
 <textarea id="dict-reflect" class="mlrk-response" data-save></textarea>

@@ -27,7 +27,7 @@
 <section class="mlrk-section">
 <h2>1. What actually happened</h2>
 <p>Steam (the video game store and launcher) once had a bug in its app for Linux computers that erased people's entire computers. Steam's uninstall process had a cleanup step: figure out exactly which folder holds Steam's own files, then delete everything inside that one folder to tidy up. For almost everyone, that step worked fine — it found the right folder, and cleanup touched only Steam's own files.</p>
-<p>But for a small number of users, the step that figured out "which folder is this" silently failed. Instead of a real folder location, the app ended up with nothing — an empty answer to "where am I." The delete step ran anyway. And a delete command aimed at "nothing" doesn't do nothing; it lands on the very top of the file system instead of one specific folder deep inside it. So instead of deleting one folder's worth of Steam files, the app deleted everything on the computer that it had permission to touch. Some users lost every personal file they had, just from running an uninstall.</p>
+<p>But for a small number of users, the step that figured out "which folder is this" silently failed, leaving an empty answer instead of a real folder location. The delete step ran anyway — and a delete command aimed at "nothing" doesn't do nothing; it lands on the very top of the file system instead of one folder deep inside it. So instead of deleting Steam's own files, the app deleted everything on the computer it had permission to touch. Some users lost every personal file they had, just from running an uninstall.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 700 310" role="img" aria-labelledby="fsTreeTitle fsTreeDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="fsTreeTitle">A folder tree with the current location marked, and its absolute path called out</title>
@@ -164,7 +164,16 @@
 </section>
 
 <section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
+<h2>6. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://overthewire.org/wargames/bandit/" target="_blank" rel="noopener">OverTheWire: Bandit</a> — a free browser-based wargame where each level is a real Linux server you connect to and navigate with actual <code>pwd</code>/<code>ls</code>/<code>cd</code> commands to find the password for the next level.</li>
+  <li><a href="https://explainshell.com/" target="_blank" rel="noopener">explainshell.com</a> — paste in any command you're unsure about and it breaks down exactly what each part does, useful the next time a command in your own terminal doesn't behave the way you expected.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary &amp; reflection</h2>
 <p>A file system is a tree: one root, folders branching off it, files and more folders branching off those. <code>pwd</code> tells you exactly where you are in that tree right now. <code>ls</code> tells you what's actually around you before you act. <code>cd</code> moves you through it — relative to where you stand, or by absolute path regardless of where you stand. <code>mkdir</code> and <code>touch</code> build new branches and leaves. The Steam bug happened because one script skipped the first two and trusted a path it never confirmed.</p>
 <label for="cli-reflect"><strong>In 2–3 sentences:</strong> now that you've practiced building out a real folder structure by hand, what's one habit — checking <code>pwd</code>, running <code>ls</code> before a command that changes anything, something else — you'd want to build into your own command-line work to avoid a mistake like Steam's?</label>
 <textarea id="cli-reflect" class="mlrk-response" data-save></textarea>
