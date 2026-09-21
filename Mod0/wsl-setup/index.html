@@ -59,7 +59,7 @@
   </g>
 </svg>
 
-<p><strong>Where this is headed:</strong> once WSL is running, every other setup step in this fellowship works exactly as written — installing <code>git</code>, running <code>python3</code>, navigating a real file system. No Windows-specific workaround needed. This one step unlocks all the others.</p>
+<p><strong>Where this is headed:</strong> once WSL is running, every other setup step in this fellowship works exactly as written. That means installing <code>git</code>, running <code>python3</code>, and navigating a real file system. No Windows-specific workaround needed. This one step unlocks all the others.</p>
 </section>
 
 <section class="mlrk-section">
@@ -75,7 +75,7 @@
 
 <section class="mlrk-section">
 <h2>3. Getting it installed</h2>
-<p>The entire install is one command, run from PowerShell or Windows Terminal opened <strong>as Administrator</strong>:</p>
+<p>The entire install is one command. Run it from PowerShell or Windows Terminal, opened <strong>as Administrator</strong>:</p>
 <div class="mlrk-code"><div class="mlrk-screen">wsl --install</div></div>
 <p>That one command downloads the WSL feature, installs a real Linux kernel, and sets Ubuntu as the default distro — all in one pass. When it finishes, Windows asks you to restart. The first time Ubuntu opens after that, it asks you to create a username and password. This login is separate from your Windows account, so write it down somewhere. You'll type it every time a command needs elevated permission (<code>sudo</code>) from here on.</p>
 
@@ -92,13 +92,13 @@
 </div>
 
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Nothing about Ubuntu can happen until the feature itself is installed, and nothing about the feature finishes installing until after the restart.</p>
+<p>Ubuntu can't do anything until the WSL feature is installed. And the feature isn't finished installing until after the restart.</p>
 </details>
 </section>
 
 <section class="mlrk-section">
 <h2>4. Try it: your first real Linux commands</h2>
-<p>Once Ubuntu opens, you land in a real Linux home directory. Try a few real commands below — this is a simulated shell for practice, but every command here works exactly the same in the real thing.</p>
+<p>Once Ubuntu opens, you land in a real Linux home directory. Try a few real commands below. This is a simulated shell for practice, but every command works the same in the real thing.</p>
 <div class="mlrk-terminal" id="wsl-terminal">
   <div class="mlrk-terminal-log" aria-live="polite"></div>
   <div class="mlrk-terminal-row"><span class="mlrk-terminal-prompt"></span><input class="mlrk-terminal-input" type="text" aria-label="Terminal input" autocomplete="off" spellcheck="false"></div>
@@ -122,23 +122,23 @@
 <h2>5. Watch: WSL, set up start to finish</h2>
 <div class="mlrk-video-wrap"><div id="wsl-video"></div></div>
 <a class="mlrk-video-link" href="https://www.youtube.com/watch?v=zZf4YH4WiZo" target="_blank" rel="noopener">Watch on YouTube</a>
-<p>As you watch, notice that every step maps to what section 3 above already walked through — the install command, the restart, then the first-launch username/password prompt.</p>
+<p>As you watch, notice the same steps from section 3: the install command, the restart, then the username and password on first launch.</p>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Go further (optional)</h2>
+<h2>6. Summary &amp; reflection</h2>
+<p>WSL exists because Microsoft's own developers needed real Linux tools, without paying for a full virtual machine or a dual boot. Now every Windows-based engineer here gets that same real Linux setup for free, built right into Windows. Run <code>wsl --install</code>, restart, and set a username and password. That's the whole setup.</p>
+<label for="wsl-reflect"><strong>In 2–3 sentences:</strong> before reading this, what did you assume "installing Linux" meant? How is WSL actually different from that?</label>
+<textarea id="wsl-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
   <li><a href="https://overthewire.org/wargames/bandit/" target="_blank" rel="noopener">OverTheWire: Bandit</a> — a free browser-based wargame that connects you to a real Linux server and has you navigate it with real commands to find each level's password, good practice once WSL gives you a real shell.</li>
   <li><a href="https://cmdchallenge.com/" target="_blank" rel="noopener">Command Challenge</a> — short, timed challenges you solve by typing a real shell command in the browser, a quick way to build speed with the commands from section 4.</li>
 </ul>
-</section>
-
-<section class="mlrk-section">
-<h2>7. Summary &amp; reflection</h2>
-<p>WSL exists because Microsoft's own developers needed real Linux tools without paying for a full virtual machine or a dual boot. Now every Windows-based engineer in this fellowship gets that same real Linux environment for free, built right into Windows. <code>wsl --install</code>, a restart, and a username/password — that's the entire setup.</p>
-<label for="wsl-reflect"><strong>In 2–3 sentences:</strong> before reading this, what did you assume "installing Linux" meant? How is WSL actually different from that?</label>
-<textarea id="wsl-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
 <section class="mlrk-section">

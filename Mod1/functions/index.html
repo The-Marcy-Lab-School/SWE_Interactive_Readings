@@ -206,19 +206,19 @@ print(result)</pre></div>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Go further (optional)</h2>
+<h2>6. Summary &amp; reflection</h2>
+<p>Roast &amp; Co.'s bug happened because the same formula lived in three places at once, and updating it meant remembering to change all three. A function fixes that by definition: the logic exists exactly once, and every call — <code>order_total(3.50)</code>, <code>order_total(4.25)</code>, <code>order_total(4.75)</code> — reads from that same single copy. <code>return</code> is what makes the function's result usable afterward; <code>print()</code> only ever displays it in the moment.</p>
+<label for="fn-reflect"><strong>In 2–3 sentences:</strong> think of a time you copy-pasted a chunk of code, a formula, or even a spreadsheet row, and changed a couple of numbers each time. Now that you've seen how a function replaces that pattern, where's one place you could use a function instead?</label>
+<textarea id="fn-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
   <li><a href="https://codingbat.com/python" target="_blank" rel="noopener">CodingBat Python</a> — short, auto-graded practice problems where you write the body of a function and get instant pass/fail feedback; the Warmup-1 section is a good place to start.</li>
   <li><a href="https://www.youtube.com/watch?v=89cGQjB5R4M" target="_blank" rel="noopener">Functions in Python are easy</a> (Bro Code, ~11 min) — a second, differently-paced walkthrough of <code>def</code>, parameters, arguments, and <code>return</code>, if section 3-4 above didn't fully click yet.</li>
 </ul>
-</section>
-
-<section class="mlrk-section">
-<h2>7. Summary &amp; reflection</h2>
-<p>Roast &amp; Co.'s bug happened because the same formula lived in three places at once, and updating it meant remembering to change all three. A function fixes that by definition: the logic exists exactly once, and every call — <code>order_total(3.50)</code>, <code>order_total(4.25)</code>, <code>order_total(4.75)</code> — reads from that same single copy. <code>return</code> is what makes the function's result usable afterward; <code>print()</code> only ever displays it in the moment.</p>
-<label for="fn-reflect"><strong>In 2–3 sentences:</strong> think of a time you copy-pasted a chunk of code, a formula, or even a spreadsheet row, and changed a couple of numbers each time. Now that you've seen how a function replaces that pattern, where's one place you could use a function instead?</label>
-<textarea id="fn-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
 <section class="mlrk-section">

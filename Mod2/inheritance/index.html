@@ -27,7 +27,7 @@
 
 <section class="mlrk-section">
 <h2>1. The payroll script that grew two heads</h2>
-<p>Northgate is a mid-size company with two kinds of employees on payroll: hourly workers and salaried workers. Here's what a first, no-inheritance attempt at its payroll script looks like — two classes, written independently:</p>
+<p>Northgate is a mid-size company. It pays two kinds of employees: hourly workers and salaried workers. Here's a first attempt at its payroll script, with no inheritance yet, just two separate classes:</p>
 <div class="mlrk-code"><pre>class HourlyWorker:
     def __init__(self, name, employee_id, hourly_rate, hours_worked):
         self.name = name
@@ -132,7 +132,7 @@ Priya (ID E-104)
 
 <section class="mlrk-section">
 <h2>4. Write the second child class yourself</h2>
-<p>Northgate pays salaried employees every two weeks — 26 pay periods a year — so a salary calculation divides the annual amount by 26. Fill in both blanks so <code>SalariedEmployee</code> follows the same pattern <code>HourlyEmployee</code> used above: run the parent's setup through <code>super()</code>, then override the one method that genuinely needs to differ.</p>
+<p>Northgate pays salaried employees every two weeks. That's 26 pay periods a year, so a salary calculation divides the annual amount by 26. Fill in both blanks so <code>SalariedEmployee</code> follows the same pattern as <code>HourlyEmployee</code> above: run the parent's setup with <code>super()</code>, then override just the one method that needs to differ.</p>
 <div class="mlrk-card">
 <div class="mlrk-code"><pre>class SalariedEmployee(Employee):
     def __init__(self, name, employee_id, annual_salary):
@@ -155,7 +155,7 @@ Priya (ID E-104)
 
 <section class="mlrk-section">
 <h2>5. Trace it: where does this actually come from?</h2>
-<p>Drag each attribute or method into the class it's actually defined on — not just any class that happens to be able to use it.</p>
+<p>Drag each attribute or method into the class it's actually defined on. Not just any class that can use it.</p>
 <div class="mlrk-card" id="trace-activity">
 <div class="mlrk-drag-source" id="trace-chips">
   <span class="mlrk-draggable" id="trace-1"><code>name</code></span>
@@ -179,19 +179,19 @@ Priya (ID E-104)
 </section>
 
 <section class="mlrk-section">
-<h2>6. Go further (optional)</h2>
+<h2>6. Summary &amp; reflection</h2>
+<p><code>class Child(Parent):</code> gets every attribute and method the parent defines without retyping any of it. A child overrides a method only when its behavior genuinely needs to differ, and calls <code>super().__init__(...)</code> to still run the parent's setup instead of duplicating it. Northgate's two employee classes went from two full copies of the same setup code to one shared parent and two small, honest differences.</p>
+<label for="inh-reflect"><strong>In 2–3 sentences:</strong> think of another real pair of things that share a lot but aren't identical (two kinds of app users, two kinds of vehicles, two kinds of game characters). What would the shared parent class hold, and what's the one method each child would need to override?</label>
+<textarea id="inh-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
   <li><a href="https://pythontutor.com/python-compiler.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>Employee</code>/<code>HourlyEmployee</code> classes and step through <code>super().__init__(...)</code> to watch exactly which attributes get set and when.</li>
   <li><a href="https://www.youtube.com/watch?v=u1be7Vele5o" target="_blank" rel="noopener">Python INHERITANCE in 6 minutes!</a> — a short, beginner-friendly walkthrough of parent/child classes and overriding, using its own example code.</li>
 </ul>
-</section>
-
-<section class="mlrk-section">
-<h2>7. Summary &amp; reflection</h2>
-<p><code>class Child(Parent):</code> gets every attribute and method the parent defines without retyping any of it. A child overrides a method only when its behavior genuinely needs to differ, and calls <code>super().__init__(...)</code> to still run the parent's setup instead of duplicating it. Northgate's two employee classes went from two full copies of the same setup code to one shared parent and two small, honest differences.</p>
-<label for="inh-reflect"><strong>In 2–3 sentences:</strong> think of another real pair of things that share a lot but aren't identical (two kinds of app users, two kinds of vehicles, two kinds of game characters). What would the shared parent class hold, and what's the one method each child would need to override?</label>
-<textarea id="inh-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
 <section class="mlrk-section">

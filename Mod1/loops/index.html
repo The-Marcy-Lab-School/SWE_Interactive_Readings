@@ -29,8 +29,8 @@
 
 <section class="mlrk-section">
 <h2>1. A trading system that couldn't stop repeating itself</h2>
-<p>Knight Capital was a Wall Street trading firm that used automated software to route stock orders. In 2012, it rolled out new trading code to eight servers, but one server missed the update. That server kept running old, retired logic called "Power Peg," which was supposed to keep sending buy or sell orders for a stock only until a running count of shares already filled told it to stop — the classic shape of a loop that runs while a condition is true and stops the moment it turns false. Years earlier, Knight had moved that counting logic to a different point in the code and never re-tested Power Peg against the change. By 2012, the count Power Peg checked no longer matched reality, so the condition that was supposed to eventually turn false never did.</p>
-<p>On August 1, 2012, a new order flag accidentally woke Power Peg back up on that one server. For forty-five minutes it kept firing off buy and sell orders, about 4 million trades across more than a hundred stocks, and nothing in the code could stop it. A person finally had to shut the server down by hand, after Knight had already lost $460 million and very nearly collapsed as a company. Strip away the trading-floor details, and it's the exact same mistake every Python beginner eventually makes: a loop meant to run until a condition goes false, with no working way for that condition to ever actually become false. That's what the rest of this reading is about.</p>
+<p>Knight Capital was a Wall Street trading firm that used automated software to route stock orders. In 2012, it rolled out new trading code to eight servers, but one server missed the update. That server kept running old, retired logic called "Power Peg." Power Peg's job was to keep sending buy or sell orders for a stock until a running count of shares filled told it to stop. That's the classic shape of a loop: it runs while a condition is true, and stops the moment that condition turns false. Years earlier, Knight had moved the counting logic to a different point in the code, and never re-tested Power Peg against that change. By 2012, the count Power Peg checked no longer matched reality. So the condition that was supposed to eventually turn false never did.</p>
+<p>On August 1, 2012, a new order flag accidentally woke Power Peg back up on that one server. For forty-five minutes, it kept firing off buy and sell orders — about 4 million trades across more than a hundred stocks — and nothing in the code could stop it. A person finally had to shut the server down by hand. By then, Knight had lost $460 million and nearly collapsed as a company. Strip away the trading-floor details, and it's the same mistake every Python beginner eventually makes: a loop meant to run until a condition goes false, with no real way for that condition to ever become false. That's what the rest of this reading is about.</p>
 <p class="mlrk-small">Source: the U.S. Securities and Exchange Commission's 2013 administrative order against Knight Capital, retold in detail in <a href="https://dougseven.com/2014/04/17/knightmare-a-devops-cautionary-tale/" target="_blank" rel="noopener">Doug Seven, "Knightmare: A DevOps Cautionary Tale," 2014</a>.</p>
 </section>
 
@@ -48,7 +48,7 @@
 
 <section class="mlrk-section">
 <h2>3. for loops vs. while loops</h2>
-<p>Use a <code>for</code> loop when you already know the full set of things you're repeating over — a list of order IDs, a range of page numbers, every character in a string:</p>
+<p>Use a <code>for</code> loop when you already know what you're repeating over: a list of order IDs, a range of page numbers, every character in a string.</p>
 <div class="mlrk-code"><div class="mlrk-screen">orders = ["A-101", "A-102", "A-103"]
 for order_id in orders:
     ship(order_id)</div></div>
@@ -132,19 +132,19 @@ while balance > 0:
 </section>
 
 <section class="mlrk-section">
-<h2>5. Go further (optional)</h2>
+<h2>5. Summary &amp; reflection</h2>
+<p>A <code>for</code> loop is for something you can count out in advance: a list, a range, a string's characters. A <code>while</code> loop is for something that depends on a condition changing while the program runs, and it only stops if the code inside its body actually changes that condition. Forgetting that one update is a small, easy mistake, and it happens to beginners and to Wall Street trading systems alike.</p>
+<label for="loop-reflect"><strong>In 2–3 sentences:</strong> pick one <code>while</code> loop you could imagine writing for a real project. What's the one line you'd double-check for, every time, so it doesn't turn into another version of Knight Capital's forty-five minutes?</label>
+<textarea id="loop-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
   <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in a <code>for</code> or <code>while</code> loop and step through it one pass at a time, watching its variables change live instead of picturing it in your head.</li>
   <li><a href="https://www.youtube.com/watch?v=6iF8Xb7Z3wQ" target="_blank" rel="noopener">Loops and Iterations — Corey Schafer</a> — a ~10-minute walkthrough of both loop types from a well-known Python teaching channel, covering the same for/while distinction as this reading.</li>
 </ul>
-</section>
-
-<section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
-<p>A <code>for</code> loop is for something you can count out in advance: a list, a range, a string's characters. A <code>while</code> loop is for something that depends on a condition changing while the program runs, and it only stops if the code inside its body actually changes that condition. Forgetting that one update is a small, easy mistake, and it happens to beginners and to Wall Street trading systems alike.</p>
-<label for="loop-reflect"><strong>In 2–3 sentences:</strong> pick one <code>while</code> loop you could imagine writing for a real project. What's the one line you'd double-check for, every time, so it doesn't turn into another version of Knight Capital's forty-five minutes?</label>
-<textarea id="loop-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
 <section class="mlrk-section">

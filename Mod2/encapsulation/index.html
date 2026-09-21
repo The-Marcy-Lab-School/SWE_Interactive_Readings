@@ -177,19 +177,19 @@
 </section>
 
 <section class="mlrk-section">
-<h2>7. Go further (optional)</h2>
+<h2>7. Summary &amp; reflection</h2>
+<p>PocketVault's <code>_balance</code> was never actually locked. The leading underscore only ever asked other code to leave it alone, and the class's real protection lived entirely inside <code>withdraw()</code>'s <code>if</code> check. Any class that needs to guarantee a rule about its own state has to route every change through a method that can enforce that rule, because a naming convention alone stops nothing.</p>
+<label for="enc-reflect"><strong>In 2-3 sentences:</strong> think of a class you've written, or one from an earlier reading in this fellowship, that has an attribute outside code probably shouldn't set directly. What could break if something changed it directly instead of going through a method?</label>
+<textarea id="enc-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>8. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
   <li><a href="https://pythontutor.com/python-compiler.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>BankAccount</code> class and step through <code>withdraw()</code> line by line to watch <code>self._balance</code> change (or not) in real time.</li>
   <li><a href="https://www.youtube.com/watch?v=D1QEYplkiOc" target="_blank" rel="noopener">Python Encapsulation in 3 Minutes</a> — a quick second walkthrough of the same underscore convention, from a different angle than the video above.</li>
 </ul>
-</section>
-
-<section class="mlrk-section">
-<h2>8. Summary &amp; reflection</h2>
-<p>PocketVault's <code>_balance</code> was never actually locked. The leading underscore only ever asked other code to leave it alone, and the class's real protection lived entirely inside <code>withdraw()</code>'s <code>if</code> check. Any class that needs to guarantee a rule about its own state has to route every change through a method that can enforce that rule, because a naming convention alone stops nothing.</p>
-<label for="enc-reflect"><strong>In 2-3 sentences:</strong> think of a class you've written, or one from an earlier reading in this fellowship, that has an attribute outside code probably shouldn't set directly. What could break if something changed it directly instead of going through a method?</label>
-<textarea id="enc-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
 <section class="mlrk-section">

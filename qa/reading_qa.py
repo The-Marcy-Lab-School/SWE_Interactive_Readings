@@ -277,8 +277,8 @@ def check_reading_level(html):
         return []  # not enough real prose to score meaningfully
     syllables = sum(_count_syllables(w) for w in words)
     grade = 0.39 * (len(words) / len(sentences)) + 11.8 * (syllables / len(words)) - 15.59
-    if grade > 10.5:
-        return [("WARN", f"Flesch-Kincaid grade level ~{grade:.1f} (target: ~9th grade outside the vocabulary section) — check for long sentences or dense wording in the prose, not just technical terms")]
+    if grade > 9.0:
+        return [("WARN", f"Flesch-Kincaid grade level ~{grade:.1f} (target: 6th-9th grade outside the vocabulary section) — check for long sentences or dense wording in the prose, not just technical terms")]
     return []
 
 

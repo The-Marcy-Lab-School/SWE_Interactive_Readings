@@ -30,8 +30,8 @@
 
 <section class="mlrk-section">
 <h2>1. The update that took down half the internet</h2>
-<p>On May 29, 2025, Google engineers shipped a new quota-policy feature inside Service Control with no error handling around it, and no feature flag (a switch to quickly turn it off if something went wrong) — so it went live everywhere at once, untested against real conditions.</p>
-<p>Two weeks later, a policy change with unexpectedly blank fields synced to every data center worldwide. The moment Service Control read it, the new code hit a value that wasn't there and raised a null pointer exception — the error you get when code tries to use something that doesn't exist. Nothing was watching for that failure. Every Service Control process that read the bad policy crashed, then crashed again on restart, everywhere, at once. For roughly three hours, no request anywhere could be authenticated, checked, or logged, taking down Gmail, Google Workspace, and countless other apps built on Google Cloud with it.</p>
+<p>On May 29, 2025, Google engineers shipped a new feature inside Service Control, the system that checks whether a request is allowed to run. Part of that check is a quota: a limit on how much of a service one customer can use. The new code had no error handling. It also had no feature flag, a switch that lets a team turn a change off fast if something goes wrong. So it went live everywhere at once, never tested against real conditions.</p>
+<p>Two weeks later, a policy change with unexpectedly blank fields synced to every data center worldwide. The moment Service Control read it, the new code tried to use a value that simply wasn't there. Nothing was set up to catch that. The program crashed instantly. Every Service Control process that read the bad policy crashed, then crashed again on restart, everywhere, at once. For roughly three hours, no request anywhere could be authenticated, checked, or logged, taking down Gmail, Google Workspace, and countless other apps built on Google Cloud with it.</p>
 <p class="mlrk-small">Source: Google Cloud's own incident report on the June 12, 2025 outage, published at <a href="https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW" target="_blank" rel="noopener">status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW</a>.</p>
 <p>None of that ran in Python, but strip away the data centers and the shape is one a beginner can reproduce in ten lines: code that assumes its input looks a certain way, meets input that doesn't, and has nothing standing between that surprise and a crash. This reading builds a smaller version — a script processing signup forms, one with a bad value — and shows the one habit that would have stopped it.</p>
 </section>
@@ -155,19 +155,19 @@
 </section>
 
 <section class="mlrk-section">
-<h2>6. Go further (optional)</h2>
+<h2>6. Summary &amp; reflection</h2>
+<p>A <code>try</code>/<code>except</code> block that names one specific exception type lets a program recover from the one failure you actually planned for, and keeps running instead of stopping cold. A bare <code>except:</code> looks like the same safety net, but it silently catches everything, including the bugs you'd actually want to know about. Google's own three-hour, worldwide outage traced back to a code path with no error handling wrapped around it at all. Naming the exception you expect is the habit that keeps a Python script's version of that failure small, visible, and survivable.</p>
+<label for="exc-reflect"><strong>In 2–3 sentences:</strong> think of one place in a real project, yours or one you can picture, where code loops over a batch of things, files, form submissions, API responses. What's one specific exception type you'd want to catch there, and why would writing a bare <code>except:</code> instead be the wrong call?</label>
+<textarea id="exc-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
   <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>process_signups</code> code from section 3 and step through it line by line to watch exactly when Python jumps from <code>try</code> into <code>except</code> instead of raising all the way up.</li>
   <li><a href="https://www.youtube.com/watch?v=NIWwJbo-9_8" target="_blank" rel="noopener">Python Tutorial: Using Try/Except Blocks for Error Handling</a> (Corey Schafer, ~11 min) — a second, differently-paced walkthrough of naming a specific exception type instead of using a bare <code>except:</code>.</li>
 </ul>
-</section>
-
-<section class="mlrk-section">
-<h2>7. Summary &amp; reflection</h2>
-<p>A <code>try</code>/<code>except</code> block that names one specific exception type lets a program recover from the one failure you actually planned for, and keeps running instead of stopping cold. A bare <code>except:</code> looks like the same safety net, but it silently catches everything, including the bugs you'd actually want to know about. Google's own three-hour, worldwide outage traced back to a code path with no error handling wrapped around it at all. Naming the exception you expect is the habit that keeps a Python script's version of that failure small, visible, and survivable.</p>
-<label for="exc-reflect"><strong>In 2–3 sentences:</strong> think of one place in a real project, yours or one you can picture, where code loops over a batch of things, files, form submissions, API responses. What's one specific exception type you'd want to catch there, and why would writing a bare <code>except:</code> instead be the wrong call?</label>
-<textarea id="exc-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
 <section class="mlrk-section">
