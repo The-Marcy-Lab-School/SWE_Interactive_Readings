@@ -43,7 +43,8 @@ def build_readme_table(readings):
     for r in readings:
         lines.append(
             f"| {_escape_md_cell(r['title'])} | {_escape_md_cell(r.get('topic_area','?'))} | "
-            f"{r.get('time_minutes','?')} min | [Open]({r['url']}) |"
+            f"{r.get('time_minutes','?')} min | "
+            f'<a href="{r["url"]}" target="_blank" rel="noopener noreferrer">Open</a> |'
         )
     return "\n".join(lines)
 
