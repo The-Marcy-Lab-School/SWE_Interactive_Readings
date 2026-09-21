@@ -43,8 +43,7 @@ def build_readme_table(readings):
     for r in readings:
         lines.append(
             f"| {_escape_md_cell(r['title'])} | {_escape_md_cell(r.get('topic_area','?'))} | "
-            f"{r.get('time_minutes','?')} min | "
-            f'<a href="{r["url"]}" target="_blank" rel="noopener noreferrer">Open</a> |'
+            f"{r.get('time_minutes','?')} min | [Open]({r['url']}) |"
         )
     return "\n".join(lines)
 
@@ -81,7 +80,7 @@ def build_landing_page(readings):
     sections = []
     for topic, items in by_topic.items():
         cards = "\n".join(
-            f'<a class="mlrk-card mlrk-reading-card" href="{r["url"]}">'
+            f'<a class="mlrk-card mlrk-reading-card" href="{r["url"]}" target="_blank" rel="noopener noreferrer">'
             f'<h3>{r["title"]}</h3>'
             f'<p class="mlrk-small">{r.get("time_minutes","?")} min</p>'
             f"</a>"
