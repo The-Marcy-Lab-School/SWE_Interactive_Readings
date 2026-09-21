@@ -74,6 +74,14 @@ main.mlrk-main{padding:2rem 1.2rem 5rem}
 .mlrk-feedback.mlrk-reveal{background:var(--mlrk-callout-gold-fill);border-left:5px solid var(--mlrk-callout-gold-border)}
 .mlrk-attempt-note{font-size:.9rem;color:var(--mlrk-text-on-light-muted)}
 
+/* select-all-that-apply checkbox options — generous spacing/padding so a
+   multi-line statement doesn't read as a cramped wall of text next to its
+   neighbor. Replaces the old ad-hoc inline "display:block;margin:.4rem 0". */
+.mlrk-selectall-option{display:flex;gap:.6rem;align-items:flex-start;margin:.7rem 0;
+  padding:.7rem .9rem;border:2px solid var(--mlrk-gray-400);border-radius:10px;cursor:pointer}
+.mlrk-selectall-option:hover{border-color:var(--mlrk-bg-brand-deep)}
+.mlrk-selectall-option input{margin-top:.25rem;flex-shrink:0}
+
 /* numbered step lists — for "do these terminal commands in order" instructions
    and similar, so steps read as a real ordered list, not a run-on sentence */
 .mlrk-steplist{padding-left:1.4rem;margin:.6rem 0}

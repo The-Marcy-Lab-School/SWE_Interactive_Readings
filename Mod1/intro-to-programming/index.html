@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:640px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
+.mlrk-illustration{width:100%;max-width:900px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
 </style>
 </head><body>
@@ -25,10 +25,9 @@
 
 <section class="mlrk-section">
 <h2>1. The book that cost more than a house</h2>
-<p>In 2011, an out-of-print biology book called <em>The Making of a Fly</em> was listed for sale on Amazon by two different used-book sellers, competing for the same buyers the way sellers on Amazon do. The two sellers were called profnath and bordeebook, and neither of them was doing anything sneaky. Profnath's program checked bordeebook's current price once a day and set its own price to 0.9983 times that number, always coming in just slightly cheaper. Bordeebook's program did the mirror-image thing: it checked profnath's price and set its own to 1.270589 times that number, always coming in noticeably more expensive, as if to say "the cheaper copy is basically sold out, so mine is the premium option." Each program was simple, each program worked exactly as written, and each program ran once more the next day using whatever number the other program had just produced.</p>
-<p>That is a loop with no exit condition. Profnath's higher output became bordeebook's input, and bordeebook's higher output became profnath's input the next day, over and over, each one multiplying a slightly bigger number. On April 18th the price hit its peak: $23,698,655.93. The following day, a human being finally noticed and manually reset profnath's price to a sane $106.23 — at which point bordeebook's program, still just following its one instruction, promptly and obediently set its own price to $106.23 times 1.270589, or $134.97. (The full price log survives; a biologist named Michael Eisen first spotted the listing and <a href="https://www.michaeleisen.org/blog/p/358/" target="_blank" rel="noopener">wrote up exactly what he found</a>.)</p>
-<p>Neither program had a bug in it, in the sense of doing something other than what its code said. Both programs did precisely what they were told, every single day. The actual problem is what was never told to them: nobody wrote an instruction for "and stop if this number gets ridiculous," because no human engineer imagined they needed to spell that out. A person would never let a used book's price wander past a million dollars without stopping to ask "wait, does this look right?" A computer does not do that unless a line of code specifically tells it to. It has no instinct for "ridiculous." It has no fallback plan. It has the instructions it was given, and it runs them.</p>
-<p>That single idea, that a computer will keep doing exactly what its instructions say with zero built-in judgment about whether the result makes sense, is the foundation everything else in programming sits on top of. Before any Python syntax, this is the mental model worth having solid.</p>
+<p>In 2011, an out-of-print biology book called <em>The Making of a Fly</em> was listed on Amazon by two used-book sellers, profnath and bordeebook. Each ran a simple pricing program: profnath set its price to 0.9983 times bordeebook's current price, always slightly cheaper; bordeebook set its price to 1.270589 times profnath's, always pricier. Neither program had a bug — each did exactly what it was told, once a day, using whatever price the other had just posted.</p>
+<p>That is a loop with no exit condition. Each output became the other's next input, growing a little bigger every round, until the price hit $23,698,655.93 on April 18th. A person finally noticed and reset profnath's price by hand, and bordeebook's program obediently multiplied that new price too. The missing piece was never "multiply by this number"; it was "stop if the result looks ridiculous," an instruction nobody thought to write. That single gap — a computer doing exactly what its instructions say with zero judgment about whether the result makes sense — is the foundation everything else in programming sits on top of.</p>
+<p class="mlrk-small">Source: the full price log survives; biologist Michael Eisen first spotted the listing and <a href="https://www.michaeleisen.org/blog/p/358/" target="_blank" rel="noopener">wrote up exactly what he found</a>.</p>
 </section>
 
 <section class="mlrk-section">
@@ -44,39 +43,37 @@
 
 <section class="mlrk-section">
 <h2>3. Instructions run in order, exactly as written</h2>
-<p>Two things are true of every program, from a five-line pricing bot to a full application: the instructions run one after another, in the exact order they're written, and each one runs exactly as written, with no step where the computer pauses to guess at your intent. Change the order of two steps and you often get a different, sometimes broken, result, even though every individual instruction is still perfectly correct on its own. Leave a step vague, or skip one the computer would need, and there's no built-in judgment to quietly patch the gap. A person filling in a vague recipe uses common sense without noticing they're doing it. A computer has no such fallback to fall back on.</p>
+<p>Two things are true of every program: instructions run in the exact order they're written, and each one runs exactly as written, with no pausing to guess your intent. Swap two steps and you often get a broken result, even though each instruction is still correct alone. Leave a step vague, or skip one the computer needs, and nothing quietly patches the gap. A person fills in a vague recipe with common sense without noticing; a computer has no such fallback.</p>
 
 <p>The classic way to see this is with a task everyone already knows how to do: making a peanut butter sandwich. Compare a vague version of the instructions against an exact one.</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 760 340" role="img" aria-labelledby="sandTitle sandDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 900 910" role="img" aria-labelledby="sandTitle sandDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="sandTitle">Vague sandwich instructions compared with exact sandwich instructions</title>
   <desc id="sandDesc">Vague instructions read: get the bread out, put peanut butter on, add the jelly, put it together. Followed literally with no common sense to fill gaps, the result is that no amount or method was ever given, so the sandwich never actually gets made. Exact instructions read: take two slices from the bag, unscrew the peanut butter jar, spread one tablespoon with a knife, press the two slices together. Followed literally, the result is the same finished sandwich, made the exact same way every time.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <rect x="15" y="20" width="350" height="300" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
-    <text x="190" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">Vague instructions</text>
-    <text x="35" y="95" font-size="16" fill="#261F1D">1. Get the bread out</text>
-    <text x="35" y="121" font-size="16" fill="#261F1D">2. Put peanut butter on</text>
-    <text x="35" y="147" font-size="16" fill="#261F1D">3. Add the jelly</text>
-    <text x="35" y="173" font-size="16" fill="#261F1D">4. Put it together</text>
-    <line x1="35" y1="191" x2="345" y2="191" stroke="#C92929" stroke-width="1"/>
-    <text x="35" y="216" font-size="16" font-weight="700" fill="#B72525">Result:</text>
-    <text x="35" y="240" font-size="16" fill="#261F1D">No amount or method given,</text>
-    <text x="35" y="262" font-size="16" fill="#261F1D">sandwich never actually gets made</text>
+    <rect x="20" y="20" width="860" height="420" rx="14" fill="#F7DFDF" stroke="#C92929" stroke-width="3"/>
+    <text x="450" y="66" text-anchor="middle" font-size="32" font-weight="700" fill="#261F1D">Vague instructions</text>
+    <text x="45" y="128" font-size="28" fill="#261F1D">1. Get the bread out</text>
+    <text x="45" y="173" font-size="28" fill="#261F1D">2. Put peanut butter on</text>
+    <text x="45" y="218" font-size="28" fill="#261F1D">3. Add the jelly</text>
+    <text x="45" y="263" font-size="28" fill="#261F1D">4. Put it together</text>
+    <line x1="45" y1="288" x2="855" y2="288" stroke="#C92929" stroke-width="1.5"/>
+    <text x="45" y="326" font-size="28" font-weight="700" fill="#B72525">Result:</text>
+    <text x="45" y="364" font-size="26" fill="#261F1D">No amount or method given, sandwich never actually gets made</text>
 
-    <rect x="390" y="20" width="350" height="300" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
-    <text x="565" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">Exact instructions</text>
-    <text x="410" y="95" font-size="16" fill="#261F1D">1. Take 2 slices from the bag</text>
-    <text x="410" y="121" font-size="16" fill="#261F1D">2. Unscrew the peanut butter jar</text>
-    <text x="410" y="147" font-size="16" fill="#261F1D">3. Spread 1 tbsp with a knife</text>
-    <text x="410" y="173" font-size="16" fill="#261F1D">4. Press the two slices together</text>
-    <line x1="410" y1="191" x2="720" y2="191" stroke="#264326" stroke-width="1"/>
-    <text x="410" y="216" font-size="16" font-weight="700" fill="#264326">Result:</text>
-    <text x="410" y="240" font-size="16" fill="#261F1D">Same finished sandwich,</text>
-    <text x="410" y="262" font-size="16" fill="#261F1D">made the exact same way every time</text>
+    <rect x="20" y="470" width="860" height="420" rx="14" fill="#A6C2B4" stroke="#264326" stroke-width="3"/>
+    <text x="450" y="516" text-anchor="middle" font-size="32" font-weight="700" fill="#261F1D">Exact instructions</text>
+    <text x="45" y="578" font-size="28" fill="#261F1D">1. Take 2 slices from the bag</text>
+    <text x="45" y="623" font-size="28" fill="#261F1D">2. Unscrew the peanut butter jar</text>
+    <text x="45" y="668" font-size="28" fill="#261F1D">3. Spread 1 tbsp with a knife</text>
+    <text x="45" y="713" font-size="28" fill="#261F1D">4. Press the two slices together</text>
+    <line x1="45" y1="738" x2="855" y2="738" stroke="#264326" stroke-width="1.5"/>
+    <text x="45" y="776" font-size="28" font-weight="700" fill="#264326">Result:</text>
+    <text x="45" y="814" font-size="26" fill="#261F1D">Same finished sandwich, made the exact same way every time</text>
   </g>
 </svg>
 
-<p>Notice that "put peanut butter on" isn't actually an instruction a literal executor can run at all: on what, with what, how much? A human reader quietly fills in "on the bread, with a knife, a reasonable amount" without even noticing there was a gap. A computer has nothing to fill it with unless a person wrote that detail down first. This is exactly the same gap that let profnath and bordeebook's prices run to $23 million: "multiply by this number" is a perfectly exact instruction on its own, but "and stop if the result looks ridiculous" was never written down anywhere, so it was never part of what either program actually did.</p>
+<p>Notice "put peanut butter on" isn't a real instruction: on what, with what, how much? A human fills in "the bread, a knife, a reasonable amount" without noticing the gap; a computer has nothing to fill it with unless someone wrote that down. It's the same gap that sent profnath and bordeebook's prices to $23 million: "multiply by this number" is exact on its own, but "stop if this looks ridiculous" never got written down.</p>
 
 <p><strong>Try it:</strong> here's a different everyday task, broken into steps but shuffled out of order. Put them back in the order a person (or a program) actually has to perform them.</p>
 <div class="mlrk-card">
@@ -110,10 +107,10 @@
 <h2>5. What would actually happen</h2>
 <p>A well-known way people demonstrate this idea for fun is by asking a kid to write step-by-step sandwich instructions, then having an adult follow them "exactly as written," refusing to fix anything with common sense the way a computer wouldn't. Select every statement below that's actually true about how a literal instruction-follower, human or computer, behaves.</p>
 <div class="mlrk-card"><p><strong>Select every TRUE statement.</strong></p>
-<label style="display:block;margin:.4rem 0"><input type="checkbox" class="sa-box" value="a"> If an instruction says "add sugar to taste" and never gives an exact amount or stopping point, a program executing it literally has no way to know when to stop.</label>
-<label style="display:block;margin:.4rem 0"><input type="checkbox" class="sa-box" value="b"> In a "follow the instructions exactly" sandwich demonstration, the adult usually ends up with a perfect sandwich, because they quietly fix any vague step using common sense.</label>
-<label style="display:block;margin:.4rem 0"><input type="checkbox" class="sa-box" value="c"> In the 2011 Amazon pricing story, one seller's program would have stopped raising its price on its own once it passed a million dollars, since that's obviously unreasonable for a used book.</label>
-<label style="display:block;margin:.4rem 0"><input type="checkbox" class="sa-box" value="d"> Two programs that each run exactly as written, with no bugs in the code itself, can still produce a result nobody wanted, if the instructions never accounted for the situation they ended up in.</label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="sa-box" value="a"> "Add sugar to taste" gives no exact amount, so a literal program has no way to know when to stop.</label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="sa-box" value="b"> In a "follow it exactly" sandwich demo, the adult usually ends up with a perfect sandwich by quietly using common sense.</label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="sa-box" value="c"> In the 2011 Amazon story, one seller's program would have stopped itself once the price passed a million dollars.</label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="sa-box" value="d"> Two bug-free programs can still produce a result nobody wanted, if the instructions never covered that situation.</label>
 <button type="button" id="sasubmit" class="mlrk-btn">Check my selections</button>
 <div id="safb" class="mlrk-feedback" tabindex="-1"></div>
 </div>

@@ -51,7 +51,7 @@
 
 <svg class="mlrk-illustration" viewBox="0 0 760 490" role="img" aria-labelledby="umlDiagTitle umlDiagDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="umlDiagTitle">UML class diagram: LibraryItem as a parent class, Book as a child class</title>
-  <desc id="umlDiagDesc">Two UML class boxes, each divided into three stacked compartments: name, attributes, and methods. The top box is named LibraryItem, with attributes title: str, item_id: str, and is_checked_out: bool, and methods check_out(): None and return_item(): None. The bottom box is named Book, with attributes author: str and isbn: str, and one method, get_citation(): str. A solid line runs from the top of the Book box up to the bottom of the LibraryItem box, ending in a hollow, unfilled triangle whose tip touches the LibraryItem box. The hollow triangle points at LibraryItem, meaning Book inherits from LibraryItem.</desc>
+  <desc id="umlDiagDesc">Two UML class boxes, each divided into three stacked compartments: name, attributes, and methods. The top box is named LibraryItem, with attributes title: str, item_id: str, and is_checked_out: bool, and methods check_out(): None and return_item(): None. The bottom box is named Book, with attributes author: str and isbn: str, and one method, get_citation(): str. A solid line connects the top of the Book box to the LibraryItem box, ending in a hollow, unfilled triangle whose tip touches the LibraryItem box. The hollow triangle points at LibraryItem, meaning Book inherits from LibraryItem.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
     <rect x="60" y="30" width="300" height="210" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
     <line x1="60" y1="72" x2="360" y2="72" stroke="#2274B5" stroke-width="2"/>
@@ -74,12 +74,12 @@
     <line x1="530" y1="260" x2="226" y2="241" stroke="#261F1D" stroke-width="2.5"/>
     <polygon points="210,240 229,233 228,249" fill="#FFFCF7" stroke="#261F1D" stroke-width="2.5"/>
 
-    <text x="380" y="465" text-anchor="middle" font-size="16" fill="#327A5F">The hollow triangle points up at LibraryItem, the parent — it means "Book inherits from LibraryItem."</text>
+    <text x="380" y="465" text-anchor="middle" font-size="16" fill="#327A5F">The hollow triangle sits on the line and points at LibraryItem, the parent — it means "Book inherits from LibraryItem."</text>
   </g>
 </svg>
 
 <p>Reading the top box: <code>LibraryItem</code> is the class name, sitting alone in the top compartment. The middle compartment lists its <strong>attributes</strong> — each one written as <code>name: type</code>, so <code>title: str</code> means every <code>LibraryItem</code> stores a <code>title</code> that's a string. The bottom compartment lists its <strong>methods</strong> — each one written as <code>name(): returnType</code>, so <code>check_out(): None</code> means calling <code>check_out()</code> takes no listed input and hands nothing back. None of this is code. It's a plan for code that hasn't been written yet.</p>
-<p>The line connecting the two boxes is the <strong>inheritance arrow</strong>. It's drawn as a plain line ending in a triangle with nothing filled in — you can see the diagram's background right through it. That hollow triangle is the whole rule to remember: it always points at the parent. Here it points up at <code>LibraryItem</code>, so the diagram is saying "<code>Book</code> inherits from <code>LibraryItem</code>," never the other way around.</p>
+<p>The line connecting the two boxes is the <strong>inheritance arrow</strong>. It's drawn as a plain line ending in a triangle with nothing filled in — you can see the diagram's background right through it. That hollow triangle is the whole rule to remember: it always points at the parent, no matter which direction the line happens to run. Here it points at <code>LibraryItem</code>, so the diagram is saying "<code>Book</code> inherits from <code>LibraryItem</code>," never the other way around.</p>
 
 <div class="mlrk-card">
 <p><strong>Predict:</strong> what does the hollow triangle arrow in the diagram above actually mean?</p>
@@ -206,7 +206,7 @@
     feedbackSelector: "#uml-arrow-predictfb",
     correct: "book-parent",
     feedback: {
-      "book-parent": "Right — the hollow triangle always points at the parent. Book is the one inheriting, so the arrow runs from Book up to LibraryItem.",
+      "book-parent": "Right — the hollow triangle always points at the parent. Book is the one inheriting, so the arrow runs from Book to LibraryItem.",
       "library-child": "Backwards — the triangle points at the parent, not the child. LibraryItem is the parent here, so the arrow points at LibraryItem.",
       "unrelated": "They're related — that's exactly what this arrow is drawn to show. An inheritance arrow only ever connects a child class to its parent.",
       "calls-method": "That's not what this arrow means. An inheritance arrow shows \"is a version of\" between two classes — it says nothing about one method calling another."

@@ -7,7 +7,7 @@
 .mlrk-illustration{width:100%;max-width:760px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:16rem;font-family:var(--mlrk-font-code)}
-.mlrk-snippet{display:block;border:2px solid var(--mlrk-gray-400);border-radius:12px;padding:.7rem;cursor:pointer}
+.mlrk-snippet{display:block;border:2px solid var(--mlrk-gray-400);border-radius:12px;padding:.7rem;margin:.7rem 0;cursor:pointer}
 .mlrk-snippet:hover{border-color:var(--mlrk-bg-brand-deep)}
 .mlrk-snippet input{margin-right:.5rem;transform:translateY(1px)}
 .mlrk-snippet .mlrk-code{margin-top:.5rem}
@@ -30,11 +30,10 @@
 
 <section class="mlrk-section">
 <h2>1. The update that took down half the internet</h2>
-<p>On May 29, 2025, engineers at Google shipped a new quota-policy feature inside Service Control. The new code path had no error handling wrapped around it, and it wasn't protected behind a feature flag (a switch that would have let a team turn the new path off instantly if it misbehaved) — so it went live everywhere at once, even though nothing had actually exercised it yet.</p>
-<p>Two weeks later, on June 12 at about 10:45 a.m. Pacific time, someone pushed a policy change into Spanner, Google's globally distributed database that keeps configuration data synced across every data center within seconds. That change contained fields that were unexpectedly blank. The moment Service Control tried to read the policy, it hit the new code path, tried to use a value that wasn't there, and hit a null pointer exception: the error you get when code tries to use something that doesn't exist. Nothing in that code path was watching for that specific failure, so nothing caught it. Every Service Control process that read the bad policy crashed outright, and each one immediately reprocessed the same bad data on restart and crashed again, in every region, worldwide, at once.</p>
-<p>For roughly three hours, from 10:49 a.m. to 1:49 p.m. Pacific time, that crash loop meant Service Control could not do its job anywhere: no request could be authenticated, checked against quota, or logged. Every product depending on it failed alongside it, from Gmail and Google Workspace to countless companies' own apps built on top of Google Cloud.</p>
+<p>On May 29, 2025, Google engineers shipped a new quota-policy feature inside Service Control with no error handling around it, and no feature flag (a switch to quickly turn it off if something went wrong) — so it went live everywhere at once, untested against real conditions.</p>
+<p>Two weeks later, a policy change with unexpectedly blank fields synced to every data center worldwide. The moment Service Control read it, the new code hit a value that wasn't there and raised a null pointer exception — the error you get when code tries to use something that doesn't exist. Nothing was watching for that failure. Every Service Control process that read the bad policy crashed, then crashed again on restart, everywhere, at once. For roughly three hours, no request anywhere could be authenticated, checked, or logged, taking down Gmail, Google Workspace, and countless other apps built on Google Cloud with it.</p>
 <p class="mlrk-small">Source: Google Cloud's own incident report on the June 12, 2025 outage, published at <a href="https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW" target="_blank" rel="noopener">status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW</a>.</p>
-<p>None of that ran in Python, and the exact error name (a null pointer exception) belongs to whatever language Service Control is written in. But strip away the data centers, and the shape of the bug is one a Python beginner can reproduce in ten lines: a piece of code that assumes its input will always look a certain way, meets input that doesn't, and has nothing standing between that surprise and a crash. This reading builds a much smaller version of the same shape, a script that processes a batch of signup forms where one form has a bad value, and shows the one habit that would have stopped the small version cold.</p>
+<p>None of that ran in Python, but strip away the data centers and the shape is one a beginner can reproduce in ten lines: code that assumes its input looks a certain way, meets input that doesn't, and has nothing standing between that surprise and a crash. This reading builds a smaller version — a script processing signup forms, one with a bad value — and shows the one habit that would have stopped it.</p>
 </section>
 
 <section class="mlrk-section">
@@ -51,16 +50,16 @@
 
 <section class="mlrk-section">
 <h2>3. Catching one specific problem, on purpose</h2>
-<p>Here's the smaller, Python-shaped version of the same bug. This function is supposed to turn a batch of signup forms into a list of valid ages:</p>
+<p>Here's the smaller, Python-shaped version. This function turns a batch of signup forms into a list of valid ages:</p>
 <div class="mlrk-code"><div class="mlrk-screen">def process_signups(forms):
     valid_ages = []
     for form in forms:
         age = int(form["age"])
         valid_ages.append(age)
     return valid_ages</div></div>
-<p>Feed it five forms where every age is a clean digit string, and it works exactly as written. Feed it five forms where one age is <code>"twenty-five"</code> instead of <code>"25"</code>, and <code>int("twenty-five")</code> raises a <code>ValueError</code>. Nothing here is set up to catch that. The exception has nowhere to go, so it propagates all the way up, the function stops, and the loop stops with it. The forms that hadn't been processed yet never get their turn, not because anything was wrong with them, but because one unrelated row crashed the whole batch on its way past.</p>
+<p>Feed it five clean forms and it works. Feed it one where an age is <code>"twenty-five"</code> instead of <code>"25"</code>, and <code>int("twenty-five")</code> raises a <code>ValueError</code>. Nothing catches it — the exception propagates up, the function stops, and the loop stops with it. The rest of the batch never gets its turn, because one bad row crashed everything on its way past.</p>
 
-<p>The fix is a <code>try</code>/<code>except</code> block wrapped around just the line that can fail, naming the exact exception type to catch:</p>
+<p>The fix wraps a <code>try</code>/<code>except</code> around just the line that can fail, naming the exact exception to catch:</p>
 <div class="mlrk-code"><div class="mlrk-screen">def process_signups(forms):
     valid_ages = []
     for form in forms:
@@ -70,9 +69,9 @@
         except ValueError:
             print(f"Skipping row: age {form['age']!r} is not a number")
     return valid_ages</div></div>
-<p>Python runs the <code>try</code> block first. If <code>int(form["age"])</code> succeeds, the <code>except</code> block never runs at all, it's there for one specific failure and stays out of the way otherwise. If it raises a <code>ValueError</code>, Python jumps straight to the <code>except</code> block, runs it, and keeps going with the next form in the loop. One bad row gets logged and skipped. The rest of the batch finishes.</p>
+<p>Python runs <code>try</code> first. If <code>int(form["age"])</code> succeeds, <code>except</code> never runs. If it raises <code>ValueError</code>, Python jumps to <code>except</code>, runs it, and continues with the next form. One bad row gets logged and skipped; the rest finishes.</p>
 
-<p>It would be tempting to skip naming <code>ValueError</code> at all and just write <code>except:</code> by itself, catching everything. That's a real, well-known anti-pattern, and it's worse than it looks. A bare <code>except:</code> doesn't just catch the bad age you expected. It also catches a typo in your own code, like <code>form["agee"]</code> instead of <code>form["age"]</code>, which would raise a <code>KeyError</code>, or a network call that failed for a reason you never anticipated, or any other bug entirely unrelated to bad user input. All of it gets swallowed the same way, silently, and the loop just keeps going as if nothing happened. That's not resilience, it's a program lying to you about how well it's working. Naming the exact exception you expect means real bugs still crash loudly enough that someone notices and fixes them, while the one failure you planned for gets handled gracefully.</p>
+<p>It's tempting to just write <code>except:</code> and catch everything. That's a real anti-pattern, worse than it looks: a bare <code>except:</code> also catches a typo like <code>form["agee"]</code> (a <code>KeyError</code>), a failed network call, or any unrelated bug — all swallowed silently. That's not resilience, it's a program lying about how well it's working. Naming the exact exception means real bugs still crash loud enough to notice, while the one failure you planned for gets handled gracefully.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 760 300" role="img" aria-labelledby="excCmpTitle excCmpDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="excCmpTitle">Three ways to handle one bad row in a batch of five signups</title>
