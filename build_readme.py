@@ -38,11 +38,12 @@ def _escape_md_cell(text):
 def build_readme_table(readings):
     if not readings:
         return "_No readings published yet._"
-    lines = ["| Reading | Topic Area | Est. time | Link |",
-             "|---|---|---|---|"]
+    lines = ["| Reading | Skill | Topic Area | Est. time | Link |",
+             "|---|---|---|---|---|"]
     for r in readings:
         lines.append(
-            f"| {_escape_md_cell(r['title'])} | {_escape_md_cell(r.get('topic_area','?'))} | "
+            f"| {_escape_md_cell(r['title'])} | {_escape_md_cell(r.get('skill','?'))} | "
+            f"{_escape_md_cell(r.get('topic_area','?'))} | "
             f"{r.get('time_minutes','?')} min | [Open]({r['url']}) |"
         )
     return "\n".join(lines)

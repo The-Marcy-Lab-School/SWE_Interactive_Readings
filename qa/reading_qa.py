@@ -242,7 +242,7 @@ def check_meta_sidecar(path):
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
         return [("ERROR", f"reading.meta.json is not valid JSON: {e}")]
-    for field in ("title", "topic_area", "time_minutes"):
+    for field in ("title", "skill", "topic_area", "time_minutes"):
         if not meta.get(field):
             return [("ERROR", f"reading.meta.json is missing required field '{field}'")]
     return []
