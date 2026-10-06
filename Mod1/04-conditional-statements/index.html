@@ -6,6 +6,13 @@
 <style>
 .mlrk-illustration{width:100%;max-width:880px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
+/* Two labelled code blocks shown at the point of contrast, so neither version
+   has to be held in the reader's head. Stacks below 900px, where two columns
+   would wrap the longest print() line. */
+.cs-compare{display:grid;grid-template-columns:1fr;gap:1.4rem;margin:1.1rem 0;align-items:start}
+@media(min-width:900px){.cs-compare{grid-template-columns:1fr 1fr;gap:1.6rem}}
+.cs-compare-label{margin:0 0 .5rem;line-height:1.4}
+.cs-compare>div{min-width:0}
 </style>
 </head><body>
 
@@ -40,7 +47,7 @@
 <div class="mlrk-grid" id="cs-flipcards">
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Control flow</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Control flow</strong><br>The order in which the statements of a program are executed, normally top to bottom. A conditional statement changes that order by letting the program skip some statements and run others.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Conditional statements</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Conditional statements</strong><br><code>if</code>, <code>elif</code>, and <code>else</code> let you control the flow of your program based on data values. The order of the conditions matters, and only the first true condition in a chain will execute.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Guard clauses</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Guard clauses</strong><br>Single <code>if</code> statements that return early from a function, simplifying conditional logic. A guard clause handles one exceptional case and leaves the function right away, so the lines below it only run for the normal case.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Guard clauses</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Guard clauses</strong><br>Single <code>if</code> statements that return early from a function, simplifying conditional logic. A guard clause handles one exceptional case and leaves the function right away, so the rest of the function runs only for the normal case.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Boolean context</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Boolean context</strong><br>An <code>if</code> statement creates a boolean context, where non-boolean values are converted to Booleans using the <code>bool()</code> function.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Truthy and falsy</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Truthy and falsy</strong><br>A non-boolean value used in a boolean context is truthy if <code>bool()</code> turns it into <code>True</code>, and falsy if <code>bool()</code> turns it into <code>False</code>. All values are truthy except <code>None</code>, <code>False</code>, the numbers <code>0</code> and <code>0.0</code>, the empty string <code>""</code>, and empty collections such as <code>[]</code> and <code>{}</code>.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Conditional expressions</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Conditional expressions</strong><br>A concise way to choose between two values based on a condition. The form is <code>value_a if condition else value_b</code>, and the whole expression becomes one of those two values.</span></button>
@@ -58,7 +65,7 @@
         return "Getting close"
     else:
         return "On track"</pre></div>
-<p>Python evaluates an <code>elif</code> only when every condition above it tested <code>False</code>. That rule makes the order of the conditions part of the logic rather than a style choice. A developer who rearranges the chain to read "smallest first" writes this instead:</p>
+<p>Python evaluates an <code>elif</code> only when every condition before it in the chain tested <code>False</code>. That rule makes the order of the conditions part of the logic rather than a style choice. A developer who rearranges the chain to read "smallest first" writes this instead:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def spending_tier(total):
     if total &gt; 100:
         return "Getting close"
@@ -70,7 +77,7 @@
 
 <svg class="mlrk-illustration" viewBox="0 0 880 400" role="img" aria-labelledby="csOrderTitle csOrderDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="csOrderTitle">The same value traced through two orderings of the same conditions</title>
-  <desc id="csOrderDesc">Two panels, side by side, each tracing the call spending_tier(250). In the left panel the conditions are ordered largest first. The first condition, total greater than 200, is True, so the function returns Over budget on that line and Python never evaluates the two conditions below it. In the right panel the same two conditions are swapped. The first condition is now total greater than 100, which is also True for 250, so the function returns Getting close and never evaluates the total greater than 200 condition below it.</desc>
+  <desc id="csOrderDesc">Two panels, side by side, each tracing the call spending_tier(250). In the left panel the conditions are ordered largest first. The first condition, total greater than 200, is True, so the function returns Over budget on that line and Python never evaluates the remaining two conditions. In the right panel the same two conditions are swapped. The first condition is now total greater than 100, which is also True for 250, so the function returns Getting close and never evaluates the remaining total greater than 200 condition.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
     <text x="8" y="22" font-size="19" font-weight="700" fill="#264326">Largest condition first</text>
     <rect x="8" y="34" width="412" height="44" rx="9" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
@@ -113,7 +120,7 @@
 </svg>
 
 <div class="mlrk-card">
-<p><strong>The swapped version above is the one running.</strong> <strong>A student spends $340. What does <code>spending_tier(340)</code> return?</strong></p>
+<p><strong>Ledger Lite is running the swapped version of <code>spending_tier</code>, the one that tests <code>total&nbsp;&gt;&nbsp;100</code> first.</strong> <strong>A student spends $340. What does <code>spending_tier(340)</code> return?</strong></p>
 <div id="cs-order-choices">
 <button type="button" class="mlrk-choice" data-a="over">"Over budget"</button>
 <button type="button" class="mlrk-choice" data-a="close">"Getting close"</button>
@@ -126,7 +133,21 @@
 </details>
 
 <h3>When the <code>elif</code>s become separate <code>if</code> statements</h3>
-<p>Putting the conditions in the wrong order shows one label from the wrong tier. A second mistake shows several labels at once and is harder to spot. Picture a developer tidying up <code>spending_tier</code> who deletes the <code>el</code> from each <code>elif</code> and changes nothing else. Every line still reads like a sensible condition, so nothing in the code looks broken. Here is that version, printing instead of returning so every line that runs is visible:</p>
+<p>The order of conditions matters: if you put the conditions in the wrong order, Ledger Lite shows one label from the wrong tier. A second mistake, deleting the <code>el</code> from each <code>elif</code>, shows several labels at once, and it is harder to spot. Picture a developer tidying up <code>spending_tier</code> who deletes those two letters from every <code>elif</code> and changes nothing else. Every line still reads like a sensible condition, so nothing in the code looks broken.</p>
+<p>Here is the original <code>spending_tier</code> chain together with the tidied-up version, which is named <code>label_week</code>. <code>label_week</code> prints instead of returning, so every line that runs stays visible:</p>
+<div class="cs-compare">
+<div>
+<p class="cs-compare-label"><strong>The <code>spending_tier</code> chain</strong><br>one <code>if</code>, then <code>elif</code>, then <code>else</code></p>
+<div class="mlrk-code"><pre class="mlrk-screen">def spending_tier(total):
+    if total &gt; 200:
+        return "Over budget"
+    elif total &gt; 100:
+        return "Getting close"
+    else:
+        return "On track"</pre></div>
+</div>
+<div>
+<p class="cs-compare-label"><strong>The <code>label_week</code> version</strong><br>four separate <code>if</code> statements</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def label_week(total):
     if total &gt; 100:
         print("Getting close")
@@ -138,7 +159,9 @@
         print("On track")
 
 label_week(250)</pre></div>
-<p>An <code>elif</code> is attached to the <code>if</code> above it, and Python evaluates it only when that <code>if</code> tested <code>False</code>. A separate <code>if</code> is attached to nothing above it. Python evaluates every separate <code>if</code>, top to bottom, and runs the body of each one that is <code>True</code>. A chain therefore runs at most one branch, and a stack of separate <code>if</code> statements can run several in a single call.</p>
+</div>
+</div>
+<p>Each <code>elif</code> in the <code>spending_tier</code> chain is attached to the <code>if</code> that opens the chain, so Python evaluates an <code>elif</code> only when every condition before it in that chain tested <code>False</code>. Each <code>if</code> in the <code>label_week</code> version is attached to nothing. Python evaluates all four of those conditions, top to bottom, and runs the body of each one that is <code>True</code>. So <code>spending_tier</code> runs at most one branch per call, and <code>label_week</code> can run several.</p>
 
 <div class="mlrk-card">
 <p><strong>Check every line that <code>label_week(250)</code> prints.</strong> More than one is possible.</p>
@@ -150,7 +173,7 @@ label_week(250)</pre></div>
 <div id="cs-sep-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>There is no <code>elif</code> here, so nothing above a given <code>if</code> can stop Python from evaluating it. Test all four conditions against 250 separately and check off every one that comes out <code>True</code>.</p>
+<p>There is no <code>elif</code> in <code>label_week</code>, so nothing earlier in the function can stop Python from evaluating a given <code>if</code>. Test all four conditions against 250 separately and check off every one that comes out <code>True</code>.</p>
 </details>
 </section>
 
@@ -216,7 +239,7 @@ print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
 
 <section class="mlrk-section">
 <h2>5. Guard clauses: handling the exceptions first</h2>
-<p>Ledger Lite's summary has three things to rule out before it can print a dollar amount. Nobody may be logged in, the week's total may never have been recorded, and the total may come back negative, which happens when a refund gets counted twice. Checking those three cases with nested <code>if</code> statements pushes the real work one level further to the right each time:</p>
+<p>Ledger Lite's summary has three things to rule out before it can print a dollar amount. Nobody may be logged in, the week's total may never have been recorded, and the total may come back negative, which happens when a refund gets counted twice. Nested <code>if</code> statements can rule out all three, and each <code>if</code> pushes the real work one more level to the right:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def weekly_summary(user, total):
     if user is not None:
         if total is not None:
@@ -229,7 +252,7 @@ print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
     else:
         return "Please log in to see your summary."</pre></div>
 <p>The line that does the actual job sits four levels in. To know when that line runs, a reader has to hold three separate conditions in mind at the same time, and each <code>else</code> sits far below the <code>if</code> it belongs to. A reader who loses track of one condition will believe the function returns a dollar amount in a case where it really returns an error message.</p>
-<p>A guard clause is a single <code>if</code> statement that returns early. A <code>return</code> ends the function the moment it runs, so once a guard returns, Python never evaluates a single line below it. Each guard handles one exceptional case and returns, so every line below it can assume that case is already ruled out. That is what keeps the main path at a single indentation level:</p>
+<p>A guard clause is a single <code>if</code> statement that returns early. A <code>return</code> ends the function the moment it runs, so once a guard returns, Python never evaluates another line of that function. Each guard handles one exceptional case and returns, so the lines that follow it can assume that case is already ruled out. That is what keeps the main path at a single indentation level:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def weekly_summary(user, total):
     if user is None:
         return "Please log in to see your summary."
@@ -238,12 +261,12 @@ print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
     if total &lt; 0:
         return "That total looks wrong. We're checking it."
     return f"You spent ${total} this week."</pre></div>
-<p>Guard order matters for the same reason the order of an <code>elif</code> chain matters: the first guard whose condition is <code>True</code> returns, and the guards below it never run. Write the narrowest condition first.</p>
+<p>Guard order matters for the same reason the order of an <code>elif</code> chain matters: the first guard whose condition is <code>True</code> returns, and the guards after it never run. Write the narrowest condition first.</p>
 <p>The last <code>return</code> needs no <code>if</code> of its own. If the program reaches that line, all three guards tested <code>False</code>, which tells you <code>user</code> exists, <code>total</code> exists, and <code>total</code> is zero or more. Those are exactly the conditions the normal case requires, so there is nothing left for a condition on that line to test. The diagram below shows what the guards do to the shape of the function.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 880 400" role="img" aria-labelledby="csGuardTitle csGuardDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="csGuardTitle">The indentation shape of nested ifs compared with guard clauses</title>
-  <desc id="csGuardDesc">Two panels, side by side, each showing five stacked bars that stand for lines of the same function. In the left panel, labelled nested if statements, every bar starts further to the right than the one above it, forming a staircase, and the highlighted bar holding the real work sits at the fourth level of indentation. In the right panel, labelled guard clauses, the three guard bars and the highlighted final bar all start at the same indentation level, one step in from the function definition, so the main path does not step right at all.</desc>
+  <desc id="csGuardDesc">Two panels, side by side, each showing five stacked bars that stand for lines of the same function. In the left panel, labelled nested if statements, every bar starts further to the right than the one before it, forming a staircase, and the highlighted bar holding the real work sits at the fourth level of indentation. In the right panel, labelled guard clauses, the three guard bars and the highlighted final bar all start at the same indentation level, one step in from the function definition, so the main path does not step right at all.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
     <text x="8" y="24" font-size="19" font-weight="700" fill="#261F1D">Nested if statements</text>
     <rect x="8" y="40" width="412" height="44" rx="9" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
@@ -273,7 +296,7 @@ print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
   </g>
 </svg>
 
-<p><strong>Try it.</strong> Below is <code>spending_tier</code> from section 3, rewritten with guard clauses instead of an <code>elif</code> chain, plus one new guard for a missing total. The four lines got shuffled. Click them in the one order that makes the function behave correctly.</p>
+<p><strong>Try it.</strong> Here is <code>spending_tier</code> from section 3, rewritten with guard clauses instead of an <code>elif</code> chain, plus one new guard for a missing total. The four lines are out of order. Click them in the one order that makes the function behave correctly.</p>
 <div class="mlrk-card">
 <ul class="mlrk-orderlist" id="cs-guard-order">
   <li class="mlrk-orderitem" data-step="hundred"><span class="mlrk-order-num"></span> <code>if total &gt; 100: return "Getting close"</code></li>
@@ -285,7 +308,7 @@ print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
 <div id="cs-guard-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Two things pin the order down. Comparing <code>None</code> to a number with <code>&gt;</code> raises an error, so the guard that catches <code>None</code> has to run before any comparison does. The narrowest-first rule above still applies too: the first guard that is <code>True</code> returns, so a wider condition placed above a narrower one returns first and the narrower one never runs.</p>
+<p>Two things pin the order down. Comparing <code>None</code> to a number with <code>&gt;</code> raises an error, so the guard that catches <code>None</code> has to run before any comparison does. The narrowest-first rule from section 5 still applies too: the first guard that is <code>True</code> returns, so a wider condition placed above a narrower one returns first and the narrower one never runs.</p>
 </details>
 </section>
 
@@ -306,7 +329,7 @@ word = "purchase" if count == 1 else "purchases"</pre></div>
 <section class="mlrk-section">
 <h2>7. Summary and reflection</h2>
 <p>An <code>if</code> / <code>elif</code> / <code>else</code> chain runs the first branch whose condition is <code>True</code> and skips the rest, so the order you write the conditions in decides which label a value gets. Turn those <code>elif</code> statements into separate <code>if</code> statements and Python evaluates every one of them, so several branches can run on a single call. An <code>if</code> also converts the value you hand it with <code>bool()</code>, which is why <code>0</code> and "no data" look identical to <code>if not total:</code>.</p>
-<label for="cs-reflect"><strong>The guard-clause version of <code>weekly_summary</code> in section 5 ends with <code>return f"You spent ${total} this week."</code> and no <code>if</code> of its own.</strong> In 2-3 sentences, say what the three guards above it have already settled about <code>user</code> and <code>total</code> by the time Python reaches that line, and explain why a condition on that line would have nothing left to test.</label>
+<label for="cs-reflect"><strong>The guard-clause version of <code>weekly_summary</code> in section 5 ends with <code>return f"You spent ${total} this week."</code> and no <code>if</code> of its own.</strong> In 2-3 sentences, say what the three guards in that function have already settled about <code>user</code> and <code>total</code> by the time Python reaches that line, and explain why a condition on that line would have nothing left to test.</label>
 <textarea id="cs-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
@@ -315,7 +338,7 @@ word = "purchase" if count == 1 else "purchases"</pre></div>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
   <li><a href="https://codingbat.com/python/Logic-1" target="_blank" rel="noopener">CodingBat, Logic-1 (Python)</a> — a set of short auto-graded problems that are almost entirely <code>if</code> / <code>elif</code> / <code>else</code> ordering, so you find out immediately when a condition is in the wrong place.</li>
-  <li><a href="https://www.youtube.com/watch?v=q0bQrGhdPm4" target="_blank" rel="noopener">Khan Academy, "if-elif-else" (4 min 45 s)</a> — traces a chained conditional one branch at a time on screen, which is a useful second pass if the order-matters diagram above moved too fast.</li>
+  <li><a href="https://www.youtube.com/watch?v=q0bQrGhdPm4" target="_blank" rel="noopener">Khan Academy, "if-elif-else" (4 min 45 s)</a> — traces a chained conditional one branch at a time on screen, which is a useful second pass if the order-matters diagram in section 3 moved too fast.</li>
 </ul>
 </section>
 
@@ -351,9 +374,9 @@ word = "purchase" if count == 1 else "purchases"</pre></div>
     correct: "close",
     answerLabel: "\"Getting close\"",
     feedback: {
-      over: "That is what the original chain returns, where <code>total &gt; 200</code> is tested first. In the swapped version <code>if total &gt; 100:</code> sits above it, and 340 is greater than 100, so Python returns on that first line and never reaches <code>elif total &gt; 200:</code>.",
+      over: "That is what the original chain returns, where <code>total &gt; 200</code> is tested first. In the swapped version <code>if total &gt; 100:</code> comes first, and 340 is greater than 100, so Python returns on that first line and never reaches <code>elif total &gt; 200:</code>.",
       close: "Python tests <code>total &gt; 100</code> first. 340 is greater than 100, so that branch returns and the chain ends there. <code>elif total &gt; 200:</code> is never evaluated, which means every total above 100 gets the same label, whether it is $101 or $10,000.",
-      track: "<code>else</code> runs only when every condition above it tested <code>False</code>. Here <code>total &gt; 100</code> tested <code>True</code> for 340, so Python returned on that branch and never reached the <code>else</code>."
+      track: "<code>else</code> runs only when every condition before it in the chain tested <code>False</code>. Here <code>total &gt; 100</code> tested <code>True</code> for 340, so Python returned on that branch and never reached the <code>else</code>."
     }
   });
 
@@ -365,10 +388,10 @@ word = "purchase" if count == 1 else "purchases"</pre></div>
     maxAttempts: 2,
     options: [
       {value:"close", label:"Getting close", correct:true,
-        hint:"Work out <code>250 &gt; 100</code> on its own, with nothing above it to stop Python from evaluating it.",
+        hint:"Work out <code>250 &gt; 100</code> on its own, with nothing earlier in <code>label_week</code> to stop Python from evaluating it.",
         explain:"<code>250 &gt; 100</code> is <code>True</code>, so this line prints. In the <code>elif</code> version the function would have stopped right here, but a separate <code>if</code> does not end anything, so Python carries on to the next one."},
       {value:"over", label:"Over budget", correct:true,
-        hint:"A line that prints above this one does not stop Python from evaluating this condition.",
+        hint:"An earlier line that prints does not stop Python from evaluating this condition.",
         explain:"<code>250 &gt; 200</code> is also <code>True</code>, so this line prints as well. Two messages come out of one call, which is exactly what an <code>elif</code> chain prevents."},
       {value:"way", label:"Way over", correct:false,
         hint:"Compare 250 against the number in this condition.",

@@ -7,6 +7,8 @@
 .mlrk-illustration{width:100%;max-width:880px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:22rem;font-family:var(--mlrk-font-code)}
 .mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+.mlrk-outlabel{display:block;font-size:1em;letter-spacing:.07em;text-transform:uppercase;opacity:.85;margin-bottom:.5rem}
+.mlrk-code + .mlrk-code{margin-top:.8rem}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}.mlrk-fillblank input{width:100%}}
 </style>
 </head><body>
@@ -28,7 +30,7 @@
 <section class="mlrk-section">
 <h2>1. A neighborhood that never got its groceries</h2>
 <p>Westside Pantry is a small food pantry that packs grocery boxes and drives them to people who can't come pick them up. Every Saturday the coordinator runs a short Python script that prints the busiest routes first, and volunteers claim routes from the top of the printed list.</p>
-<p>The script copied the box counts into a second list, sorted that list of numbers, then searched back through the routes to find the name that went with each number:</p>
+<p>The script copied the box counts into a second list called <code>counts</code>, sorted that list of numbers, then searched back through the routes to find the name that went with each number:</p>
 <div class="mlrk-code"><pre>routes = [
     {'name': 'Hill Street', 'boxes': 12},
     {'name': 'Oak Row',     'boxes': 31},
@@ -46,20 +48,24 @@ for count in counts:
         if route['boxes'] == count:
             print(route['name'])
             break</pre></div>
-<p>The script printed <code>Oak Row</code>, <code>Hill Street</code>, <code>Hill Street</code>. Hill Street and Pine Court both have 12 boxes, and the search loop stops at the first route whose count matches, so the loop found Hill Street both times. Pine Court never reached the printed list, no volunteer claimed that route, and those boxes sat in the pantry all weekend.</p>
-<p>The number 12 carries no route name with it. When the script searches the routes for a count of 12, the search finds Hill Street every time and never reaches Pine Court. Python can sort the routes themselves instead, which keeps every name attached to its own count. That fix rests on one fact you may not have noticed yet: a function is a value.</p>
+<p>The <code>print</code> line runs once per count, so the script printed three lines:</p>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — the counts version</div><pre>Oak Row
+Hill Street
+Hill Street</pre></div>
+<p>Hill Street printed twice, and Pine Court never printed at all. Hill Street and Pine Court both have 12 boxes, and the search loop stops at the first route whose count matches, so the loop found Hill Street both times. Pine Court never reached the printed list, no volunteer claimed that route, and those boxes sat in the pantry all weekend.</p>
+<p>The number 12 carries no route name with it. When the script searches the routes for a count of 12, the search finds Hill Street every time and never reaches Pine Court. Python can sort the routes themselves instead, which keeps every name attached to its own count. That fix rests on one fact: in Python a function is a value, the same way a number or a string is a value.</p>
 </section>
 
 <section class="mlrk-section">
 <h2>2. Technical vocabulary</h2>
-<p>Flip each card before the practice below.</p>
+<p>Flip each card before you work through the activities.</p>
 <div class="mlrk-grid">
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Functions are "first-class" values</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Functions are "first-class" values</strong><br>Python treats a function the way it treats a number or a string. A function can be stored in a variable, stored inside a list or a dictionary, passed to another function as an argument, and returned out of a function.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>method</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>method</strong><br>A function attached to a value, like <code>"abc".upper()</code>. The string carries the <code>upper</code> function around with it, and the dot looks that function up. Later in the fellowship you will attach functions to values of your own.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Higher-order functions (HOFs)</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Higher-order functions (HOFs)</strong><br>Functions that accept other functions as input, return a function, or both. The pattern lets one function be reused for many different jobs, because the part that changes is handed in from outside.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Callback functions</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Callback functions</strong><br>Functions passed as arguments to a higher-order function, so you can change what that function does without editing it. Pass a callback by its bare name, with no parentheses after it. The higher-order function calls it for you, with the right argument.</span></button>
 <button type="button" class="mlrk-term"><span class="mlrk-front"><strong>lambda</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>lambda</strong><br>Creates a small anonymous function in one expression, with parameters before the colon and a single expression after it. It is a short way to write a callback that will not be reused anywhere else.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>wrapper</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>wrapper</strong><br>A function returned by another function, which calls the original function and adds behavior around it. Written with an <code>@</code> on the line above a definition, this pattern is called a <strong>decorator</strong>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>wrapper</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>wrapper</strong><br>A function returned by another function, which calls the original function and adds behavior around it. Written with an <code>@</code> on its own line, immediately before a definition, this pattern is called a <strong>decorator</strong>.</span></button>
 </div>
 </section>
 
@@ -202,20 +208,23 @@ repeat(print_receipt, 3)</pre></div>
 <section class="mlrk-section">
 <h2>5. sorted(), min(), and max() take a callback too</h2>
 <p>Python ships with higher-order functions of its own, and <code>sorted()</code> is the one you will reach for most. Its <code>key</code> parameter accepts a callback, and <code>sorted</code> calls that callback once on every item to get the value to compare. Each item stays whole and moves as one piece.</p>
-<p>Section 3 used <code>key=len</code> that way. The same parameter fixes section 1's bug: write a function that pulls the box count out of one route, and hand that function to <code>sorted</code>:</p>
+<p>Section 3 used <code>key=len</code> that way. The same parameter fixes the bug in the <code>counts</code> version from section 1: write a function that pulls the box count out of one route, and hand that function to <code>sorted</code>:</p>
 <div class="mlrk-code"><pre>def boxes(route):
     return route['boxes']
 
 for route in sorted(routes, key=boxes, reverse=True):
-    print(route['name'])
-
-# Oak Row
-# Hill Street
-# Pine Court</pre></div>
-<p>Pine Court is on the list now. <code>sorted</code> compares the number <code>boxes</code> hands back but moves the whole dictionary, so a route's name never comes apart from its count, and the two routes tied at 12 boxes stay two separate routes. <code>min()</code> and <code>max()</code> accept <code>key</code> the same way, and both hand back the whole item rather than the number they compared.</p>
+    print(route['name'])</pre></div>
+<p>Here is what each version prints, with the same three routes:</p>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — the counts version from section 1</div><pre>Oak Row
+Hill Street
+Hill Street</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — the boxes version</div><pre>Oak Row
+Hill Street
+Pine Court</pre></div>
+<p>Pine Court is on the list now, and Hill Street prints once instead of twice. <code>sorted</code> compares the number <code>boxes</code> hands back but moves the whole dictionary, so a route's name never comes apart from its count, and the two routes tied at 12 boxes stay two separate routes. <code>min()</code> and <code>max()</code> accept <code>key</code> the same way, and both hand back the whole item rather than the number the callback produced for that item.</p>
 
 <h3>lambda, for a callback you use once</h3>
-<p>Writing a two-line <code>def</code> for a callback you use once is a lot of typing for one line of work. <code>lambda</code> builds a small function in one expression, with no name:</p>
+<p>A callback you use once does not need a name, and a two-line <code>def</code> is a lot of typing for one line of work. <code>lambda</code> builds a small function in one expression, with no name:</p>
 <div class="mlrk-code"><pre>biggest = max(routes, key=lambda route: route['boxes'])</pre></div>
 <p>The parameters go before the colon and one expression goes after the colon, and that expression's value is what the function hands back. A <code>lambda</code> has no room for a second line, so write a <code>def</code> as soon as a callback needs two.</p>
 
@@ -244,7 +253,7 @@ print(busiest['name'])   # Oak Row</pre></div>
 
 <section class="mlrk-section">
 <h2>6. A function that hands back another function</h2>
-<p>The coordinator is debugging the Saturday script and wants the terminal to say when each route starts posting and when that route is done. Six functions post things, so doing this by hand means pasting two <code>print</code> lines into each of the six, then picking all twelve back out once the bug is found. Miss one, and volunteers keep seeing debug dashes every Saturday. Write the two <code>print</code> lines once instead, inside a function that takes the function to announce as its parameter:</p>
+<p>The coordinator is debugging the Saturday script and wants the terminal to say when each route starts posting and when that route is done. Six functions post things. By hand that is twelve <code>print</code> lines to paste in and twelve to take back out once the bug is found. Miss one, and volunteers keep seeing debug dashes every Saturday. Write the two <code>print</code> lines once instead, inside a function that takes the function to announce as its parameter:</p>
 <div class="mlrk-code"><pre>def announce(func):
     def wrapper(route):
         print("--- posting ---")
@@ -258,8 +267,8 @@ def post(route):
 loud_post = announce(post)
 print("ready")
 loud_post(routes[0])</pre></div>
-<p>Three functions are involved, and they do not all run at the same time, so read the order carefully. <code>announce(post)</code> runs first. Inside <code>announce</code>, <code>func</code> holds the <code>post</code> function itself, because <code>post</code> was passed with no parentheses. <code>announce</code> then builds <code>wrapper</code> and hands <code>wrapper</code> back without calling it, so <code>loud_post</code> holds that <code>wrapper</code>, and nothing inside <code>wrapper</code> has run yet.</p>
-<p>The last line does all the printing, and that line runs two functions, not one. <code>loud_post(routes[0])</code> calls <code>wrapper</code>, which prints <code>--- posting ---</code>, then calls <code>func(route)</code>. <code>func</code> is <code>post</code>, so <code>post</code> prints the route line. Then <code>wrapper</code> prints <code>--- posted ---</code>. Two of those three lines come from <code>wrapper</code> and one comes from <code>post</code>.</p>
+<p>Three functions are involved — <code>announce</code>, <code>wrapper</code>, and <code>post</code> — and the three do not all run at the same time, so read the order carefully. <code>announce(post)</code> runs first. Inside <code>announce</code>, <code>func</code> holds the <code>post</code> function itself, because <code>post</code> was passed with no parentheses. <code>announce</code> then builds <code>wrapper</code> and hands <code>wrapper</code> back without calling it, so <code>loud_post</code> holds that <code>wrapper</code>, and nothing inside <code>wrapper</code> has run yet.</p>
+<p>The call <code>loud_post(routes[0])</code> runs two functions, not one. <code>loud_post</code> holds <code>wrapper</code>, so <code>wrapper</code> runs first and prints <code>--- posting ---</code>, then calls <code>func(route)</code>. <code>func</code> is <code>post</code>, so <code>post</code> prints the route line. Then <code>wrapper</code> prints <code>--- posted ---</code>. Two of those three lines come from <code>wrapper</code> and one comes from <code>post</code>.</p>
 <p><code>wrapper</code> still has <code>func</code> even though <code>announce</code> finished two lines earlier. A function defined inside another function keeps access to the outer function's variables after that outer function returns, so <code>wrapper</code> carries <code>func</code> with it. <code>post</code> was never edited, and <code>announce</code> never mentions routes; the line <code>loud_post = announce(post)</code> is what joins the two. A function handed back this way is a <strong>wrapper</strong>, because that function wraps around the original.</p>
 
 <div class="mlrk-card">
@@ -277,7 +286,13 @@ loud_post(routes[0])</pre></div>
 <p>Look for the first line Python actually <em>runs</em>, not the first line written. <code>loud_post = announce(post)</code> builds a function and stores it, and Python prints nothing while building a function, so look at what the next line does.</p>
 </details>
 
-<p style="margin-top:1.4rem">Python has a shorter spelling for handing <code>post</code> to <code>announce</code>, with an <code>@</code> above the definition:</p>
+<p style="margin-top:1.4rem">Run the script and four lines come out, in this order:</p>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output</div><pre>ready
+--- posting ---
+Hill Street: 12 boxes
+--- posted ---</pre></div>
+<p><code>ready</code> prints first because <code>loud_post = announce(post)</code> only builds <code>wrapper</code> and stores it, and building a function prints nothing. The other three lines all come out of the single call <code>loud_post(routes[0])</code>: <code>wrapper</code> printed the first dashed line and the last one, and <code>post</code> printed the route line between them.</p>
+<p>Python has a shorter spelling for handing <code>post</code> to <code>announce</code>: an <code>@</code> on its own line, immediately before the definition.</p>
 <div class="mlrk-code"><pre>@announce
 def post(route):
     print(f"{route['name']}: {route['boxes']} boxes")</pre></div>
@@ -286,7 +301,7 @@ def post(route):
 
 <section class="mlrk-section">
 <h2>7. Summary &amp; reflection</h2>
-<p>A function is a value, so it can live in a variable, in a dictionary, or in another function's argument list, and it can be handed back out of a function. A function that takes or returns a function is a higher-order function, and the function you hand to it is the callback. Pass that callback by its bare name; parentheses run the callback on the spot and hand over its return value, which for a printing function is <code>None</code>. Pine Court showed up on the printed list again as soon as <code>sorted</code> sorted the routes themselves.</p>
+<p>A function is a value, so it can live in a variable, in a dictionary, or in another function's argument list, and it can be handed back out of a function. A function that takes or returns a function is a higher-order function, and the function you hand to it is the callback. Pass that callback by its bare name; parentheses run the callback on the spot and hand over its return value, which for a printing function is <code>None</code>. Pine Court showed up on the printed list again as soon as the Saturday script handed <code>key=boxes</code> to <code>sorted</code> and sorted the routes themselves.</p>
 <label for="reflect"><strong>In 2-3 sentences:</strong> <code>announce</code> never mentions routes, and <code>post</code> never mentions the dashed lines, yet together they print both. Think of a program you have written or used. What is one extra step you would want to add around several different functions at once, without editing any of them?</label>
 <textarea id="reflect" class="mlrk-response" data-save></textarea>
 </section>

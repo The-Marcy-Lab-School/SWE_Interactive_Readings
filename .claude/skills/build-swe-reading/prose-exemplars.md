@@ -89,6 +89,49 @@ knowledge. **This reverses an earlier instruction of mine** that favored typed
 production over recognition — Angelica's call, and it stands: for a short fixed
 set like the falsy values, select-all is the better activity.
 
+**7. Lead with the rule as a plain statement. Do not bury it in the subject.**
+
+> Written: "Putting the conditions in the wrong order shows one label from the wrong tier. A second mistake shows several labels at once and is harder to spot."
+>
+> Wanted: "The order of conditions matters — if you put the conditions in the wrong order you get the wrong label…"
+
+Two faults. The rule ("order matters") is hidden inside a gerund phrase doing
+duty as a subject, so the reader meets the consequence before the principle.
+And "a second mistake" names nothing — a second mistake compared to what, and
+what is it? **State the rule as a sentence, then the consequence, then name the
+thing you are contrasting.**
+
+**8. Refer to code by name, never by position.**
+
+> Written, directly under a code block containing only separate `if` statements: "An `elif` is attached to the `if` above it, and Python evaluates it only when that `if` tested `False`."
+
+There is no `elif` in the block above. The `elif` version is in the previous
+section, so a student looks up, sees no `elif`, and cannot follow the sentence.
+
+Rules:
+- **Give every code block a short label** (`spending_tier`, `label_week`) and
+  refer to it by that name: "the `label_week` version", "the `spending_tier`
+  chain". Function names usually serve as the label for free.
+- **Never write "the code above", "the example below", or "the `if` above it"**
+  unless the block is literally adjacent *and* contains the thing being
+  described. `qa/reading_qa.py` WARNs on bare positional references.
+- **When contrasting two versions, put both on screen at the point of
+  contrast.** Do not ask the reader to hold a snippet from a previous section
+  in their head. Repeating a four-line snippet is cheap; a reader scrolling back
+  to find it is not.
+
+**9. Program output goes on separate lines, the way the program prints it.**
+
+> Written: "The script printed Oak Row, Hill Street, Hill Street."
+>
+> Wanted: the three values on three lines, as output.
+
+A `print()` per iteration produces one line per value. Flattening that into a
+comma-separated sentence hides the shape of the output, which is often the
+whole point — here, that the same route printed twice. Put real output in a
+`<pre>` block, one line per line the program actually prints. The same goes for
+any multi-value result a reader is meant to compare.
+
 ## The standing rules these add up to
 
 1. **Plain English wins** over any rule in the writing guide.
@@ -99,3 +142,13 @@ set like the falsy values, select-all is the better activity.
 6. **No gendered pronouns for people.** `qa/reading_qa.py` WARNs on them.
 7. **Every word has to mean something** in its sentence. "Innocent", "elegant",
    "powerful" usually do not.
+8. **State the rule, then the consequence.** Never hide the rule inside a gerund
+   phrase serving as the subject, and never write "a second mistake" without
+   naming it.
+9. **Refer to code by name, not by position.** Label blocks, and put both
+   versions on screen wherever you contrast them.
+10. **Real program output renders as real output** — a `<pre>` block, one line
+    per printed line, never a comma list inside a sentence.
+11. **Clarity beats brevity.** Naming a specific function instead of writing
+    "it" costs words and is still correct. Word count is not a tradeoff worth
+    reporting; only an actual change in activities changes the time estimate.

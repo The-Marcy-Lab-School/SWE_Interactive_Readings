@@ -110,6 +110,15 @@ def check_font_sizes(text):
         px = val if unit == "px" else val*16 if unit == "rem" else val*1.333
         if px < 14:
             findings.append(("ERROR", f"font-size below 14px floor: {m.group(0)} (~{px:.1f}px)"))
+    # `em` is relative to the parent's computed size, so it can smuggle a value
+    # under the 14px floor that the px/rem/pt branch above never sees. A label
+    # inside .mlrk-code (.95rem = 15.2px) at .78em computes to ~11.9px. Assume a
+    # ~15px parent, which is the smallest common context in these readings.
+    for m in re.finditer(r"font-size\s*:\s*([\d.]+)em\b", text, re.I):
+        approx = float(m.group(1)) * 15.2
+        if approx < 14:
+            findings.append(("ERROR", f"font-size in em computes below the 14px floor "
+                                      f"against a ~15.2px parent: {m.group(0)} (~{approx:.1f}px)"))
     # SVG presentation-attribute form: font-size="12" (no colon, not caught above).
     # Diagram text has its own, lower preferred floor (16px) since it sits inside a
     # fixed viewBox next to much larger surrounding body text.
@@ -226,6 +235,26 @@ def visible_text(html):
     text = re.sub(r"<style.*?</style>", " ", text, flags=re.S | re.I)
     text = re.sub(r"<[^>]+>", " ", text)
     return text
+
+
+def feedback_text(html):
+    """Student-facing prose that lives inside the inline <script>.
+
+    visible_text() strips <script> wholesale, so quiz feedback, hints and
+    reveal strings were invisible to every prose check — and those are exactly
+    where reasoning gets compressed hardest, per Ben's guide. This pulls the
+    string literals back out so the prose checks can see them. Code-ish
+    literals (selectors, ids, single words) are skipped: a real sentence has
+    a space and some length.
+    """
+    out = []
+    for m in re.finditer(r"<script\b[^>]*>(.*?)</script>", html, re.S | re.I):
+        body = m.group(1)
+        for lit in re.findall(r'"((?:[^"\\]|\\.)*)"|\'((?:[^\'\\]|\\.)*)\'', body):
+            val = lit[0] or lit[1]
+            if len(val) > 25 and " " in val.strip():
+                out.append(re.sub(r"<[^>]+>", " ", val))
+    return "\n".join(out)
 
 
 def check_copyright(text):
@@ -383,6 +412,34 @@ def check_writing_guide(text, html):
             snippet = " ".join(text[max(0, m.start() - 30):m.end() + 30].split())
             findings.append(("WARN", f"{msg} — near: ...{snippet}..."))
     return findings
+
+
+# Angelica, 2026-10-06: a paragraph said "the `if` above it" directly under a
+# code block that contained no `if`/`elif` pair at all — the version it meant
+# was a section earlier. Refer to code by its name ("the `label_week` version"),
+# and put both versions on screen wherever you contrast them.
+POSITIONAL_CODE_REF = re.compile(
+    r"\b(?:the\s+)?(?:code|example|snippet|block|version|function|program|output|chain|line)\s+"
+    r"(?:above|below)\b"
+    r"|\b(?:above|below)\s+it\b"
+    r"|\bshown\s+(?:above|below)\b"
+    r"|\bthe\s+`[^`]+`\s+above\b",
+    re.I)
+
+
+def check_positional_code_refs(text):
+    hits = []
+    for m in POSITIONAL_CODE_REF.finditer(text):
+        snippet = " ".join(text[max(0, m.start() - 45):m.end() + 45].split())
+        hits.append(f'"{m.group(0).strip()}" in: ...{snippet}...')
+    if not hits:
+        return []
+    shown = hits[:3]
+    more = f" (+{len(hits) - len(shown)} more)" if len(hits) > len(shown) else ""
+    return [("WARN", "code referred to by position rather than by name — say "
+                     '"the `label_week` version", and make sure the block you point at '
+                     "actually contains what the sentence describes: "
+                     + " | ".join(shown) + more)]
 
 
 # Angelica, 2026-10-06: drop gendered pronouns for people in examples. A
@@ -554,8 +611,11 @@ def run(path, skip_links=False):
     findings += check_meta_sidecar(path)
     findings += check_mod1_key_terms(path, text)
     findings += check_mod1_extra_key_terms(path, html)
-    findings += check_writing_guide(text, html)
-    findings += check_gendered_pronouns(text)
+    fb = feedback_text(html)
+    prose = text + "\n" + fb
+    findings += check_writing_guide(prose, html)
+    findings += check_gendered_pronouns(prose)
+    findings += check_positional_code_refs(prose)
     findings += check_no_recall_section(text.lower())
     findings += check_reading_level(html)
     findings += check_ai_sounding_language(text)
