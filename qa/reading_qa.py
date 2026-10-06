@@ -353,6 +353,23 @@ def check_mod1_key_terms(path, html, text):
     owned_token_sets = [_tokens(t["term"]) for t in lesson["key_terms"]]
     extra = [c for c, ct in zip(cards, card_tokens)
              if ct and not any(ot and ot <= ct for ot in owned_token_sets)]
+
+    # A card that covers an owned term can still smuggle a second concept in
+    # beside it: "loop condition" passes the test above purely because
+    # "loop" is owned, and `condition` is a term this lesson never teaches.
+    # Whether that is a merged card the GitBook itself nests ("Truthy and
+    # falsy") or genuine creep is a judgment call, so it warns rather than
+    # fails.
+    owned_vocab = set().union(*owned_token_sets) if owned_token_sets else set()
+    for c, ct in zip(cards, card_tokens):
+        stray = ct - owned_vocab
+        if ct and not stray:
+            continue
+        if stray and any(ot and ot <= ct for ot in owned_token_sets):
+            findings.append(("WARN",
+                f"vocabulary card \"{c}\" carries word(s) no key term in lesson "
+                f"{lesson['lesson']} uses ({', '.join(sorted(stray))}) — confirm it is a merged "
+                f"card the chapter itself nests, not a second concept riding along"))
     if extra:
         findings.append(("ERROR",
             f"lesson {lesson['lesson']} ({lesson['title']}) has vocabulary card(s) for term(s) the "

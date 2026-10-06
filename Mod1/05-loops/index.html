@@ -4,8 +4,21 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:640px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
+.mlrk-illustration{width:100%;max-width:780px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
+/* Two labelled code blocks side by side, so a contrast never asks the reader
+   to hold one version in their head while looking at the other. Stacks below
+   900px, where two columns would wrap the longest print() line. */
+.lp-compare{display:grid;grid-template-columns:1fr;gap:1.4rem;margin:1.1rem 0;align-items:start}
+@media(min-width:900px){.lp-compare{grid-template-columns:1fr 1fr;gap:1.6rem}}
+.lp-compare-label{margin:0 0 .5rem;line-height:1.4}
+.lp-compare>div{min-width:0}
+.lp-out{min-height:0}
+/* The four while-loop snippets are code, not prose: at the shared grid's
+   210px minimum they land four-up and every line wraps mid-identifier. Two
+   columns keeps the longest line (retry_connection()) on one line. */
+#lp-spot-grid{grid-template-columns:1fr}
+@media(min-width:760px){#lp-spot-grid{grid-template-columns:1fr 1fr}}
 .mlrk-snippet{display:block;border:2px solid var(--mlrk-gray-400);border-radius:12px;padding:.7rem;margin:.7rem 0;cursor:pointer}
 .mlrk-snippet:hover{border-color:var(--mlrk-bg-brand-deep)}
 .mlrk-snippet input{margin-right:.5rem;transform:translateY(1px)}
@@ -17,7 +30,7 @@
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>The Loop That Never Stopped</h1>
 <div class="mlrk-meta">
-  <span class="mlrk-pill">~9 minutes</span>
+  <span class="mlrk-pill">~13 minutes</span>
   <span class="mlrk-pill">Interactive</span>
   <span class="mlrk-pill">No setup needed to read</span>
 </div>
@@ -28,43 +41,126 @@
 <main class="mlrk-main"><div class="mlrk-wrap">
 
 <section class="mlrk-section">
-<h2>1. A trading system that couldn't stop repeating itself</h2>
-<p>Knight Capital was a Wall Street trading firm that used automated software to route stock orders. In 2012, it rolled out new trading code to eight servers, but one server missed the update. That server kept running old, retired logic called "Power Peg." Power Peg's job was to keep sending buy or sell orders for a stock until a running count of shares filled told it to stop. That's the classic shape of a loop: it runs while a condition is true, and stops the moment that condition turns false. Years earlier, Knight had moved the counting logic to a different point in the code, and never re-tested Power Peg against that change. By 2012, the count Power Peg checked no longer matched reality. So the condition that was supposed to eventually turn false never did.</p>
-<p>On August 1, 2012, a new order flag accidentally woke Power Peg back up on that one server. For forty-five minutes, it kept firing off buy and sell orders — about 4 million trades across more than a hundred stocks — and nothing in the code could stop it. A person finally had to shut the server down by hand. By then, Knight had lost $460 million and nearly collapsed as a company. Strip away the trading-floor details, and it's the same mistake every Python beginner eventually makes: a loop meant to run until a condition goes false, with no real way for that condition to ever become false. That's what the rest of this reading is about.</p>
-<p class="mlrk-small">Source: the U.S. Securities and Exchange Commission's 2013 administrative order against Knight Capital, retold in detail in <a href="https://dougseven.com/2014/04/17/knightmare-a-devops-cautionary-tale/" target="_blank" rel="noopener">Doug Seven, "Knightmare: A DevOps Cautionary Tale," 2014</a>.</p>
+<h2>1. A trading system that could not stop repeating itself</h2>
+<p>Knight Capital was a Wall Street trading firm whose software decided, on its own, which stock orders to send to the market. In 2012 the firm pushed new trading code to eight servers, and one server missed the update. That server kept running an old, retired routine called Power Peg. Power Peg sent buy or sell orders for a stock over and over. It was supposed to stop as soon as a running count of shares filled reached the size of the order. That is the shape of a loop: repeat while something is true, stop the moment it stops being true. Years earlier, Knight had moved the counting code somewhere else and never re-tested Power Peg against that change. By 2012 the count Power Peg read never went up, so the thing that was supposed to end the repeating never happened.</p>
+<p>On August 1, 2012, a new order flag woke Power Peg up on that one server. It fired off buy and sell orders for about 45 minutes, roughly 4 million trades across 154 stocks, and no line of code stopped it. A person finally shut the server down by hand. Knight lost $460 million and nearly went out of business. The mistake is one every Python beginner makes too: write a loop that repeats until something changes, and leave out the line that changes it. The next few sections cover the two kinds of loop Python gives you, when each one fits, and how to stop one on purpose.</p>
+<p class="mlrk-small">Source: the U.S. Securities and Exchange Commission's 2013 administrative order against Knight Capital Americas LLC, Release No. 34-70694.</p>
 </section>
 
 <section class="mlrk-section">
-<h2>2. Vocabulary</h2>
-<p>Flip each card before the practice below.</p>
-<div class="mlrk-grid">
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>iterable</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Iterable</strong><br>A collection Python can go through one item at a time: a list, a string, a range of numbers, the lines of a file. <code>for</code> loops are built to walk through iterables.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>for loop</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>for loop</strong><br>Repeats a block of code once for each item in a known, iterable sequence. It stops automatically the moment the sequence runs out — no counting required.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>while loop</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>while loop</strong><br>Repeats a block of code for as long as a condition stays True. Python checks that condition again before every single pass, including the very first one.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>loop condition</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Loop condition</strong><br>The True/False test a <code>while</code> loop checks before each pass, like <code>queue_size &gt; 0</code>. Something inside the loop body has to change the outcome of this test, or the loop never ends on its own.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>infinite loop</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Infinite loop</strong><br>A <code>while</code> loop whose condition never becomes False, so it keeps repeating until something outside the program — a crash, a timeout, or a person — stops it.</span></button>
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card. These six terms are the ones the rest of the reading uses.</p>
+<div class="mlrk-grid" id="lp-flipcards">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Loops</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Loops</strong><br>Loops let you repeat code multiple times. They automate repetitive work, and they let one block of code run over every item in a collection of data.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>for loop</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>for loop</strong><br>A <code>for</code> loop runs its block once for each item it is given. Paired with <code>range()</code>, it is the right choice for repeating a process a known number of times, such as counting.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>iterable</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>iterable</strong><br>An iterable is any value a <code>for</code> loop can walk through one element at a time. A <code>range()</code> is an iterable of numbers, and a string is an iterable of characters.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>while loop</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>while loop</strong><br>A <code>while</code> loop repeats a process an unknown number of times. It keeps going until its condition is no longer true, and Python re-tests that condition before every pass.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Infinite loops</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Infinite loops</strong><br>Infinite loops happen when a loop's condition never becomes <code>False</code>, so the program runs forever. Use <code>break</code> to exit a loop early and <code>continue</code> to skip to the next pass.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Nested loops</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Nested loops</strong><br>Nested loops are one loop written inside the body of another. The inner loop finishes all of its passes for every single pass of the outer loop. They suit data with rows and columns, and any process that repeats inside another process.</span></button>
 </div>
 </section>
 
 <section class="mlrk-section">
-<h2>3. for loops vs. while loops</h2>
-<p>Use a <code>for</code> loop when you already know what you're repeating over: a list of order IDs, a range of page numbers, every character in a string.</p>
-<div class="mlrk-code"><div class="mlrk-screen">orders = ["A-101", "A-102", "A-103"]
-for order_id in orders:
-    ship(order_id)</div></div>
-<p>Python walks the list <code>orders</code> once per item, in order, and stops automatically the moment the list runs out. There's no manual counting, and no way to accidentally skip that stop.</p>
+<h2>3. Writing a line 100 times, or writing it once</h2>
+<p>Knight's order router had to send the same kind of order again and again. Written out by hand, 100 orders means 100 near-identical lines, and the only thing that changes between them is a number. Here is that by-hand version next to the same job written as a <code>for</code> loop:</p>
+<div class="lp-compare">
+<div>
+<p class="lp-compare-label"><strong>Written out by hand</strong><br>one line per order, 100 of them</p>
+<div class="mlrk-code"><pre class="mlrk-screen">send_order(0)
+send_order(1)
+send_order(2)
+send_order(3)
+send_order(4)
+# and 95 more lines like this</pre></div>
+</div>
+<div>
+<p class="lp-compare-label"><strong>The same job as a <code>for</code> loop</strong><br>two lines, any number of orders</p>
+<div class="mlrk-code"><pre class="mlrk-screen">for i in range(100):
+    send_order(i)</pre></div>
+</div>
+</div>
+<p><code>range(100)</code> produces the numbers <code>0</code>, <code>1</code>, <code>2</code>, and so on up to <code>99</code>. The variable <code>i</code> takes one of those numbers on each pass. Every pass of a <code>for</code> loop does the same three things:</p>
+<ol class="mlrk-steplist">
+  <li>Take the next number out of the range and assign it to <code>i</code>.</li>
+  <li>Run the indented block.</li>
+  <li>Go back to the first step, until the range runs out.</li>
+</ol>
+<p>The rule for <code>range(n)</code> is "n numbers, starting at zero." So <code>range(5)</code> produces five numbers and the first one is <code>0</code>, which makes the last one <code>4</code>. Counting from zero is the convention everywhere in Python. Here is <code>range(5)</code> printed one number per line:</p>
+<div class="lp-compare">
+<div>
+<p class="lp-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">for i in range(5):
+    print(i)</pre></div>
+</div>
+<div>
+<p class="lp-compare-label"><strong>What it prints</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen lp-out">0
+1
+2
+3
+4</pre></div>
+</div>
+</div>
+<p>Five lines, not six. <code>range()</code> also takes a starting point and a step size:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">range(1, 101)      # 1, 2, 3, ... 100
+range(0, 20, 5)    # 0, 5, 10, 15
+range(10, 0, -1)   # 10, 9, 8, ... 1</pre></div>
+<p>Given a start and a stop, <code>range()</code> begins at the start and ends just before the stop. That is why <code>range(1, 101)</code> gets you the numbers 1 through 100.</p>
 
-<p>Use a <code>while</code> loop when you don't know in advance how many times you'll repeat, only the condition that should eventually end it:</p>
-<div class="mlrk-code"><div class="mlrk-screen">queue_size = 3
-while queue_size > 0:
-    process_next_order()
-    queue_size -= 1</div></div>
-<p>Before every single pass, including the first one, Python re-checks <code>queue_size &gt; 0</code>. The loop only ends once that check comes back False — and that only happens if something inside the loop body actually changes <code>queue_size</code>. Picture the same code with that one line, <code>queue_size -= 1</code>, deleted. Nothing else in the loop would change. Keep that picture in mind for the diagram and the step-through below.</p>
+<div class="mlrk-card">
+<p><strong>You run this loop.</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">for n in range(1, 5):
+    print(n)</pre></div>
+<p><strong>What is the first number it prints, and what is the last?</strong></p>
+<div id="lp-range-choices">
+<button type="button" class="mlrk-choice" data-a="a">First <code>1</code>, last <code>5</code></button>
+<button type="button" class="mlrk-choice" data-a="b">First <code>1</code>, last <code>4</code></button>
+<button type="button" class="mlrk-choice" data-a="c">First <code>0</code>, last <code>4</code></button>
+<button type="button" class="mlrk-choice" data-a="d">First <code>0</code>, last <code>5</code></button>
+</div>
+<div id="lp-range-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Two numbers inside <code>range()</code> means a start and a stop. The start is included. The stop is where <code>range()</code> ends, and it is not one of the numbers produced.</p>
+</details>
 
+<h3>Strings are iterables too</h3>
+<p>A <code>for</code> loop can walk through the characters of a string with no <code>range()</code> involved at all:</p>
+<div class="lp-compare">
+<div>
+<p class="lp-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">for letter in "GOOG":
+    print(letter)</pre></div>
+</div>
+<div>
+<p class="lp-compare-label"><strong>What it prints</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen lp-out">G
+O
+O
+G</pre></div>
+</div>
+</div>
+<p>Any value a <code>for</code> loop can walk through one element at a time is called an iterable. A <code>range()</code> is an iterable of numbers, and a string is an iterable of characters. Lists are iterables as well, so the same loop shape works on them.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Known count, or unknown count?</h2>
+<p>The number of repetitions is what decides which loop to write. If you can work the count out before the loop starts, write a <code>for</code> loop. If the count depends on something that happens while the program runs, write a <code>while</code> loop.</p>
+<p>Shipping every order in a batch has a count you already have, so <code>ship_batch</code> uses a <code>for</code> loop:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">def ship_batch(orders):
+    for order_id in orders:
+        ship(order_id)</pre></div>
+<p>Python walks <code>orders</code> once per item, in order, and stops on its own the moment the items run out. Nothing has to count, and nothing can forget to stop.</p>
+<p>Draining a queue is different. <code>drain_queue</code> uses a <code>while</code> loop:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">def drain_queue(queue_size):
+    while queue_size &gt; 0:
+        process_next_order()
+        queue_size -= 1</pre></div>
+<p>Before every pass, including the first one, Python tests <code>queue_size &gt; 0</code>. The loop ends the first time that test comes out <code>False</code>. It only comes out <code>False</code> because <code>queue_size -= 1</code> runs inside the body and brings <code>queue_size</code> down to 0. Delete that one line and <code>queue_size</code> stays at its starting value forever, so <code>drain_queue</code> keeps processing orders for as long as the computer stays on. That is the Knight Capital bug in four lines.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 770 280" role="img" aria-labelledby="loopCmpTitle loopCmpDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="loopCmpTitle">Three loop shapes, compared by whether they can stop themselves</title>
-  <desc id="loopCmpDesc">A for loop walks a known list and always stops on its own once the list runs out. A while loop that updates its condition variable inside the body also stops on its own. A while loop that never updates that variable checks the same condition forever and never stops without outside help.</desc>
+  <desc id="loopCmpDesc">A for loop walks a known list and always stops on its own once the list runs out. A while loop that updates its condition variable inside the body also stops on its own. A while loop that never updates that variable tests the same condition forever and never stops without outside help.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
     <rect x="15" y="20" width="230" height="235" rx="12" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
     <text x="130" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">for loop</text>
@@ -76,7 +172,7 @@ while queue_size > 0:
 
     <rect x="270" y="20" width="230" height="235" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
     <text x="385" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">while (updated)</text>
-    <text x="385" y="110" text-anchor="middle" font-size="16" fill="#261F1D">Checks queue_size</text>
+    <text x="385" y="110" text-anchor="middle" font-size="16" fill="#261F1D">Tests queue_size</text>
     <text x="385" y="134" text-anchor="middle" font-size="16" fill="#261F1D">before every pass</text>
     <text x="385" y="158" text-anchor="middle" font-size="16" fill="#261F1D">The body updates</text>
     <text x="385" y="182" text-anchor="middle" font-size="16" fill="#261F1D">queue_size each time</text>
@@ -84,7 +180,7 @@ while queue_size > 0:
 
     <rect x="525" y="20" width="230" height="235" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5"/>
     <text x="640" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">while (buggy)</text>
-    <text x="640" y="110" text-anchor="middle" font-size="16" fill="#261F1D">Checks queue_size</text>
+    <text x="640" y="110" text-anchor="middle" font-size="16" fill="#261F1D">Tests queue_size</text>
     <text x="640" y="134" text-anchor="middle" font-size="16" fill="#261F1D">before every pass</text>
     <text x="640" y="158" text-anchor="middle" font-size="16" fill="#261F1D">But nothing inside</text>
     <text x="640" y="182" text-anchor="middle" font-size="16" fill="#261F1D">ever changes it</text>
@@ -92,58 +188,232 @@ while queue_size > 0:
   </g>
 </svg>
 
-<p><strong>Trace it, line by line:</strong> step through the loop above one pass at a time, then step through the same code with its update line missing.</p>
-<div class="mlrk-card"><div id="loop-trace"></div></div>
+<div class="mlrk-card" id="lp-choose">
+<p><strong>Four jobs. Drag each one into the loop that fits it</strong>, then press "Check my answers". Ask one question about each job: can you work out the number of repetitions before the loop starts?</p>
+<div class="mlrk-drag-source" id="lp-chips">
+  <span class="mlrk-draggable" id="chip-receipts">Print a receipt for each of the 12 items in a cart</span>
+  <span class="mlrk-draggable" id="chip-password">Keep asking for a password until the one typed is correct</span>
+  <span class="mlrk-draggable" id="chip-squares">Print the square of every number from 1 to 50</span>
+  <span class="mlrk-draggable" id="chip-shuffle">Shuffle a deck until the top card is an ace</span>
+</div>
+<div class="mlrk-grid">
+  <div class="mlrk-dropzone" id="zone-for"><strong>for loop</strong></div>
+  <div class="mlrk-dropzone" id="zone-while"><strong>while loop</strong></div>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="lp-choose-check">Check my answers</button></div>
+<div id="lp-choose-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Two of these jobs name their own count: 12 items, and the numbers 1 to 50. The other two depend on what happens while the program runs, and no amount of planning tells you the count ahead of time.</p>
+</details>
 </section>
 
 <section class="mlrk-section">
-<h2>4. Practice: spot the infinite loop</h2>
-<p>Each snippet below is a complete <code>while</code> loop. Some of them will run forever. Select every one that will.</p>
-<details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>For each snippet, find the line that's supposed to change the condition's variable. Then check: does it actually run every pass, and does it change the <em>right</em> variable?</p>
-</details>
-<div class="mlrk-grid" style="margin-top:1rem">
+<h2>5. Stopping on purpose: <code>while True</code>, <code>break</code>, and <code>continue</code></h2>
+<p>Sometimes there is no condition to write at the top of the loop, because the thing you are waiting for is the only reason to stop. A price watcher is one of those. It reads quotes as they arrive and buys the first time a quote comes in at 97 or less. Nobody can know in advance how many quotes that takes.</p>
+<div class="mlrk-code"><pre class="mlrk-screen">import random
+
+def next_quote():
+    return random.randint(95, 110)
+
+while True:
+    quote = next_quote()
+    if quote &lt;= 97:
+        print(f"Bought at {quote}.")
+        break
+    if quote &gt; 105:
+        print(f"{quote} is outside the range we track. Ignoring it.")
+        continue
+    print(f"{quote} is above our price. Waiting for the next quote.")
+
+print("Trading session over.")</pre></div>
+<p><code>random.randint(95, 110)</code> picks a whole number from 95 to 110, so <code>next_quote()</code> stands in here for a price arriving from the market. Chapter 1.9 covers how <code>import</code> works. For now it is a price feed.</p>
+<p><code>while True</code> is a condition that is always true, so this loop has no natural ending and <code>break</code> is the only way out of it. <code>break</code> ends the loop immediately, and the program carries on with the first line after the loop body. <code>continue</code> ends the current pass only and sends Python straight back to the top of the loop, so the lines under it are skipped this time around. A quote above 105 therefore never reaches the "Waiting for the next quote." line.</p>
+
+<h3>How <code>break</code> is different from <code>return</code></h3>
+<p>Both statements leave the loop, and that is where the similarity stops. <code>break</code> ends the loop. <code>return</code> ends the whole function the loop is sitting inside, so no line after the loop in that function ever runs. Here are two functions that are identical except for that one word:</p>
+<div class="lp-compare">
+<div>
+<p class="lp-compare-label"><strong><code>watch_with_break</code></strong><br>leaves the loop</p>
+<div class="mlrk-code"><pre class="mlrk-screen">def watch_with_break():
+    while True:
+        if next_quote() &lt;= 97:
+            print("Bought.")
+            break
+    print("Session over.")</pre></div>
+<p class="lp-compare-label">It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen lp-out">Bought.
+Session over.</pre></div>
+</div>
+<div>
+<p class="lp-compare-label"><strong><code>watch_with_return</code></strong><br>leaves the whole function</p>
+<div class="mlrk-code"><pre class="mlrk-screen">def watch_with_return():
+    while True:
+        if next_quote() &lt;= 97:
+            print("Bought.")
+            return
+    print("Session over.")</pre></div>
+<p class="lp-compare-label">It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen lp-out">Bought.</pre></div>
+</div>
+</div>
+<p>The missing line is the whole difference. <code>watch_with_return</code> never prints "Session over." because <code>return</code> ended the function before Python got there.</p>
+
+<div class="mlrk-card">
+<p><strong>A teammate edits <code>watch_with_break</code> and changes the word <code>break</code> to <code>return</code>, leaving everything else alone.</strong> <strong>What changes about what the function prints?</strong></p>
+<div id="lp-breakret-choices">
+<button type="button" class="mlrk-choice" data-a="same">Nothing changes</button>
+<button type="button" class="mlrk-choice" data-a="noline">"Session over." stops printing</button>
+<button type="button" class="mlrk-choice" data-a="keepgoing">The loop keeps reading quotes after the purchase</button>
+</div>
+<div id="lp-breakret-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<h3>When a loop has no way out</h3>
+<p>An infinite loop is a loop whose condition never becomes <code>False</code>. The program keeps running and keeps using the computer's resources until something outside the program stops it. <code>while True</code> is an infinite loop written on purpose, and the <code>break</code> is what makes it safe to write. Power Peg had the same shape with nothing that could ever fire the <code>break</code>, which is why a person had to shut the server off.</p>
+<p>If you start one by accident, press <code>Control+C</code> in the Terminal. Python prints <code>KeyboardInterrupt</code>, which means you interrupted it. Nothing is wrong with your computer.</p>
+
+<div class="mlrk-card">
+<p><strong>Four complete <code>while</code> loops. Check every one that runs forever.</strong></p>
+<div class="mlrk-grid" id="lp-spot-grid" style="margin-top:1rem">
 <label class="mlrk-snippet"><input type="checkbox" class="loop-spot-box" value="a">Snippet A
-<div class="mlrk-code"><div class="mlrk-screen">tickets = 5
-while tickets > 0:
-    sell_ticket()</div></div>
+<div class="mlrk-code"><pre class="mlrk-screen">tickets = 5
+while tickets &gt; 0:
+    sell_ticket()</pre></div>
 </label>
 <label class="mlrk-snippet"><input type="checkbox" class="loop-spot-box" value="b">Snippet B
-<div class="mlrk-code"><div class="mlrk-screen">tickets = 5
-while tickets > 0:
+<div class="mlrk-code"><pre class="mlrk-screen">tickets = 5
+while tickets &gt; 0:
     sell_ticket()
-    tickets -= 1</div></div>
+    tickets -= 1</pre></div>
 </label>
 <label class="mlrk-snippet"><input type="checkbox" class="loop-spot-box" value="c">Snippet C
-<div class="mlrk-code"><div class="mlrk-screen">attempts = 0
-while attempts < 3:
+<div class="mlrk-code"><pre class="mlrk-screen">attempts = 0
+while attempts &lt; 3:
     retry_connection()
-    success = True</div></div>
+    success = True</pre></div>
 </label>
 <label class="mlrk-snippet"><input type="checkbox" class="loop-spot-box" value="d">Snippet D
-<div class="mlrk-code"><div class="mlrk-screen">balance = 100
-while balance > 0:
+<div class="mlrk-code"><pre class="mlrk-screen">balance = 100
+while balance &gt; 0:
     balance -= 20
-    print(balance)</div></div>
+    print(balance)</pre></div>
 </label>
 </div>
 <div class="mlrk-actions"><button type="button" class="mlrk-btn" id="loop-spot-submit">Check my answers</button></div>
 <div id="loop-spot-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>For each snippet, find the line that is supposed to change the variable the condition tests. Then ask two things: does that line run on every pass, and does it change the same variable the condition names?</p>
+</details>
 </section>
 
 <section class="mlrk-section">
-<h2>5. Summary &amp; reflection</h2>
-<p>A <code>for</code> loop is for something you can count out in advance: a list, a range, a string's characters. A <code>while</code> loop is for something that depends on a condition changing while the program runs, and it only stops if the code inside its body actually changes that condition. Forgetting that one update is a small, easy mistake, and it happens to beginners and to Wall Street trading systems alike.</p>
-<label for="loop-reflect"><strong>In 2–3 sentences:</strong> pick one <code>while</code> loop you could imagine writing for a real project. What's the one line you'd double-check for, every time, so it doesn't turn into another version of Knight Capital's forty-five minutes?</label>
+<h2>6. Keeping a running count</h2>
+<p>A loop that handles one order per pass can report on that one order and nothing more. To say how many of 100 orders came back filled, the program needs a number that survives from one pass to the next. That number is an ordinary variable created before the loop starts, and each pass adds to it. Here is <code>fill_report</code>, which does exactly that:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">import random
+
+def route_order():
+    return random.choice(["filled", "rejected"])
+
+def fill_report(orders):
+    filled = 0
+    for i in range(orders):
+        if route_order() == "filled":
+            filled += 1
+    print(f"{filled} of {orders} orders filled.")
+
+fill_report(100)</pre></div>
+<p>One run printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen lp-out">52 of 100 orders filled.</pre></div>
+<p>The position of <code>filled = 0</code> is the whole trick, and the rule behind it is simple: an assignment statement runs every single time Python reaches it. Written before the <code>for</code> loop, <code>filled = 0</code> is reached once, so the count starts at zero and then only ever grows. Move that same line into the loop body and Python reaches it on every pass, which sets the count back to zero every pass.</p>
+<p><code>filled += 1</code> is shorthand for <code>filled = filled + 1</code>. It reads the current count, adds one, and stores the result back in the same variable. That is what carries the total forward across passes.</p>
+
+<div class="mlrk-card">
+<p><strong>Here is <code>count_filled</code>, where the counter line sits inside the loop body instead.</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">def count_filled(orders):
+    for i in range(orders):
+        filled = 0
+        filled += 1
+    print(filled)
+
+count_filled(5)</pre></div>
+<p><strong>What does <code>count_filled(5)</code> print?</strong></p>
+<div id="lp-acc-choices">
+<button type="button" class="mlrk-choice" data-a="five">5</button>
+<button type="button" class="mlrk-choice" data-a="one">1</button>
+<button type="button" class="mlrk-choice" data-a="zero">0</button>
+<button type="button" class="mlrk-choice" data-a="error">Nothing. It raises a NameError on the <code>print</code> line.</button>
+</div>
+<div id="lp-acc-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Walk through a single pass. Python reaches <code>filled = 0</code>, then <code>filled += 1</code>. Now ask what <code>filled</code> equals at the start of the next pass, and whether any pass can leave it any higher.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>7. A loop inside a loop</h2>
+<p>Reporting one line per stock takes one loop. Reporting one line per stock for each of three trading days takes that first loop again, once per day. Writing a loop inside another loop's body gives you that, and the pattern is called a nested loop:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">for day in range(3):
+    print(f"Day {day}:")
+    for stock in range(5):
+        print(f"  day {day}, stock {stock}")</pre></div>
+<p>The rule that governs a nested loop is that the inner loop completes all of its passes for every single pass of the outer loop, and it starts over from the beginning each time. So <code>for stock in range(5)</code> runs from <code>0</code> to <code>4</code>, finishes, and then runs from <code>0</code> to <code>4</code> again on the next day.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 760 300" role="img" aria-labelledby="nestTitle nestDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="nestTitle">An inner loop drawn inside the body of an outer loop</title>
+  <desc id="nestDesc">A large outer box labelled "Outer loop: for day in range(3)" says it makes 3 passes and prints one Day line per pass. Inside that box sits a smaller box labelled "Inner loop: for stock in range(5)", which says it makes all 5 of its passes before the outer loop moves on, and starts over from stock equals 0 on every outer pass. A line at the bottom of the outer box states that 3 outer passes with 5 inner passes each means the inner print statement runs 15 times.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="16" y="16" width="728" height="268" rx="14" fill="#FFEECA" stroke="#83671C" stroke-width="2.5"/>
+    <text x="40" y="52" font-size="19" font-weight="700" fill="#675116">Outer loop: for day in range(3)</text>
+    <text x="40" y="80" font-size="17" fill="#261F1D">Makes 3 passes. Prints one "Day d:" line per pass.</text>
+
+    <rect x="48" y="100" width="664" height="118" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="72" y="136" font-size="19" font-weight="700" fill="#1E659D">Inner loop: for stock in range(5)</text>
+    <text x="72" y="164" font-size="17" fill="#261F1D">Makes all 5 of its passes before the outer loop moves on.</text>
+    <text x="72" y="192" font-size="17" fill="#261F1D">Starts over from stock = 0 on every outer pass.</text>
+
+    <text x="40" y="254" font-size="18" font-weight="700" fill="#261F1D">3 outer passes, 5 inner passes each: the inner print runs 15 times.</text>
+  </g>
+</svg>
+
+<p><strong>Step through it.</strong> Each click runs the next pass and adds the line it prints to the output panel. The first twelve steps cover day 0 and day 1.</p>
+<div class="mlrk-card"><div id="lp-nest-trace"></div></div>
+<p>Day 2 repeats the same five inner passes one more time. In total, <code>Day d:</code> printed 3 times and the indented <code>day d, stock s</code> line printed 15 times, because the inner loop ran 5 times inside each of the outer loop's 3 passes. Here is the whole output:</p>
+<div class="mlrk-code"><pre class="mlrk-screen lp-out">Day 0:
+  day 0, stock 0
+  day 0, stock 1
+  day 0, stock 2
+  day 0, stock 3
+  day 0, stock 4
+Day 1:
+  day 1, stock 0
+  day 1, stock 1
+  day 1, stock 2
+  day 1, stock 3
+  day 1, stock 4
+Day 2:
+  day 2, stock 0
+  day 2, stock 1
+  day 2, stock 2
+  day 2, stock 3
+  day 2, stock 4</pre></div>
+</section>
+
+<section class="mlrk-section">
+<h2>8. Summary and reflection</h2>
+<p>Write a <code>for</code> loop when you can work out the number of repetitions before the loop starts, and let <code>range(n)</code> count for you from <code>0</code> up to <code>n - 1</code>. Write a <code>while</code> loop when the count depends on something that happens while the program runs, and make sure a line inside the body changes what the condition tests. <code>break</code> leaves the loop, <code>return</code> leaves the whole function. A running count lives in a variable created before the loop, because an assignment inside the body would reset it on every pass.</p>
+<label for="loop-reflect"><strong>You are writing a program that keeps reading quotes until one comes in under $100, then reports how many quotes it read in total.</strong> In 2-3 sentences, say which kind of loop fits and why, say what ends it, and name the one line that has to sit outside the loop body for the count to come out right.</label>
 <textarea id="loop-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Go further (optional)</h2>
+<h2>9. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
-  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in a <code>for</code> or <code>while</code> loop and step through it one pass at a time, watching its variables change live instead of picturing it in your head.</li>
-  <li><a href="https://www.youtube.com/watch?v=6iF8Xb7Z3wQ" target="_blank" rel="noopener">Loops and Iterations — Corey Schafer</a> — a ~10-minute walkthrough of both loop types from a well-known Python teaching channel, covering the same for/while distinction as this reading.</li>
+  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in a <code>for</code> or <code>while</code> loop and step through it one pass at a time, watching its variables change live instead of picturing it in your head. A nested loop is worth pasting in first.</li>
+  <li><a href="https://www.youtube.com/watch?v=6iF8Xb7Z3wQ" target="_blank" rel="noopener">Corey Schafer, "Loops and Iterations" (about 10 minutes)</a> — a walkthrough of both loop types from a well-known Python teaching channel, covering the same ground as this reading plus <code>else</code> on a loop.</li>
 </ul>
 </section>
 
@@ -170,20 +440,45 @@ while balance > 0:
   const TITLE = "The Loop That Never Stopped — for and while Loops in Python";
   K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
 
-  K.flipCards(document, "act-flipcards");
+  K.flipCards("#lp-flipcards", "act-flipcards");
 
-  K.traceStepper("#loop-trace", {
-    steps: [
-      {cell:"queue_size = 3", line:"queue_size is set to 3 before the loop starts."},
-      {cell:"lap 1: 3 > 0? True", line:"while queue_size > 0 checks 3 > 0. That's True, so the body runs: process_next_order() runs, then queue_size -= 1 sets queue_size to 2."},
-      {cell:"lap 2: 2 > 0? True", line:"queue_size is now 2. 2 > 0 is True, so the body runs again and queue_size -= 1 sets it to 1."},
-      {cell:"lap 3: 1 > 0? True", line:"queue_size is now 1. 1 > 0 is True, so the body runs once more and queue_size -= 1 sets it to 0."},
-      {cell:"check: 0 > 0? False", line:"queue_size is now 0. 0 > 0 is False, so Python skips the body and moves past the loop. Three laps happened because queue_size actually reached the value that made the check False."},
-      {cell:"bug: no update line", line:"Now picture the same code with queue_size -= 1 deleted. Lap 1 still runs process_next_order(), but queue_size is still 3 right after, because nothing changed it."},
-      {cell:"lap 2 (buggy): 3 > 0? True", line:"Python checks queue_size > 0 again. queue_size is still 3, so it's still True. process_next_order() runs a second time, for the exact same reason as the first."},
-      {cell:"lap 3 (buggy): 3 > 0? True", line:"queue_size is still 3. Still True. Still running. No line in this version of the loop will ever make queue_size anything other than 3."},
-      {cell:"no natural stop", line:"That's the whole bug: laps keep happening until something outside the loop stops them. In Knight Capital's case, that something was a person shutting the server down by hand, forty-five minutes and $460 million later."}
-    ]
+  K.quiz({
+    id: "act-range-bounds",
+    buttonSelector: "#lp-range-choices .mlrk-choice",
+    feedbackSelector: "#lp-range-fb",
+    correct: "b",
+    answerLabel: "First <code>1</code>, last <code>4</code>",
+    feedback: {
+      a: "The start is right. The stop is not produced: <code>range(1, 5)</code> ends just before 5, so the last number printed is <code>4</code> and the loop prints four lines, not five.",
+      b: "Two numbers inside <code>range()</code> are a start and a stop. The start is included, so the first number is <code>1</code>. The stop is not, so the numbers run out at <code>4</code> and the loop prints four lines.",
+      c: "<code>0</code> is the first number only when <code>range()</code> is given a single number, as in <code>range(5)</code>. Given two numbers, the first one is the starting point, so <code>range(1, 5)</code> starts at <code>1</code> and ends at <code>4</code>.",
+      d: "Both halves are off by one in opposite directions. <code>range(1, 5)</code> starts at the first number it is given, <code>1</code>, and ends just before the second, which makes <code>4</code> the last number."
+    }
+  });
+
+  K.dragDrop("#lp-choose", "act-choose-loop");
+  K.selfCheck({
+    buttonSelector: "#lp-choose-check",
+    feedbackSelector: "#lp-choose-fb",
+    mapping: {
+      "chip-receipts": {expectedId: "zone-for", label: "Print a receipt for each of the 12 items in a cart (the count is 12, and you have it before the loop starts)", expectedLabel: "for loop"},
+      "chip-squares": {expectedId: "zone-for", label: "Print the square of every number from 1 to 50 (the count is 50, so range(1, 51) does the counting)", expectedLabel: "for loop"},
+      "chip-password": {expectedId: "zone-while", label: "Keep asking for a password until the one typed is correct (it could take one try or twenty)", expectedLabel: "while loop"},
+      "chip-shuffle": {expectedId: "zone-while", label: "Shuffle a deck until the top card is an ace (chance decides the count, so no plan can work it out first)", expectedLabel: "while loop"}
+    }
+  });
+
+  K.quiz({
+    id: "act-break-vs-return",
+    buttonSelector: "#lp-breakret-choices .mlrk-choice",
+    feedbackSelector: "#lp-breakret-fb",
+    correct: "noline",
+    answerLabel: "\"Session over.\" stops printing",
+    feedback: {
+      same: "Both statements do leave the loop, so the purchase line still prints either way. They differ in how much else they leave: <code>return</code> ends the whole function, so <code>print(\"Session over.\")</code> on the last line of <code>watch_with_break</code> never runs.",
+      noline: "<code>return</code> ends the whole function it is written in, not just the loop. Everything after the loop inside that function is skipped, and <code>print(\"Session over.\")</code> is exactly that. Swap the word back to <code>break</code> and the function leaves the loop, reaches that last line, and prints it.",
+      keepgoing: "<code>return</code> is at least as final as <code>break</code>, so the loop certainly stops. What also stops is the rest of the function: <code>print(\"Session over.\")</code> sits after the loop and never gets to run."
+    }
   });
 
   K.selectAll({
@@ -194,17 +489,48 @@ while balance > 0:
     maxAttempts: 2,
     options: [
       {value:"a", label:"Snippet A (tickets, no update line)", correct:true,
-        hint:"Look for the line that's supposed to change tickets. Is there one anywhere in this body?",
-        explain:"There's no line that changes tickets anywhere in the loop, so tickets > 0 checks True every single pass. This runs forever."},
+        hint:"Look for a line that changes <code>tickets</code>. Is there one anywhere in this body?",
+        explain:"No line changes <code>tickets</code>, so <code>tickets &gt; 0</code> is True on every pass. This runs forever."},
       {value:"b", label:"Snippet B (tickets, with tickets -= 1)", correct:false,
-        hint:"Compare this one to Snippet A line by line. What's different?",
-        explain:"tickets -= 1 runs every pass, so tickets eventually reaches 0 and the check goes False. This stops after 5 passes."},
+        hint:"Compare this one to Snippet A line by line. What is different?",
+        explain:"<code>tickets -= 1</code> runs every pass, so <code>tickets</code> reaches 0 and <code>tickets &gt; 0</code> turns False. This stops after 5 passes."},
       {value:"c", label:"Snippet C (attempts, updates success instead)", correct:true,
-        hint:"A line does run every pass here. Check exactly which variable it changes, and compare that to the condition.",
-        explain:"success gets updated every pass, but the condition checks attempts, which never changes from 0. attempts < 3 stays True forever."},
+        hint:"A line does run every pass here. Check which variable it changes, and compare that to the variable the condition names.",
+        explain:"<code>success</code> gets updated every pass, but the condition tests <code>attempts</code>, which never moves off 0. <code>attempts &lt; 3</code> stays True forever."},
       {value:"d", label:"Snippet D (balance, counts down by 20)", correct:false,
-        hint:"Walk through what balance equals after each pass. Does it ever reach 0?",
-        explain:"balance drops by 20 every pass: 80, 60, 40, 20, 0. balance > 0 goes False right when balance hits 0, so this stops after 5 passes."}
+        hint:"Walk through what <code>balance</code> equals after each pass. Does it ever reach 0?",
+        explain:"<code>balance</code> drops by 20 every pass: 80, 60, 40, 20, 0. <code>balance &gt; 0</code> turns False once balance hits 0, so this stops after 5 passes."}
+    ]
+  });
+
+  K.quiz({
+    id: "act-accumulator",
+    buttonSelector: "#lp-acc-choices .mlrk-choice",
+    feedbackSelector: "#lp-acc-fb",
+    correct: "one",
+    answerLabel: "1",
+    feedback: {
+      five: "That is what <code>count_filled</code> would print with <code>filled = 0</code> written before the <code>for</code> loop, where Python reaches it once. Inside the body, Python reaches it on all 5 passes and sets the count back to 0 each time, so the running total never survives a pass and the function prints <code>1</code>.",
+      one: "An assignment runs every time Python reaches it. Each pass sets <code>filled</code> to <code>0</code> and then adds 1, so <code>filled</code> is <code>1</code> at the end of every pass, including the last one. Move <code>filled = 0</code> above the <code>for</code> loop and Python reaches it once, which lets the count grow to 5.",
+      zero: "<code>filled += 1</code> is the last line of the body, so the final thing every pass does is add 1. <code>filled</code> is <code>1</code> when the loop ends, not <code>0</code>. The bug is the reset at the top of each pass, which keeps the count from ever reaching 2.",
+      error: "A variable first created inside a loop is still available after that loop ends in Python, so <code>print(filled)</code> runs fine here and prints <code>1</code>. The reason <code>filled = 0</code> belongs above the <code>for</code> loop is not availability, it is the reset: inside the body it runs on every pass and wipes the count."
+    }
+  });
+
+  K.traceStepper("#lp-nest-trace", {
+    steps: [
+      {cell:"outer pass 1: day = 0", line:"Day 0:"},
+      {cell:"inner 1 of 5: stock = 0", line:"  day 0, stock 0"},
+      {cell:"inner 2 of 5: stock = 1", line:"  day 0, stock 1"},
+      {cell:"inner 3 of 5: stock = 2", line:"  day 0, stock 2"},
+      {cell:"inner 4 of 5: stock = 3", line:"  day 0, stock 3"},
+      {cell:"inner 5 of 5: stock = 4", line:"  day 0, stock 4"},
+      {cell:"outer pass 2: day = 1", line:"Day 1:"},
+      {cell:"inner 1 of 5: stock = 0", line:"  day 1, stock 0"},
+      {cell:"inner 2 of 5: stock = 1", line:"  day 1, stock 1"},
+      {cell:"inner 3 of 5: stock = 2", line:"  day 1, stock 2"},
+      {cell:"inner 4 of 5: stock = 3", line:"  day 1, stock 3"},
+      {cell:"inner 5 of 5: stock = 4", line:"  day 1, stock 4"}
     ]
   });
 
