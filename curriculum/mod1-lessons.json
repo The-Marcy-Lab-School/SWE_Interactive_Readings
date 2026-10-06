@@ -1,12 +1,15 @@
 {
-  "_comment": "Mod 1 lesson sequence and key terms, extracted verbatim from the Marcy GitBook and cross-checked against SWE_Mod1_LOs_KeyTerms.docx, which carries an identical term list. One reading per lesson; folder slug = `slug` below. A reading must define every term in its own lesson's `key_terms`; qa/reading_qa.py's check_mod1_key_terms enforces this. Regenerate from the GitBook rather than hand-editing. `parent` marks a term the GitBook nests under a broader one, such as the six operator families under Operators. Definitions are the GitBook's own wording with a leading copula trimmed, so they read as a sentence fragment completing '<term> ...' — rewrite them for students, don't paste verbatim into a flip card.",
-  "_source_url": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals",
+  "_comment": "Mod 1 lesson map. Generated from the curriculum source repo The-Marcy-Lab-School/marcy-curriculum-docs-swe-python, NOT from the rendered GitBook: `key_terms` and both objective lists come verbatim from mod-1-python-fundamentals/learning-objectives-key-terms.md, which is itself generated from each chapter's Key Terms section by that repo's scripts/sync-key-terms.py. `gitbook_sections` comes from each chapter file. One reading per lesson; folder slug = `slug`. A reading must define every term in its own lesson's key_terms and must not add cards for terms it does not own; qa/reading_qa.py enforces both. `objectives_in_session` is what a reading is built and audited against; `objectives_end_of_module` is deferred and must not crowd out the in-session set. Regenerate when _source_commit falls behind that repo's main.",
+  "_source_repo": "https://github.com/The-Marcy-Lab-School/marcy-curriculum-docs-swe-python",
+  "_source_commit": "dc9566e2b1608fee0d7fdc75452cb5185b6341c8",
+  "_source_of_truth": "mod-1-python-fundamentals/learning-objectives-key-terms.md",
   "lessons": [
     {
       "lesson": "1.1",
       "slug": "01-intro-to-programming",
       "title": "Intro to Programming",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/1-intro-to-programming",
+      "source_file": "mod-1-python-fundamentals/1-intro-to-programming.md",
       "gitbook_sections": [
         "Setup",
         "What is a program?",
@@ -56,6 +59,17 @@
           "term": "Code Style",
           "definition": "the formatting of the code in a way that makes it easier to read and understand. Python's style conventions are written down in a document called PEP 8."
         }
+      ],
+      "objectives_in_session": [
+        "Explain what a program is and name the three kinds of lines it is made of: comments, expressions, and statements.",
+        "Run a .py file from the Terminal with python3 and explain what the interpreter does with it.",
+        "Use print() to inspect a value, and use an f-string to place a value inside a message.",
+        "Describe the default control flow of a program and name the two kinds of statement that change it."
+      ],
+      "objectives_end_of_module": [
+        "Tell an expression from a statement, and say what value a simple expression evaluates to.",
+        "Read an IndentationError and explain why the interpreter refused the whole file.",
+        "Rewrite a badly formatted function to follow PEP 8: four-space indentation, spaces around operators, snake_case names."
       ]
     },
     {
@@ -63,6 +77,7 @@
       "slug": "02-data-types-variables-operators",
       "title": "Data Types, Variables, and Operators",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/2-data-types-variables",
+      "source_file": "mod-1-python-fundamentals/2-data-types-variables.md",
       "gitbook_sections": [
         "Computation is All About Data",
         "Data Types",
@@ -125,6 +140,17 @@
           "term": "snake_case",
           "definition": "the Python convention for naming variables and functions: lowercase words joined by underscores, like days_in_each_month."
         }
+      ],
+      "objectives_in_session": [
+        "Identify the data type of any literal value and give a real-world example of data that each type represents.",
+        "Predict the result of an expression that combines values with arithmetic, comparison, and logical operators, including the cases where the result is a TypeError.",
+        "Apply operator precedence to predict the value of an expression, and add parentheses to change it.",
+        "Assign, reassign, and reference a variable, and use augmented assignment (+=) to update one.",
+        "Choose descriptive snake_case variable names, and recognize an ALL_CAPS name as a constant."
+      ],
+      "objectives_end_of_module": [
+        "Identify operators that produce unexpected output, such as 8 / 2, \"3\" * 5, and 0.1 + 0.2 == 0.3, and explain each result.",
+        "Read and write a conditional expression that chooses between two values."
       ]
     },
     {
@@ -132,6 +158,7 @@
       "slug": "03-functions",
       "title": "Functions",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/3-functions",
+      "source_file": "mod-1-python-fundamentals/3-functions.md",
       "gitbook_sections": [
         "What is `print()`?",
         "Don't Repeat Yourself (DRY)",
@@ -193,6 +220,19 @@
           "definition": "the inside of a function. A variable or parameter assigned there exists only while that function is running and is reachable only within it.",
           "parent": "Scope"
         }
+      ],
+      "objectives_in_session": [
+        "Define a function with def, call it, and trace the control flow of a program that defines and calls functions",
+        "Recognize repeated code and refactor it into a function with well-named parameters.",
+        "Distinguish parameters from arguments and predict the TypeError that results from calling a function with the wrong number of them.",
+        "Explain the two jobs of return, and explain why a function without return produces None.",
+        "Predict whether a variable is reachable from a given line, using the rules for local and global scope, and explain the NameError when it is not."
+      ],
+      "objectives_end_of_module": [
+        "Resolve nested function calls from the inside out.",
+        "Write a function with default parameter values and call it with positional and keyword arguments.",
+        "Explain why a function must be defined before the line that calls it runs, and why two functions can each have a variable with the same name.",
+        "Explain why assigning to a global variable inside a function raises UnboundLocalError, and say why passing values in and returning them out is preferred to global."
       ]
     },
     {
@@ -200,6 +240,7 @@
       "slug": "04-conditional-statements",
       "title": "Conditional Statements",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/4-conditional-statements",
+      "source_file": "mod-1-python-fundamentals/4-conditional-statements.md",
       "gitbook_sections": [
         "Conditional Statements"
       ],
@@ -228,6 +269,15 @@
           "term": "Conditional expressions",
           "definition": "provide a concise way to choose between two values based on a condition."
         }
+      ],
+      "objectives_in_session": [
+        "Write an if/elif/else chain and predict which branch runs, including when the branches are in the wrong order or are separate if statements.",
+        "Rewrite a conditional chain as guard clauses and explain why the last return needs no condition.",
+        "List the falsy values, predict what if \"False\": does, and use if not value: as a guard against an empty value."
+      ],
+      "objectives_end_of_module": [
+        "Say when if value is None: is the right test instead of if not value:.",
+        "Replace an if/else that assigns one of two values with a conditional expression."
       ]
     },
     {
@@ -235,6 +285,7 @@
       "slug": "05-loops",
       "title": "Loops",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/5-loops",
+      "source_file": "mod-1-python-fundamentals/5-loops.md",
       "gitbook_sections": [
         "Intro to Iteration",
         "The `for` loop",
@@ -266,6 +317,17 @@
           "term": "Nested loops",
           "definition": "let you loop inside another loop, useful for working with multi-dimensional data or complex processes. Loop challenges help you practice using loops to solve real problems, such as counting results or repeating until something happens."
         }
+      ],
+      "objectives_in_session": [
+        "Rewrite repeated statements as a for loop over range(), and predict the first and last values range() produces.",
+        "Choose between a for loop and a while loop from whether the number of repetitions is known in advance.",
+        "Write a while True loop that repeats until a random event happens, using break to leave and continue to skip, and explain how break differs from return.",
+        "Keep a running count across iterations of a loop and report it afterward."
+      ],
+      "objectives_end_of_module": [
+        "Loop over the characters of a string.",
+        "Predict the output and the number of iterations of a nested loop.",
+        "Stop an infinite loop from the Terminal."
       ]
     },
     {
@@ -273,6 +335,7 @@
       "slug": "06-inputs-and-outputs",
       "title": "Inputs and Outputs",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/6-inputs-outputs",
+      "source_file": "mod-1-python-fundamentals/6-inputs-outputs.md",
       "gitbook_sections": [
         "Strings",
         "Output with `print()`",
@@ -287,7 +350,7 @@
         },
         {
           "term": "bracket notation",
-          "definition": "You can *access* individual characters of a string with ."
+          "definition": "You can _access_ individual characters of a string with ."
         },
         {
           "term": "len(str)",
@@ -325,6 +388,18 @@
           "term": "hard-coded",
           "definition": "A program is if the program code must be modified in order to produce a new result."
         }
+      ],
+      "objectives_in_session": [
+        "Access a character of a string by positive or negative index, take a slice, and predict the IndexError for a position that does not exist.",
+        "Print several values in one print() call, control what goes between and after them with sep and end, and build a message with an f-string that formats a decimal with :.2f.",
+        "Read a line of input with input(), clean it up with strip() and lower(), explain why it is always a string, and convert it with int() or float() after checking it with isdigit().",
+        "Convert a hard-coded program into one that takes its values from input(), turning a Y/N answer into a boolean."
+      ],
+      "objectives_end_of_module": [
+        "Explain what it means that strings are immutable and predict the TypeError from trying to change one in place.",
+        "Search and change strings with in, find(), startswith(), endswith(), replace(), and split(), and chain two methods in one expression.",
+        "Predict the TypeError from \"1\" + 1 and fix it by converting one side.",
+        "Explain the difference between displaying a number with :.2f and changing it with round()."
       ]
     },
     {
@@ -332,6 +407,7 @@
       "slug": "07-lists",
       "title": "Lists",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/7-lists",
+      "source_file": "mod-1-python-fundamentals/7-lists.md",
       "gitbook_sections": [
         "List Basics",
         "Mutable Values and References",
@@ -358,6 +434,19 @@
           "term": "2D lists",
           "definition": "Lists can contain other lists (), and a list can be unpacked into several variables at once. A tuple is a list that cannot change, written with parentheses."
         }
+      ],
+      "objectives_in_session": [
+        "Create a list, access elements by index, slice it, test membership with in, and loop over it with for and enumerate().",
+        "Add, replace, and remove elements with the list methods and del, and predict the list's contents after each operation.",
+        "Predict what happens to nums after clone = nums; clone[1] = 20, and explain it in terms of references.",
+        "Explain why a function can change a list it was given, and classify a function as pure or impure."
+      ],
+      "objectives_end_of_module": [
+        "Explain why the same bracket assignment that fails on a string works on a list.",
+        "Make a pure version of an impure list function by copying the list first.",
+        "Access rows and columns of a 2D list and report its size with len().",
+        "Explain when to use a tuple instead of a list, and predict the TypeError from changing one.",
+        "Unpack a list into several variables, including with *rest."
       ]
     },
     {
@@ -365,6 +454,7 @@
       "slug": "08-dictionaries",
       "title": "Dictionaries",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/8-dictionaries",
+      "source_file": "mod-1-python-fundamentals/8-dictionaries.md",
       "gitbook_sections": [
         "The basics",
         "Dictionaries are Mutable and Held by Reference",
@@ -407,6 +497,17 @@
           "term": ".keys()",
           "definition": ".values(), and .items() let you loop over a dictionary. .items() hands you each key and value together."
         }
+      ],
+      "objectives_in_session": [
+        "Create a dictionary, read a value by key, and choose between bracket notation and .get() based on whether the key is guaranteed to exist.",
+        "Add, update, and delete key-value pairs, including with a key held in a variable.",
+        "Loop over a dictionary's keys, values, and key-value pairs with .items() and unpacking, and explain what .keys() returns.",
+        "Model \"many of the same kind of thing\" as a list of dictionaries, loop over it, and add to it."
+      ],
+      "objectives_end_of_module": [
+        "Explain which values can be keys and why a list cannot.",
+        "Predict the effect of mutating a dictionary through a second variable, and copy a dictionary before changing it in a pure function.",
+        "Write a function that takes a dictionary and uses only the keys it needs."
       ]
     },
     {
@@ -414,6 +515,7 @@
       "slug": "09-modules-environments-pytest",
       "title": "Modules, Virtual Environments, and pytest",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/9-modules-environments-pytest",
+      "source_file": "mod-1-python-fundamentals/9-modules-environments-pytest.md",
       "gitbook_sections": [
         "Modules",
         "What Happens When You Import a File?",
@@ -497,6 +599,22 @@
           "term": "assert",
           "definition": "The statement checks that an expression is truthy. If it is not, it raises an AssertionError and pytest reports the test as failed. The expression is an ordinary comparison: == for most values, is for True, False, and None, and pytest.approx() for decimal numbers."
         }
+      ],
+      "objectives_in_session": [
+        "Split a single-file program into modules so that each file has one concern, import a whole module or specific names, and explain why from module import * is avoided.",
+        "Predict what prints when a module with top-level code is imported, explain what __name__ holds, and use the __main__ guard to keep a module's code from running on import.",
+        "Create and activate a virtual environment, install pytest into it with pip, and record it in requirements.txt with pip freeze.",
+        "Write a test function with assert and a docstring, run the tests with python3 -m pytest, and read a failure report to find which assertion failed and what the function actually returned."
+      ],
+      "objectives_end_of_module": [
+        "Explain what the __pycache__ folder is, keep it and .venv/ out of Git, and explain why the recipe is committed rather than the meal.",
+        "Distinguish a standard library module from a third-party package and say which needs installing.",
+        "Save a list or dictionary to a JSON file and read it back with json.dump() and json.load().",
+        "Use pip list and pip show to see what is installed and what a package requires, and rebuild an environment with pip install -r requirements.txt.",
+        "Explain the ModuleNotFoundError that appears when the environment is not activated, and check for that first.",
+        "Explain why pytest is a developer dependency and why the tests are run with python3 -m pytest rather than pytest.",
+        "Assert a boolean result with is True or is False and a decimal result with pytest.approx(), and say what each catches that == would miss.",
+        "Split the madlib program into a module for the story and a main.py for the input."
       ]
     },
     {
@@ -504,6 +622,7 @@
       "slug": "10-reading-unfamiliar-code",
       "title": "Reading Unfamiliar Code",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/10-reading-unfamiliar-code",
+      "source_file": "mod-1-python-fundamentals/10-reading-unfamiliar-code.md",
       "gitbook_sections": [
         "The Orientation Questions",
         "A Method for Reading Code You Did Not Write",
@@ -524,6 +643,18 @@
           "term": "run it, find the entry point, find the data, trace one action, predict then run, and write down what you know and what you are guessing",
           "definition": "The method has six steps: . Names are the author's notes to you. A function's name and its parameters tell you its intent; the body tells you whether it lives up to it. Reading code a model wrote is the same activity with more suspicion. Generated code is confident and plausible, and plausible is not the same as correct."
         }
+      ],
+      "objectives_in_session": [
+        "Run an unfamiliar program with good and bad input and describe what it does in one sentence, before reading it.",
+        "Map a multi-file program by its import and def lines and identify the entry point and the one piece of data everything revolves around.",
+        "Trace a single user action from input to output through every function it touches.",
+        "Predict what a function returns for a specific input, check the prediction, and treat a wrong prediction as a finding."
+      ],
+      "objectives_end_of_module": [
+        "Answer the six orientation questions about a program before changing anything in it.",
+        "Keep separate lists of what is known and what is guessed, and move an item across only after running code.",
+        "Find a defect in a plausible, model-written function and describe it as a bug report: concrete input, actual output, expected output, and where.",
+        "Ask a model about code in tutor mode, using the AI policy's standing instruction."
       ]
     },
     {
@@ -531,6 +662,7 @@
       "slug": "11-errors-and-tracebacks",
       "title": "Errors and Tracebacks",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/11-errors-tracebacks",
+      "source_file": "mod-1-python-fundamentals/11-errors-tracebacks.md",
       "gitbook_sections": [
         "What is an error? Why are they \"raised\"?",
         "What causes an error? Syntax and Runtime Errors",
@@ -560,6 +692,18 @@
           "term": "pytest.raises(ErrorType)",
           "definition": "how a test checks that a function raises the error it should."
         }
+      ],
+      "objectives_in_session": [
+        "Distinguish a syntax error from a runtime error by whether any of the program ran before it appeared.",
+        "Read a traceback from the bottom up: the error type and message, the line where it occurred, and the chain of calls that led there, including across two files.",
+        "Catch a specific error type with try/except, use the error object's message, and explain why a bare except: is avoided.",
+        "Write a loop that keeps asking for input until int() succeeds, catching ValueError."
+      ],
+      "objectives_end_of_module": [
+        "Name the error type that a given mistake produces, and read an error message to say what went wrong.",
+        "Point at the line where an error occurred and the line where the bad value came from, and say which one the fix belongs on.",
+        "Raise a ValueError or TypeError from a function that is handed a value it cannot work with.",
+        "Test that a function raises an error with pytest.raises, and read the DID NOT RAISE failure when it does not."
       ]
     },
     {
@@ -567,6 +711,7 @@
       "slug": "12-first-class-functions-hofs",
       "title": "First-Class Functions and Higher-Order Functions",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/12-first-class-functions-hof",
+      "source_file": "mod-1-python-fundamentals/12-first-class-functions-hof.md",
       "gitbook_sections": [
         "Functions are \"First-Class\" Values",
         "Higher-Order Functions Built Into Python",
@@ -597,6 +742,19 @@
           "term": "wrapper",
           "definition": "A is a function returned by another function that calls the original and adds behavior around it. Written with an @ above a definition, it is called a decorator."
         }
+      ],
+      "objectives_in_session": [
+        "Show that a function is a value: store it in a variable, in a dictionary, and pass it to another function.",
+        "Write a higher-order function that accepts a callback and calls it, and explain what makes it reusable.",
+        "Predict the TypeError from passing say_hello() instead of say_hello as a callback, and explain the None that causes it.",
+        "Sort a list of strings by length and find the largest dictionary in a list by one of its values, using key=.",
+        "Write a function that returns a wrapper around another function, and predict when each line of it prints."
+      ],
+      "objectives_end_of_module": [
+        "Replace an if/elif chain of menu options with a dictionary of functions.",
+        "Write a short callback as a lambda and say when a def is the better choice.",
+        "Explain what @announce above a definition does, in terms of greet = announce(greet).",
+        "Change a wrapper so that it returns the wrapped function's return value, and so that it guards the call with a condition."
       ]
     },
     {
@@ -604,6 +762,7 @@
       "slug": "13-comprehensions-builtin-iteration",
       "title": "Comprehensions and Built-in Iteration",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/13-comprehensions-builtin-iteration",
+      "source_file": "mod-1-python-fundamentals/13-comprehensions-builtin-iteration.md",
       "gitbook_sections": [
         "Imperative vs. Declarative Code: Why We Use Built-in Iteration",
         "The Toolkit",
@@ -662,7 +821,80 @@
           "term": "isinstance(value, type)",
           "definition": "asks whether a value is of a given type, and accepts a tuple of types."
         }
+      ],
+      "objectives_in_session": [
+        "Rewrite an imperative loop that builds a new list as a list comprehension, and read a comprehension aloud from the for outward.",
+        "Filter a list of dictionaries by one of their values.",
+        "Combine a list into one value with sum(), min(), max(), or len(), and write the accumulator loop when none of them fits.",
+        "Explain the difference between sorted() and .sort(), predict the None from result = nums.sort(), and sort with key= and reverse=True."
+      ],
+      "objectives_end_of_module": [
+        "Choose the right tool for a loop shape: a for loop for side effects, a comprehension to transform, a comprehension with if to filter, an early return to find the first match, a built-in or accumulator to combine, sorted() to order.",
+        "Write a function that returns the first element passing a test, and decide what it returns when nothing passes.",
+        "Build a frequency counter with a dictionary and .get(key, 0).",
+        "Use enumerate(), zip(), any(), and all() in place of index-based loops.",
+        "Test a pure function with == for its contents and is not for a new list, then refactor it from a loop to a comprehension while its tests stay green.",
+        "Apply the TDD cycle to a new requirement: write a failing test, implement just enough to pass, refactor.",
+        "Set up and run a multi-file Python project from a repository using a virtual environment.",
+        "Trace a menu choice from main.py through menu.py to the function in tasks.py that handles it.",
+        "Identify every guard clause in the application and predict what would happen without each one.",
+        "Predict how the program responds to invalid input, and identify the try/except and the two-condition check that handle it.",
+        "Explain how the task manager's data is represented and justify the choice of a boolean over a number or a string.",
+        "Explain why tasks lives in tasks.py and is not imported into menu.py, and why only main.py has the __main__ guard.",
+        "Explain why the menu uses a while loop, what is_running does, and how the same loop could be written with break.",
+        "Debug a model-written delete_task() and write a bug report that names the input, the actual output, the expected output, and the line at fault.",
+        "Plan a dispatch table for the menu and explain which option cannot go into it.",
+        "Write a list comprehension that selects the completed tasks, and use all() to check whether every task is complete.",
+        "Extend the application with a new feature that respects the existing separation of concerns.",
+        "Build an interactive command-line application from a written specification, one feature at a time, committing after each.",
+        "Organize the code into an entry point, a menu module, and a data module, with an if __name__ == \"__main__\": guard and a virtual environment kept out of Git.",
+        "Represent the application's data as a dictionary or a list of dictionaries and choose the shape deliberately.",
+        "Validate every piece of user input so that the program never ends with a traceback.",
+        "Write a README.md that lets someone else set up and run the program, and a reflection that explains one concept in plain terms.",
+        "Describe the program well enough to critique generated additions to it in December."
       ]
+    },
+    {
+      "lesson": "1.14",
+      "slug": "14-regex",
+      "title": "Regex",
+      "optional": true,
+      "optional_note": "GitBook labels this 'Regex (Optional Friday Reading)'. It is a page, so it gets a reading, but it is absent from the scope-and-sequence calendar and from learning-objectives-key-terms.md — hence no objectives.",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/regex",
+      "source_file": "mod-1-python-fundamentals/regex.md",
+      "gitbook_sections": [
+        "Intro",
+        "Regular Expression Syntax",
+        "How to Use Regular Expressions in Python"
+      ],
+      "key_terms": [
+        {
+          "term": "Regular expressions (RegEx)",
+          "definition": "patterns used to search for, match, and manipulate text strings, providing powerful text processing capabilities."
+        },
+        {
+          "term": "re module",
+          "definition": "In Python, regular expressions live in the standard library's , and patterns are written as raw strings (r\"pattern\") that can include special characters like ^ (start), $ (end), \\w (word characters), and + (one or more)."
+        },
+        {
+          "term": "String validation",
+          "definition": "a common use case, allowing you to check if strings match specific formats like email addresses, phone numbers, or date formats."
+        },
+        {
+          "term": "Text extraction",
+          "definition": "enables finding and extracting specific patterns from larger text blocks, such as extracting all email addresses from a document."
+        },
+        {
+          "term": "fullmatch()",
+          "definition": "The re module provides several functions: for validation, search() for finding the first match and its position, findall() for extracting every match, and sub() for substitutions."
+        },
+        {
+          "term": "Flags",
+          "definition": "like re.IGNORECASE modify how patterns behave, making them more flexible and powerful."
+        }
+      ],
+      "objectives_in_session": [],
+      "objectives_end_of_module": []
     }
   ]
 }

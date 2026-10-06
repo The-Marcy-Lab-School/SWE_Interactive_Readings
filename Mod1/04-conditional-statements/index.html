@@ -16,7 +16,7 @@
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>Zero Is Not Nothing</h1>
 <div class="mlrk-meta">
-  <span class="mlrk-pill">~13 minutes</span>
+  <span class="mlrk-pill">~14 minutes</span>
   <span class="mlrk-pill">Interactive</span>
   <span class="mlrk-pill">No setup needed to read</span>
 </div>
@@ -52,7 +52,7 @@
 
 <section class="mlrk-section">
 <h2>3. Control flow, and why the order of the conditions matters</h2>
-<p>Python executes the statements of a program top to bottom. That order is called control flow. An <code>if</code> / <code>elif</code> / <code>else</code> chain changes it: Python tests each condition from the top, runs the first branch whose condition is <code>True</code>, and skips the rest of the chain entirely.</p>
+<p>A week of $250 and a week of $20 should not get the same sentence out of Ledger Lite, and a program that runs every one of its lines every time cannot tell them apart. Python does run statements top to bottom by default, and that order is called control flow. An <code>if</code> / <code>elif</code> / <code>else</code> chain changes it. Python tests each condition from the top, runs the first branch whose condition is <code>True</code>, and skips the rest of the chain.</p>
 <p>Ledger Lite uses a chain to label how a week went:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def spending_tier(total):
     if total &gt; 200:
@@ -69,7 +69,7 @@
         return "Over budget"
     else:
         return "On track"</pre></div>
-<p>Now a student who spent $250 and a student who spent $120 read the exact same label. The student who spent $250 has already passed the over-budget line, and the app shows her nothing that says so, so she keeps spending. The diagram below traces <code>spending_tier(250)</code> through both versions.</p>
+<p>Trace $250 through that version. Python tests <code>total &gt; 100</code> first, 250 is greater than 100, so that branch returns "Getting close" and the chain ends before <code>elif total &gt; 200:</code> is ever evaluated. Trace $120 and the same first condition is <code>True</code> again, so it returns "Getting close" too. Both students read the exact same label. The student who spent $250 has already crossed the $200 line the app was built to warn her about, and the one sentence it gives her says she is getting close to that line, which she reads as "not over it yet." The diagram below traces <code>spending_tier(250)</code> through both versions.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 880 400" role="img" aria-labelledby="csOrderTitle csOrderDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="csOrderTitle">The same value traced through two orderings of the same conditions</title>
@@ -127,6 +127,34 @@
 <details class="mlrk-hint"><summary>Need a hint?</summary>
 <p>Start at the top of the chain and test the conditions in the order they are written. Stop at the first one that is <code>True</code>, because Python stops there too.</p>
 </details>
+
+<h3>When the <code>elif</code>s become separate <code>if</code> statements</h3>
+<p>A wrong order hands a student a single label for the wrong tier. A second mistake hands her several labels at once, and it looks even more innocent on the page. Picture a developer tidying up <code>spending_tier</code> who deletes the <code>el</code> from each <code>elif</code> and changes nothing else. Every line still reads like a sensible condition. Here is that version, printing instead of returning so every line that runs is visible:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">def label_week(total):
+    if total &gt; 100:
+        print("Getting close")
+    if total &gt; 200:
+        print("Over budget")
+    if total &gt; 500:
+        print("Way over")
+    if total &lt;= 100:
+        print("On track")
+
+label_week(250)</pre></div>
+<p>An <code>elif</code> is attached to the <code>if</code> above it, and Python evaluates it only when that <code>if</code> tested <code>False</code>. A separate <code>if</code> is attached to nothing above it. Python evaluates every separate <code>if</code>, top to bottom, and runs the body of each one that is <code>True</code>. A chain therefore runs at most one branch, and a stack of separate <code>if</code> statements can run several in a single call.</p>
+
+<div class="mlrk-card">
+<p><strong>Check every line that <code>label_week(250)</code> prints.</strong> More than one is possible.</p>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-sep-box" value="close"> <span><code>Getting close</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-sep-box" value="over"> <span><code>Over budget</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-sep-box" value="way"> <span><code>Way over</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-sep-box" value="track"> <span><code>On track</code></span></label>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="cs-sep-submit">Check my answers</button></div>
+<div id="cs-sep-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>There is no <code>elif</code> here, so nothing above a given <code>if</code> can stop Python from evaluating it. Test all four conditions against 250 separately and check off every one that comes out <code>True</code>.</p>
+</details>
 </section>
 
 <section class="mlrk-section">
@@ -139,32 +167,50 @@ print(bool(None))     # False
 print(bool([]))       # False  (an empty list)
 print(bool(100))      # True
 print(bool("hello"))  # True</pre></div>
-<p>That rule explains the bug from the start of this reading. The student spent nothing, so <code>weekly_summary</code> received <code>total = 0</code>. The <code>if not total:</code> line placed <code>0</code> in a boolean context, <code>bool(0)</code> produced <code>False</code>, and <code>not False</code> produced <code>True</code>. The <code>return</code> on the next line ran and handed back "We couldn't find your spending data." The function never asked whether the data existed. It asked whether the number was zero, and to <code>bool()</code>, zero and missing look identical.</p>
-<p>The fix is to ask the question the team meant to ask:</p>
+<p>That rule explains the bug from the start of this reading. The student spent nothing all week, so <code>weekly_summary</code> received <code>total = 0</code>. The <code>if not total:</code> line put <code>0</code> in a boolean context, and <code>bool(0)</code> produced <code>False</code>. The <code>not</code> operator flips a boolean to its opposite, so <code>not False</code> produced <code>True</code> and the <code>return</code> on the next line ran. <code>weekly_summary</code> never asked whether the data existed. It asked whether the number was zero, and <code>bool()</code> gives zero and missing the same answer.</p>
+
+<div class="mlrk-card">
+<p><strong>List the falsy values.</strong> Python has a short, fixed set of them, and everything else is truthy. Three are already named below. Type the other three, one per box.</p>
+<p class="mlrk-small">Already named: <code>False</code>, <code>0.0</code>, and empty collections such as <code>[]</code> and <code>{}</code>.</p>
+<div class="cs-blank-row"><label for="cs-blank1">The value that means "nothing is here at all":</label> <input type="text" id="cs-blank1" autocomplete="off" placeholder="first value"></div>
+<div class="cs-blank-row"><label for="cs-blank2">The one falsy whole number:</label> <input type="text" id="cs-blank2" autocomplete="off" placeholder="second value"></div>
+<div class="cs-blank-row"><label for="cs-blank3">The one falsy string, written the way Python writes it:</label> <input type="text" id="cs-blank3" autocomplete="off" placeholder="third value"></div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="cs-blank-check">Check my answers</button></div>
+<div id="cs-blank-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Every falsy value is a "nothing" of some kind: no value, no quantity, no characters, no items. Name the no-value one, the no-quantity whole number, and the string with no characters between its quote marks.</p>
+</details>
+
+<p><strong>Predict before you read on.</strong> This snippet catches almost everybody the first time:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">if "False":
+    print("printed")
+else:
+    print("skipped")</pre></div>
+<div class="mlrk-card">
+<p><strong>What does that snippet print?</strong></p>
+<div id="cs-strfalse-choices">
+<button type="button" class="mlrk-choice" data-a="printed">printed</button>
+<button type="button" class="mlrk-choice" data-a="skipped">skipped</button>
+</div>
+<div id="cs-strfalse-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<p>That bug and this snippet share a shape: <code>if not total:</code> was the wrong question for Ledger Lite, and it is the right question most of the time. Any function handed something a person may have left empty has to decide first whether there is anything to work with at all:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">def greet(name):
+    if not name:
+        return "I can't say hi if I don't know your name!"
+    return f"Hi, {name}! Nice to meet you."
+
+print(greet(""))      # I can't say hi if I don't know your name!
+print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
+<p>The empty string is falsy, so <code>bool("")</code> is <code>False</code> and <code>not ""</code> is <code>True</code>, and the first <code>return</code> runs. <code>"Jane"</code> is a non-empty string and so it is truthy, which means <code>not "Jane"</code> evaluates to <code>False</code>, and Python skips past the guard to the greeting. You will meet the shape <code>if not something:</code> in nearly every program that takes input.</p>
+<p>The one thing <code>if not value:</code> cannot do is tell <code>None</code> apart from <code>0</code> or <code>""</code>, since <code>bool()</code> answers <code>False</code> for all three. Ledger Lite needed exactly that difference. When the question really is "is this <code>None</code>?", write <code>if value is None:</code>, which compares the value against <code>None</code> itself instead of converting it to a boolean:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def weekly_summary(total):
     if total is None:
         return "We couldn't find your spending data."
     return f"You spent ${total} this week."</pre></div>
-<p><code>is None</code> compares a value against <code>None</code> itself instead of converting it to a boolean. <code>0</code> is not <code>None</code>, so the first <code>return</code> is skipped, and the student who spent nothing now reads "You spent $0 this week." Reach for <code>if value is None:</code> whenever "missing" and "empty" need different answers, and keep <code>if not value:</code> for when they can share one.</p>
-
-<div class="mlrk-callout mlrk-callout-gold">
-<p><strong>The one that surprises everybody:</strong> <code>if "False":</code> runs its body. <code>"False"</code> is a string with five characters in it, and every non-empty string is truthy. What the characters spell has no effect on <code>bool()</code>. This matters any time you test something a person typed, because a person always types a string.</p>
-</div>
-
-<div class="mlrk-card" style="margin-top:1.2rem">
-<p><strong>Select every value below that is falsy.</strong> A falsy value sends an <code>if</code> statement to its <code>else</code>.</p>
-<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="zero"> <span>the number <code>0</code></span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="strzero"> <span>the string <code>"0"</code></span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="emptylist"> <span>the empty list <code>[]</code></span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="strnone"> <span>the string <code>"None"</code></span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="neg"> <span>the number <code>-1</code></span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="emptydict"> <span>the empty dictionary <code>{}</code></span></label>
-<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="cs-falsy-submit">Check my answers</button></div>
-<div id="cs-falsy-fb" class="mlrk-feedback" tabindex="-1"></div>
-</div>
-<details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Two of the six are text with characters inside them. Apply the rule to the value itself, not to what the value looks like it means.</p>
-</details>
+<p><code>0</code> is not <code>None</code>, so the first <code>return</code> is skipped and the student who spent nothing reads "You spent $0 this week."</p>
 </section>
 
 <section class="mlrk-section">
@@ -182,7 +228,7 @@ print(bool("hello"))  # True</pre></div>
     else:
         return "Please log in to see your summary."</pre></div>
 <p>The line that does the actual job sits four levels in. To know when that line runs, a reader has to hold three separate conditions in mind at the same time, and each <code>else</code> sits far below the <code>if</code> it belongs to. A reader who loses track of one condition will believe the function returns a dollar amount in a case where it really returns an error message.</p>
-<p>A guard clause is a single <code>if</code> statement that returns before any later <code>return</code> gets a chance to run. Each guard takes one exceptional case and leaves the function immediately. Every line below a guard can then assume that guard's case is already ruled out, which is what keeps the main path at one indentation level:</p>
+<p>A guard clause is a single <code>if</code> statement that returns early. A <code>return</code> ends the function the moment it runs, so once a guard returns, not one line below it is evaluated. Each guard takes one exceptional case and leaves, which lets every line below it assume that case is already ruled out. That is what keeps the main path at one indentation level:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def weekly_summary(user, total):
     if user is None:
         return "Please log in to see your summary."
@@ -191,7 +237,8 @@ print(bool("hello"))  # True</pre></div>
     if total &lt; 0:
         return "That total looks wrong. We're checking it."
     return f"You spent ${total} this week."</pre></div>
-<p>The last <code>return</code> needs no <code>if</code> of its own. If the program reaches that line, all three guards tested <code>False</code>, which tells you <code>user</code> exists, <code>total</code> exists, and <code>total</code> is zero or more. Those are exactly the conditions the normal case requires, and the diagram below shows what that does to the shape of the function.</p>
+<p>Order matters for guards for the same reason it matters in an <code>elif</code> chain: the first guard whose condition is <code>True</code> returns, and the guards below it never run. Write the narrowest condition first.</p>
+<p>The last <code>return</code> needs no <code>if</code> of its own. If the program reaches that line, all three guards tested <code>False</code>, which tells you <code>user</code> exists, <code>total</code> exists, and <code>total</code> is zero or more. Those are exactly the conditions the normal case requires, so there is nothing left for a condition on that line to test. The diagram below shows what the guards do to the shape of the function.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 880 400" role="img" aria-labelledby="csGuardTitle csGuardDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="csGuardTitle">The indentation shape of nested ifs compared with guard clauses</title>
@@ -237,41 +284,28 @@ print(bool("hello"))  # True</pre></div>
 <div id="cs-guard-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Two things pin the order down. Comparing <code>None</code> to a number with <code>&gt;</code> raises an error, so the guard that catches <code>None</code> has to run before any comparison does. And section 3's rule still applies to guards: the first <code>if</code> that is <code>True</code> returns, so a wider condition placed above a narrower one will swallow it.</p>
+<p>Two things pin the order down. Comparing <code>None</code> to a number with <code>&gt;</code> raises an error, so the guard that catches <code>None</code> has to run before any comparison does. And the narrowest-first rule above still applies: the first guard that is <code>True</code> returns, so a wider condition placed over a narrower one will swallow it.</p>
 </details>
 </section>
 
 <section class="mlrk-section">
 <h2>6. Conditional expressions: choosing a value on one line</h2>
-<p>Ledger Lite's summary line has to say "1 purchase" or "3 purchases". Choosing that one word with a full <code>if</code> / <code>else</code> statement takes four lines:</p>
-<div class="mlrk-code"><pre class="mlrk-screen">if count == 1:
+<p>Ledger Lite's summary line has to say "1 purchase" or "3 purchases". Both branches of a full <code>if</code> / <code>else</code> statement assign to the same variable, <code>word</code>, so a reader has to get through four lines to learn that the only thing changing is one string:</p>
+<div class="mlrk-code"><pre class="mlrk-screen"># Okay - an if statement picks which block of code runs
+if count == 1:
     word = "purchase"
 else:
     word = "purchases"
-print(f"{count} {word} this week.")</pre></div>
-<p>Both branches assign to the same variable, <code>word</code>. A reader still has to read all four lines to learn that the only thing changing between them is one string.</p>
-<p>A conditional expression chooses between two values and fits on one line. The form is <code>value_a if condition else value_b</code>. Python evaluates the condition, and the whole expression becomes <code>value_a</code> when the condition is <code>True</code> and <code>value_b</code> when it is <code>False</code>:</p>
-<div class="mlrk-code"><pre class="mlrk-screen">word = "purchase" if count == 1 else "purchases"
-print(f"{count} {word} this week.")</pre></div>
-<p>Use a conditional expression when both branches produce a value for the same destination, such as one variable or one <code>return</code>. Keep the full <code>if</code> / <code>else</code> statement when the branches run genuinely different code, because an expression can only hand back a value.</p>
 
-<div class="mlrk-card">
-<p><strong>Fill in the blanks.</strong> The first two blanks are each a single Python keyword from the form above. The third asks what the first line actually produces.</p>
-<div class="cs-blank-row"><label for="cs-blank1"><code>tier = "Over budget" ____ total &gt; 200 else "On track"</code></label> <input type="text" id="cs-blank1" autocomplete="off" placeholder="first blank"></div>
-<div class="cs-blank-row"><label for="cs-blank2"><code>fee = 0 if total &gt; 50 ____ 5</code></label> <input type="text" id="cs-blank2" autocomplete="off" placeholder="second blank"></div>
-<div class="cs-blank-row"><label for="cs-blank3">With <code>total = 250</code>, the first line puts this in <code>tier</code>:</label> <input type="text" id="cs-blank3" autocomplete="off" placeholder="third blank"></div>
-<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="cs-blank-check">Check my answers</button></div>
-<div id="cs-blank-fb" class="mlrk-feedback" tabindex="-1"></div>
-</div>
-<details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Write out the form <code>value_a if condition else value_b</code> and line it up against each blank line. For the third blank, evaluate <code>total &gt; 200</code> with <code>total = 250</code> first, then pick the side of the expression that result selects.</p>
-</details>
+# Better - a conditional expression picks which value gets assigned
+word = "purchase" if count == 1 else "purchases"</pre></div>
+<p>The form is <code>value_a if condition else value_b</code>, and the whole expression becomes <code>value_a</code> when the condition is <code>True</code> and <code>value_b</code> when it is <code>False</code>. A conditional expression can only hand back a value, so reach for one when both branches feed the same destination and keep the full <code>if</code> / <code>else</code> statement when they run different code.</p>
 </section>
 
 <section class="mlrk-section">
 <h2>7. Summary and reflection</h2>
-<p>An <code>if</code> / <code>elif</code> / <code>else</code> chain runs the first branch whose condition is <code>True</code> and skips the rest, so the order you write the conditions in decides where a value lands. An <code>if</code> also converts that value with <code>bool()</code>, which is why <code>0</code> and "no data" look the same to <code>if not total:</code> and why <code>is None</code> exists.</p>
-<label for="cs-reflect"><strong>In 2-3 sentences:</strong> the bug in section 1 happened because <code>if not total:</code> treated "zero" and "never recorded" as the same thing. Describe one other situation where a program would need to tell those two apart, and say which comparison you would write in place of <code>if not value:</code>.</label>
+<p>An <code>if</code> / <code>elif</code> / <code>else</code> chain runs the first branch whose condition is <code>True</code> and skips the rest, so the order you write the conditions in decides where a value lands. Turn those <code>elif</code> statements into separate <code>if</code> statements and Python evaluates every one of them, so several branches can run on a single call. An <code>if</code> also converts the value you hand it with <code>bool()</code>, which is why <code>0</code> and "no data" look identical to <code>if not total:</code>.</p>
+<label for="cs-reflect"><strong>The guard-clause version of <code>weekly_summary</code> in section 5 ends with <code>return f"You spent ${total} this week."</code> and no <code>if</code> of its own.</strong> In 2-3 sentences, say what the three guards above it have already settled about <code>user</code> and <code>total</code> by the time Python reaches that line, and explain why a condition on that line would have nothing left to test.</label>
 <textarea id="cs-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
@@ -323,38 +357,38 @@ print(f"{count} {word} this week.")</pre></div>
   });
 
   K.selectAll({
-    id: "act-falsy",
-    boxSelector: ".cs-falsy-box",
-    submitSelector: "#cs-falsy-submit",
-    feedbackSelector: "#cs-falsy-fb",
+    id: "act-separate-ifs",
+    boxSelector: ".cs-sep-box",
+    submitSelector: "#cs-sep-submit",
+    feedbackSelector: "#cs-sep-fb",
     maxAttempts: 2,
     options: [
-      {value:"zero", label:"the number 0", correct:true,
-        hint:"The number zero is named directly in the falsy rule.",
-        explain:"The rule lists the numbers <code>0</code> and <code>0.0</code> as falsy, and this is the bug from section 1."},
-      {value:"strzero", label:"the string \"0\"", correct:false,
-        hint:"Count the characters inside the quotes before deciding.",
-        explain:"<code>\"0\"</code> is a string holding one character, and the rule makes every non-empty string truthy. Only the empty string <code>\"\"</code> is falsy."},
-      {value:"emptylist", label:"the empty list []", correct:true,
-        hint:"The rule names empty collections specifically.",
-        explain:"An empty collection is falsy, so <code>bool([])</code> produces <code>False</code>. A list with even one item in it is truthy."},
-      {value:"strnone", label:"the string \"None\"", correct:false,
-        hint:"Compare this to <code>None</code> written without quotes.",
-        explain:"<code>None</code> without quotes is falsy. <code>\"None\"</code> with quotes is a four-character string, and what those characters spell has no effect on <code>bool()</code>."},
-      {value:"neg", label:"the number -1", correct:false,
-        hint:"The rule names one number as falsy. Check whether this is that number.",
-        explain:"Only <code>0</code> and <code>0.0</code> are falsy numbers. Every other number, negative ones included, is truthy."},
-      {value:"emptydict", label:"the empty dictionary {}", correct:true,
-        hint:"The rule names empty collections specifically.",
-        explain:"<code>{}</code> is an empty collection, so it is falsy. Add one entry to it and it becomes truthy."}
+      {value:"close", label:"Getting close", correct:true,
+        hint:"Work out <code>250 &gt; 100</code> on its own, with nothing above it to stop Python evaluating it.",
+        explain:"<code>250 &gt; 100</code> is <code>True</code>, so this line prints. In the <code>elif</code> version the function would have stopped right here, but a separate <code>if</code> does not end anything, so Python carries on to the next one."},
+      {value:"over", label:"Over budget", correct:true,
+        hint:"A line printing above this one does not stop Python from evaluating this one.",
+        explain:"<code>250 &gt; 200</code> is also <code>True</code>, so this line prints as well. Two messages come out of one call, which is the behaviour an <code>elif</code> chain is there to prevent."},
+      {value:"way", label:"Way over", correct:false,
+        hint:"Compare 250 against the number in this condition.",
+        explain:"<code>250 &gt; 500</code> is <code>False</code>, so Python skips this line. Separate <code>if</code> statements run every true condition, and this one is not true."},
+      {value:"track", label:"On track", correct:false,
+        hint:"Compare 250 against the number in this condition.",
+        explain:"<code>250 &lt;= 100</code> is <code>False</code>, so this line is skipped. Writing the conditions as separate <code>if</code> statements means this last one gets evaluated on every call rather than acting as an <code>else</code>."}
     ]
   });
 
-  K.orderSteps("#cs-guard-order", {
-    id: "act-guard-order",
-    correctOrder: ["none","twohundred","hundred","track"],
-    feedbackSelector: "#cs-guard-fb",
-    checkSelector: "#cs-guard-check"
+  K.quiz({
+    id: "act-string-false",
+    buttonSelector: "#cs-strfalse-choices .mlrk-choice",
+    feedbackSelector: "#cs-strfalse-fb",
+    correct: "printed",
+    maxAttempts: 1,
+    answerLabel: "printed",
+    feedback: {
+      printed: "<code>\"False\"</code> is a string with five characters in it, and every non-empty string is truthy, so <code>bool(\"False\")</code> produces <code>True</code> and the <code>if</code> runs its body. What the characters spell has no effect on <code>bool()</code>. This matters any time you test something a person typed, because a person always types a string.",
+      skipped: "The falsy list names the boolean <code>False</code>, written without quotes. <code>\"False\"</code> with quotes is a five-character string, and every non-empty string is truthy, so <code>bool(\"False\")</code> produces <code>True</code> and the body runs. If you ever compare what a user typed against a boolean, remember the user typed a string."
+    }
   });
 
   const blank1 = document.getElementById("cs-blank1");
@@ -362,37 +396,46 @@ print(f"{count} {word} this week.")</pre></div>
   const blank3 = document.getElementById("cs-blank3");
   const blankBtn = document.getElementById("cs-blank-check");
   const blankFb = document.getElementById("cs-blank-fb");
-  K.Scoring.register("act-cond-expression", 1, "quiz");
+  K.Scoring.register("act-falsy-list", 1, "quiz");
   let blankAttempts = 0, blankDone = false;
-  function clean(s){ return s.trim().toLowerCase().replace(/^["']|["']$/g, "").trim(); }
+  function norm(s){ return s.trim().toLowerCase(); }
   blankBtn.addEventListener("click", function(){
     if(blankDone) return;
     blankAttempts++;
-    const v1 = clean(blank1.value);
-    const v2 = clean(blank2.value);
-    const v3 = clean(blank3.value);
-    const ok = v1 === "if" && v2 === "else" && v3 === "over budget";
-    if(ok){
-      K.Scoring.award("act-cond-expression", blankAttempts === 1 ? 1 : 0.5);
+    const v1 = norm(blank1.value);
+    const v2 = norm(blank2.value);
+    const v3 = norm(blank3.value);
+    const ok1 = v1 === "none";
+    const ok2 = v2 === "0";
+    const ok3 = ['""', "''", "empty string", "the empty string"].indexOf(v3) !== -1;
+    if(ok1 && ok2 && ok3){
+      K.Scoring.award("act-falsy-list", blankAttempts === 1 ? 1 : 0.5);
       blankFb.className = "mlrk-feedback mlrk-show mlrk-good";
-      blankFb.innerHTML = "<strong>Correct.</strong> Both lines follow the form <code>value_a if condition else value_b</code>. With <code>total = 250</code>, <code>total &gt; 200</code> evaluates to <code>True</code>, so the expression becomes the value written to the left of <code>if</code>, which is <code>\"Over budget\"</code>.";
+      blankFb.innerHTML = "<strong>Correct.</strong> The full list is <code>None</code>, <code>False</code>, <code>0</code>, <code>0.0</code>, <code>\"\"</code>, and empty collections such as <code>[]</code> and <code>{}</code>. Every other value Python can hold is truthy, which is why you can learn the falsy side and infer the rest.";
       blankDone = true;
     } else if(blankAttempts >= 2){
-      K.Scoring.award("act-cond-expression", 0);
+      K.Scoring.award("act-falsy-list", 0);
       blankFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
-      blankFb.innerHTML = "<strong>Here are the answers.</strong> The first blank is <code>if</code> and the second is <code>else</code>, because every conditional expression is written <code>value_a if condition else value_b</code>. The third is <code>\"Over budget\"</code>: <code>total &gt; 200</code> is <code>True</code> for 250, and a true condition selects the value on the left of the <code>if</code>.";
+      blankFb.innerHTML = "<strong>Here are the three.</strong> <code>None</code> is the value that means nothing is here at all. <code>0</code> is the one falsy whole number, and <code>0.0</code> is its decimal twin. <code>\"\"</code> is the one falsy string, because it holds no characters, which makes the full list <code>None</code>, <code>False</code>, <code>0</code>, <code>0.0</code>, <code>\"\"</code>, and empty collections such as <code>[]</code> and <code>{}</code>.";
       blankDone = true;
     } else {
       blankFb.className = "mlrk-feedback mlrk-show mlrk-bad";
       const wrong = [];
-      if(v1 !== "if") wrong.push("the first blank");
-      if(v2 !== "else") wrong.push("the second blank");
-      if(v3 !== "over budget") wrong.push("the third blank");
-      blankFb.innerHTML = "<strong>Not quite.</strong> Re-check " + wrong.join(" and ") +
-        ". Line the form <code>value_a if condition else value_b</code> up against each line word by word." +
+      if(!ok1) wrong.push("the first box, which wants the value that stands for no value at all");
+      if(!ok2) wrong.push("the second box, which wants a whole number");
+      if(!ok3) wrong.push("the third box, which wants a string written with its quote marks and nothing between them");
+      blankFb.innerHTML = "<strong>Not there yet.</strong> Re-check " + wrong.join(", and ") +
+        ". Each falsy value is a \"nothing\" of some kind, so name the one that fits each description." +
         "<div class=\"mlrk-attempt-note\">One more try before the answers are revealed.</div>";
     }
     blankFb.setAttribute("tabindex","-1"); blankFb.focus();
+  });
+
+  K.orderSteps("#cs-guard-order", {
+    id: "act-guard-order",
+    correctOrder: ["none","twohundred","hundred","track"],
+    feedbackSelector: "#cs-guard-fb",
+    checkSelector: "#cs-guard-check"
   });
 
   K.freeResponse({id:"act-reflect", selector:"#cs-reflect", minWords:12});

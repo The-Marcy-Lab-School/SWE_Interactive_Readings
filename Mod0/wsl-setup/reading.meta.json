@@ -2,5 +2,7 @@
   "title": "The Missing Terminal — Setting Up WSL",
   "skill": "environment setup",
   "topic_area": "Command Line & Environment",
-  "time_minutes": 9
+  "time_minutes": 9,
+  "supplementary": true,
+  "supplementary_note": "No GitBook lesson page owns this. Mod 0's four GitBook lessons are CLIs, Git & GitHub, Git Pulling/Merging, and Git Branching. Kept because students still need it; excluded from the one-reading-per-page rule."
 }

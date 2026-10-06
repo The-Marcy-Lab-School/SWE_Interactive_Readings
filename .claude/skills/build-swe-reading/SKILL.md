@@ -80,6 +80,55 @@ No numbered "Recall" section, otherwise similar shape to the DA readings:
    Doesn't count toward the reading's stated time estimate — it's optional and outside the timed activities. It goes last, after the summary/reflection, not before it — a student closes out the required content first, then sees the optional "if you want more" links on their way to the score chip.
 9. **Score chip** (`ReadingKit.Scoring.renderChip`) + **Copy Plain Text Answers** and **Download as .txt** buttons side by side in one `.mlrk-actions` row (`ReadingKit.copyPlainText` + `ReadingKit.downloadPlainText`) + copyright footer.
 
+## A good video that's too long goes in "Go further" (confirmed 2026-10-06)
+
+The 5-minute cap governs the **embedded** video only, because an embed is
+inside the timed activities and competes with the practice that teaches the
+hard part. A genuinely good, English, verified video that runs longer is not
+wasted — put it in "Go further (optional)", where it costs no time budget.
+Never stretch the cap to keep an embed, and never embed a weaker short video
+just to have one. Shipping with no embedded video is a normal outcome,
+especially for the back half of Mod 1 (HOFs, comprehensions, modules), where
+little English material under 5 minutes exists.
+
+## Auditing a Mod 1 reading (added 2026-10-06)
+
+Four things have to stay true, and they split across two layers.
+
+**Automated, in `qa/reading_qa.py` — run it, don't eyeball these:**
+- `check_mod1_key_terms` — every term the lesson owns is defined in the
+  reading, and the folder maps to a real lesson.
+- `check_mod1_extra_key_terms` — **no vocabulary creep**: a flip card for a
+  term the lesson does not own is an ERROR. A term may still be *used* in
+  prose; this governs the vocabulary card set only. One card may cover two
+  owned terms the GitBook defines together ("Truthy and falsy").
+- `check_writing_guide` — the mechanically-detectable parts of Ben's rules
+  (rules 2, 5, 6, and generic feedback). WARN-level, because phrasing needs
+  judgment.
+
+**Needs a human or a semantic pass — no regex can do these:**
+- **Does the reading match its GitBook page?** The page is canonical. Fetch
+  `<gitbook_page>.md` from the manifest and check the reading doesn't
+  contradict it or skip a concept the page treats as central.
+- **Ben's rules 1 and 3** (state the problem before the solution; every
+  "so"/"because" follows from a premise already on the page). These are about
+  the order and completeness of reasoning across sentences, which is exactly
+  what a pattern match cannot see.
+
+**Audit against the in-session objectives.** `SWE_Mod1_LOs_KeyTerms.docx` carries
+them under a "You will be able to…" heading *after* each lesson's key terms,
+split into two tiers, and both are in the manifest:
+- `objectives_in_session` — what a Fellow must be able to do by the end of that
+  session. **This is the set a reading is built and audited against**, 54 of
+  them across the 13 lessons.
+- `objectives_end_of_module` — deferred and cumulative. A reading may touch
+  these; it is not required to teach them, and padding a reading to cover them
+  is how a 12-minute reading becomes a 25-minute one.
+
+An objective is the real target, not the key-term list — terms are the
+vocabulary an objective needs. A reading that defines all its terms but leaves
+an in-session objective untaught has missed the point.
+
 ## Mod 1: one reading per GitBook lesson (added 2026-10-05)
 
 Mod 1 is no longer a loose set of Python topics. It mirrors the fellowship's

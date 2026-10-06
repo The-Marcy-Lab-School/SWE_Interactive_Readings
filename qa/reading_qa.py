@@ -298,6 +298,93 @@ def check_mod1_key_terms(path, text):
     return []
 
 
+def _mod1_lesson_for(path):
+    """The manifest entry owning this reading's folder, or None."""
+    manifest_path = Path(__file__).parent.parent / "curriculum" / "mod1-lessons.json"
+    if not manifest_path.exists():
+        return None
+    try:
+        lessons = json.loads(manifest_path.read_text(encoding="utf-8"))["lessons"]
+    except (json.JSONDecodeError, KeyError):
+        return None
+    folder = Path(path).parent.name
+    return next((L for L in lessons if L["slug"] == folder), None)
+
+
+def _norm_term(s):
+    return re.sub(r"[^a-z0-9]", "", s.lower())
+
+
+def check_mod1_extra_key_terms(path, html):
+    """Vocabulary creep: a flip card teaching a term the lesson does not own.
+
+    Every extra card is a term the student is told to learn that no later
+    reading, assignment, or assessment will reinforce, and that the GitBook
+    never defines — so it reads as required vocabulary but is not. Terms can
+    still be *used* in prose; this only governs the vocabulary card set.
+    """
+    lesson = _mod1_lesson_for(path)
+    if lesson is None:
+        return []
+    owned = {_norm_term(t["term"]) for t in lesson["key_terms"]}
+    # Singular/plural tolerance, both directions.
+    for t in list(owned):
+        owned.add(t.rstrip("s"))
+        owned.add(t + "s")
+
+    cards = re.findall(
+        r'<button[^>]*class="[^"]*mlrk-term[^"]*"[^>]*>\s*<span[^>]*mlrk-front[^>]*>\s*<strong>(.*?)</strong>',
+        html, re.S)
+    extra = []
+    for raw in cards:
+        term = " ".join(re.sub("<[^>]+>", "", raw).split())
+        n = _norm_term(term)
+        if not n:
+            continue
+        # A single card may legitimately cover two owned terms that the GitBook
+        # defines in one breath ("Truthy and falsy"), so a card passes when it
+        # names an owned term, not only when it equals one.
+        covers_owned = (n in owned or n.rstrip("s") in owned
+                        or any(o and o in n for o in owned))
+        if not covers_owned:
+            extra.append(term)
+    if extra:
+        return [("ERROR",
+                 f"lesson {lesson['lesson']} ({lesson['title']}) has vocabulary card(s) for "
+                 f"term(s) the lesson does not own: {', '.join(extra)}. Teach it in prose if the "
+                 f"reading needs it, or move it to the lesson that owns it.")]
+    return []
+
+
+# Ben's writing guide, the mechanically-detectable parts. Rules 1 and 3
+# (problem-before-solution, every connective justified) need a human or a
+# semantic pass — these catch the phrasings that signal the other four.
+WRITING_GUIDE_PATTERNS = [
+    (r"\bit (?:is|'s) there (?:so that|to)\b",
+     "rule 6: name the actual code element and give it an active verb, not \"it is there so that\""),
+    (r"\bthe check\b",
+     "rule 6: \"the check\" is not a term the code uses — name the `if` statement, the guard, the call"),
+    (r"\bis not (?:there )?to [a-z ]{3,40}\. it is\b",
+     "rule 5: \"not X, it is Y\" — state the positive rule first and see if the negation still has a job"),
+    (r"\b(?:this|that|it) (?:is|'s) (?:confusing|unclear|bad|messy|ugly|wrong)\b(?![^.]{0,80}\b(?:because|so that|which means|a reader|a user)\b)",
+     "rule 2: name the consequence — what would a person wrongly believe or do? — not just the judgment"),
+    (r"\bnot quite[.,!]?\s*(?:try again)?\s*[\"<]",
+     "rule 2/6: generic feedback. Say which rule the answer missed and what follows from it"),
+    (r"\b(?:nope|incorrect)[.!]\s*[\"<]",
+     "rule 2/6: generic feedback. Say which rule the answer missed and what follows from it"),
+]
+
+
+def check_writing_guide(text, html):
+    """Lint for Ben's AI writing guide (see the skill's "Writing rules")."""
+    findings = []
+    for pat, msg in WRITING_GUIDE_PATTERNS:
+        for m in re.finditer(pat, text, re.I):
+            snippet = " ".join(text[max(0, m.start() - 30):m.end() + 30].split())
+            findings.append(("WARN", f"{msg} — near: ...{snippet}..."))
+    return findings
+
+
 def check_no_recall_section(text_lower):
     if re.search(r"\brecall\b.{0,20}\b(before|first|check)\b", text_lower):
         return [("WARN", "found the word 'recall' near 'before/first/check' — this format has no recall/prerequisite-check section, confirm this isn't one")]
@@ -447,6 +534,8 @@ def run(path, skip_links=False):
     findings += check_copyright(text)
     findings += check_meta_sidecar(path)
     findings += check_mod1_key_terms(path, text)
+    findings += check_mod1_extra_key_terms(path, html)
+    findings += check_writing_guide(text, html)
     findings += check_no_recall_section(text.lower())
     findings += check_reading_level(html)
     findings += check_ai_sounding_language(text)
