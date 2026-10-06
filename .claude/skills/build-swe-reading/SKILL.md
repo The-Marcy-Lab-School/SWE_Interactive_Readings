@@ -187,6 +187,22 @@ between sentences. Sentences that each read fine on their own, with the links
 between them missing, is the exact signature of AI-written explanation — a
 sentence here is allowed to be longer if it carries the link.
 
+**Scope, and what overrides these (2026-10-06).** The six rules govern the
+*completeness of reasoning between sentences*. They say nothing about how to
+build a sentence, and applying them as style rules produces contorted prose:
+abstract subjects, modifiers stranded after their noun, actions nominalized
+into noun phrases, and openings that defer the point. **When a rule here and
+plain English pull in opposite directions, plain English wins.** Rule 6 in
+particular is for sentences explaining what code does — in a sentence about a
+person it yields nonsense like "a wrong order hands a student a label."
+
+**Read `prose-exemplars.md` next to this file before writing prose.** It holds
+real passages from shipped readings beside the rewrites Angelica asked for, and
+the standing rules they add up to: say the fact plainly rather than abstracting
+it, never defer an answer you have just set up, natural subject and natural word
+order, subject-verb agreement, **no gendered pronouns for people anywhere**
+(`qa/reading_qa.py` WARNs), and every word meaning something in its sentence.
+
 ## Time estimate methodology (10-15 min ceiling, video included)
 Build the top-of-page time pill from real counts:
 - ~40 seconds per quiz/question-style item.

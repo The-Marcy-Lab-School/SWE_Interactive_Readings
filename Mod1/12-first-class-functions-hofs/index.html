@@ -27,8 +27,8 @@
 
 <section class="mlrk-section">
 <h2>1. A neighborhood that never got its groceries</h2>
-<p>Westside Pantry is a small food pantry that packs grocery boxes and drives them to people who can't come pick them up. Every Saturday a volunteer runs a short Python script that prints the delivery routes busiest first, and volunteers claim them from the top of the printed list.</p>
-<p>The script pulled the box counts into a second list, sorted that list of numbers, then walked back through the routes to find the name that went with each number:</p>
+<p>Westside Pantry is a small food pantry that packs grocery boxes and drives them to people who can't come pick them up. Every Saturday the coordinator runs a short Python script that prints the busiest routes first, and volunteers claim routes from the top of the printed list.</p>
+<p>The script copied the box counts into a second list, sorted that list of numbers, then searched back through the routes to find the name that went with each number:</p>
 <div class="mlrk-code"><pre>routes = [
     {'name': 'Hill Street', 'boxes': 12},
     {'name': 'Oak Row',     'boxes': 31},
@@ -46,8 +46,8 @@ for count in counts:
         if route['boxes'] == count:
             print(route['name'])
             break</pre></div>
-<p>It printed <code>Oak Row</code>, <code>Hill Street</code>, <code>Hill Street</code>. Hill Street and Pine Court both have 12 boxes, and the search loop stops at the first route whose count matches, so it found Hill Street both times. Pine Court was never printed, no volunteer claimed it, and those boxes sat in the pantry all weekend.</p>
-<p>A number copied out on its own has no name attached, so matching it back by value cannot tell two routes with the same count apart. Python can sort the routes themselves instead, which keeps every name with its count. That fix rests on one fact you may not have noticed yet: a function is a value.</p>
+<p>The script printed <code>Oak Row</code>, <code>Hill Street</code>, <code>Hill Street</code>. Hill Street and Pine Court both have 12 boxes, and the search loop stops at the first route whose count matches, so the loop found Hill Street both times. Pine Court never reached the printed list, no volunteer claimed that route, and those boxes sat in the pantry all weekend.</p>
+<p>The number 12 carries no route name with it. When the script searches the routes for a count of 12, the search finds Hill Street every time and never reaches Pine Court. Python can sort the routes themselves instead, which keeps every name attached to its own count. That fix rests on one fact you may not have noticed yet: a function is a value.</p>
 </section>
 
 <section class="mlrk-section">
@@ -71,23 +71,23 @@ for count in counts:
 
 print(say_hi)        # &lt;function say_hi at 0x104fccd60&gt;
 print(type(say_hi))  # &lt;class 'function'&gt;</pre></div>
-<p><code>say_hi</code> holds a value whose type is <code>function</code>, the way a variable called <code>name</code> holds a string. <code>def say_hi():</code> <em>is</em> an assignment: it builds a function and stores it in the name <code>say_hi</code>.</p>
+<p><code>say_hi</code> holds a value whose type is <code>function</code>, the way a variable called <code>name</code> holds a string. <code>def say_hi():</code> <em>is</em> an assignment: the <code>def</code> statement builds a function and stores that function under the name <code>say_hi</code>.</p>
 
 <h3>Place one: a variable</h3>
-<p>Any variable can hold an ordinary value, and a function is one, so a second variable can hold this function:</p>
+<p>A variable can hold any value, and a function is a value, so a second variable can hold this same function:</p>
 <div class="mlrk-code"><pre>greet = say_hi   # no parentheses, so nothing runs and nothing is copied
 greet()          # Hi</pre></div>
-<p><code>greet</code> and <code>say_hi</code> are now two names for one function, and calling either runs it.</p>
+<p><code>greet</code> and <code>say_hi</code> are now two names for one function, and calling either name runs that one function.</p>
 
 <h3>Place two: a dictionary</h3>
-<p>The pantry runs a second script, a menu the coordinator picks jobs from. It started as a chain of branches, one per job:</p>
+<p>The pantry runs a second script, a menu the coordinator picks jobs from. That menu started as a chain of branches, one per job:</p>
 <div class="mlrk-code"><pre>if choice == "pack":
     pack_boxes()
 elif choice == "label":
     print_labels()
 elif choice == "route":
     assign_routes()</pre></div>
-<p>Every new job adds another <code>elif</code> with the comparison retyped. Someone typed <code>elif choice == "rout":</code> last spring. A comparison that is false is not a mistake, so no error appeared; the coordinator picked that job, saw nothing happen, and assumed the script was slow.</p>
+<p>Every new job means typing another <code>elif</code> and retyping the comparison. Someone typed <code>elif choice == "rout":</code> last spring. Python does not complain about a comparison that comes out false, so the script raised no error; the coordinator picked that job, saw nothing happen, and assumed the script was slow.</p>
 <p>A dictionary holds values, and a function is a value, so a dictionary can hold functions:</p>
 <div class="mlrk-code"><pre>jobs = {
     "pack":  pack_boxes,
@@ -96,18 +96,18 @@ elif choice == "route":
 }
 
 jobs[choice]()</pre></div>
-<p><code>jobs[choice]</code> looks up a function, and the <code>()</code> after it calls whatever came back. One lookup line replaces the chain, and a new job is one new line. A dictionary used this way is called a <strong>dispatch table</strong>.</p>
-<p>You have already done this lookup without noticing. <code>"abc".upper()</code> finds the <code>upper</code> function stored inside the string and calls it, exactly as <code>jobs["pack"]()</code> does. A function attached to a value like that is a <strong>method</strong>.</p>
+<p><code>jobs[choice]</code> looks up a function, and the <code>()</code> after that lookup calls whatever came back. One lookup line replaces the whole chain, and adding a new job takes one new line in the dictionary. A dictionary used this way is called a <strong>dispatch table</strong>.</p>
+<p>You have already done this lookup without noticing. <code>"abc".upper()</code> finds the <code>upper</code> function stored inside the string and calls that function, exactly as <code>jobs["pack"]()</code> does. A function attached to a value like that is a <strong>method</strong>.</p>
 
 <h3>Place three: another function's argument list</h3>
-<p>A function can also be handed to another function, the same way a string can. The built-in <code>sorted</code> accepts one:</p>
+<p>A function can also be handed to another function, the same way a string can. The built-in <code>sorted</code> accepts a function:</p>
 <div class="mlrk-code"><pre>names = ['Hill Street', 'Oak Row', 'Pine Court']
 print(sorted(names, key=len))
 # ['Oak Row', 'Pine Court', 'Hill Street']</pre></div>
-<p><code>len</code> is written with no parentheses, so <code>sorted</code> receives the <code>len</code> function itself and calls it on each name. Those three places, plus being handed back out of a function, are what <strong>Functions are "first-class" values</strong> means.</p>
+<p><code>len</code> is written with no parentheses, so <code>sorted</code> receives the <code>len</code> function itself and calls <code>len</code> on each name. A function can sit in a variable, in a dictionary, and in another function's argument list, and a function can come back out of another function. That is what <strong>Functions are "first-class" values</strong> means.</p>
 
 <div class="mlrk-card" id="place-activity">
-<p><strong>Drag each line into what it does with a function.</strong> If a line does two things, go by the function whose name is written with no parentheses after it.</p>
+<p><strong>Drag each line into the box that says what that line does with a function.</strong> If a line does two things, go by the function whose name is written with no parentheses after it.</p>
 <div class="mlrk-drag-source" id="place-chips">
   <span class="mlrk-draggable" id="chip-greet"><code>greet = say_hi</code></span>
   <span class="mlrk-draggable" id="chip-jobs"><code>jobs = {"pack": pack_boxes}</code></span>
@@ -126,7 +126,7 @@ print(sorted(names, key=len))
 <div id="place-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Empty parentheses after a function's name mean Python runs it on that line. A bare name means the function is being stored or handed over for something else to run later.</p>
+<p>Empty parentheses after a function's name mean Python runs that function on that line. A bare name stores the function or hands it over for something else to run later.</p>
 </details>
 </section>
 
@@ -138,10 +138,10 @@ print(sorted(names, key=len))
 
 for i in range(3):
     print_receipt()</pre></div>
-<p>The loop is written twice, and the driver manifest will make three. The pantry is also buying a printer that jams unless the script pauses a second between lines. That pause goes inside every copy of the loop, and the copy somebody misses is the one that jams on a Saturday morning.</p>
+<p>The same loop is written twice, and the driver manifest will add a third copy. The pantry is also buying a printer that jams unless the script pauses a second between lines. That pause has to go inside every copy of the loop. Miss one copy, and that loop jams the printer on a Saturday morning.</p>
 
 <div class="mlrk-card">
-<p><strong>Write the loop once instead, inside a function whose parameter is the job to run.</strong> One line of <code>repeat</code> is missing: the line that runs the job it was handed.</p>
+<p><strong>Write the loop once instead, inside a function whose parameter is the job to run.</strong> One line of <code>repeat</code> is missing: the line that runs the job <code>repeat</code> was handed.</p>
 <div class="mlrk-code"><pre>def repeat(callback, times):
     for i in range(times):
         ______________
@@ -153,15 +153,15 @@ repeat(print_receipt, 3)</pre></div>
 <div id="hof-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p><code>callback</code> is a parameter holding a function. Running a function means writing its name followed by parentheses, and <code>repeat</code> has no argument to put inside them.</p>
+<p><code>callback</code> is a parameter holding a function. To run a function, write its name followed by parentheses. <code>repeat</code> has no argument to put inside them.</p>
 </details>
 
-<p><code>repeat</code> never mentions labels or receipts. It calls whatever function it was handed, <code>times</code> times. The part that changes between jobs comes in from outside, so one copy of the loop serves every job and the pause gets added in one place. That is what makes <code>repeat</code> reusable.</p>
+<p><code>repeat</code> never mentions labels or receipts. <code>repeat</code> calls whatever function it was handed, <code>times</code> times. The job that changes comes in from outside, so one copy of the loop serves every job, and you add the printer pause in one place. That is what makes <code>repeat</code> reusable.</p>
 <p><code>repeat</code> is a <strong>higher-order function (HOF)</strong>: a function that accepts another function as an argument, returns a function, or does both. <code>print_label</code>, the function handed in, is the <strong>callback</strong>.</p>
 
 <h3>Hand over the function, not what it returned</h3>
-<p>Three rules decide what happens here. <strong>A function's name with no parentheses is the function itself</strong>, so handing that name over hands over the function. <strong>The same name with parentheses runs the function right now</strong>, and what gets handed over is whatever that call produced. <strong>A function with no <code>return</code> statement hands back <code>None</code>.</strong></p>
-<p>Python works out every argument before starting the call it belongs to, and the parentheses are part of the argument. So in <code>repeat(print_label(), 3)</code>, <code>print_label()</code> runs first and prints one label; it has no <code>return</code> statement, so it is worth <code>None</code>; and <code>repeat</code> gets handed that <code>None</code>. The diagram traces both lines.</p>
+<p>Three rules decide what happens here. <strong>A function's name with no parentheses is the function itself</strong>, so writing the bare name hands the function over. <strong>The same name with parentheses runs the function right now</strong>, and the value that run produces is what gets handed over. <strong>A function with no <code>return</code> statement hands back <code>None</code>.</strong></p>
+<p>Python works out every argument before starting the call that argument belongs to, and the parentheses are part of the argument. So in <code>repeat(print_label(), 3)</code>, <code>print_label()</code> runs first and prints one label; <code>print_label</code> has no <code>return</code> statement, so that call is worth <code>None</code>; and <code>repeat</code> gets handed that <code>None</code>. The diagram traces both lines.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 880 556" role="img" aria-labelledby="parenTitle parenDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="parenTitle">The callback written with and without parentheses, and what Python does with each</title>
@@ -201,8 +201,8 @@ repeat(print_receipt, 3)</pre></div>
 
 <section class="mlrk-section">
 <h2>5. sorted(), min(), and max() take a callback too</h2>
-<p>Python ships with higher-order functions of its own, and <code>sorted()</code> is the one you will reach for most. Its <code>key</code> parameter accepts a callback, which <code>sorted</code> calls once on every item to get the value it should compare. The items stay whole and move as one piece.</p>
-<p>Section 3 used <code>key=len</code> that way. The same parameter fixes section 1's bug: write a function that pulls the box count out of one route, and hand it to <code>sorted</code>:</p>
+<p>Python ships with higher-order functions of its own, and <code>sorted()</code> is the one you will reach for most. Its <code>key</code> parameter accepts a callback, and <code>sorted</code> calls that callback once on every item to get the value to compare. Each item stays whole and moves as one piece.</p>
+<p>Section 3 used <code>key=len</code> that way. The same parameter fixes section 1's bug: write a function that pulls the box count out of one route, and hand that function to <code>sorted</code>:</p>
 <div class="mlrk-code"><pre>def boxes(route):
     return route['boxes']
 
@@ -212,12 +212,12 @@ for route in sorted(routes, key=boxes, reverse=True):
 # Oak Row
 # Hill Street
 # Pine Court</pre></div>
-<p>Pine Court is on the list now. <code>sorted</code> compares the number <code>boxes</code> hands back but moves the whole dictionary, so a route's name never comes apart from its count, and the two routes tied at 12 boxes stay two separate routes. <code>min()</code> and <code>max()</code> accept <code>key</code> the same way, and each hands back the whole item rather than the number it compared.</p>
+<p>Pine Court is on the list now. <code>sorted</code> compares the number <code>boxes</code> hands back but moves the whole dictionary, so a route's name never comes apart from its count, and the two routes tied at 12 boxes stay two separate routes. <code>min()</code> and <code>max()</code> accept <code>key</code> the same way, and both hand back the whole item rather than the number they compared.</p>
 
 <h3>lambda, for a callback you use once</h3>
-<p>A two-line <code>def</code> for a callback you use once can feel like a lot of ceremony. <code>lambda</code> builds a small function in one expression, with no name:</p>
+<p>Writing a two-line <code>def</code> for a callback you use once is a lot of typing for one line of work. <code>lambda</code> builds a small function in one expression, with no name:</p>
 <div class="mlrk-code"><pre>biggest = max(routes, key=lambda route: route['boxes'])</pre></div>
-<p>The parameters go before the colon and one expression goes after it, and that expression's value is what the function hands back. There is no room for a second line, so the moment a callback needs one, use <code>def</code>.</p>
+<p>The parameters go before the colon and one expression goes after the colon, and that expression's value is what the function hands back. A <code>lambda</code> has no room for a second line, so write a <code>def</code> as soon as a callback needs two.</p>
 
 <div class="mlrk-card">
 <p><strong>Fill in both blanks.</strong> <code>names</code> and <code>routes</code> are the lists from earlier in this reading.</p>
@@ -238,13 +238,13 @@ print(busiest['name'])   # Oak Row</pre></div>
 <div id="key-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Both blanks are the same parameter, spelled the same way in <code>sorted</code>, <code>min</code>, and <code>max</code>. Set it to the bare name of a function that takes one item and hands back the thing to compare. For the names, Python already has one that measures length.</p>
+<p>Both blanks are the same parameter, spelled the same way in <code>sorted</code>, <code>min</code>, and <code>max</code>. Set that parameter to the bare name of a function that takes one item and hands back the value to compare. For the names, Python already has a built-in function that measures length.</p>
 </details>
 </section>
 
 <section class="mlrk-section">
 <h2>6. A function that hands back another function</h2>
-<p>The coordinator is debugging the Saturday script and wants the terminal to announce when each route gets posted and when it finishes. Six functions post things, so adding those announcements by hand means pasting two <code>print</code> lines into each, then picking all twelve back out afterward. Miss one, and a volunteer keeps seeing debug dashes every Saturday. Write the announcing as its own function instead, with the function to announce as its parameter:</p>
+<p>The coordinator is debugging the Saturday script and wants the terminal to say when each route starts posting and when that route is done. Six functions post things, so doing this by hand means pasting two <code>print</code> lines into each of the six, then picking all twelve back out once the bug is found. Miss one, and volunteers keep seeing debug dashes every Saturday. Write the two <code>print</code> lines once instead, inside a function that takes the function to announce as its parameter:</p>
 <div class="mlrk-code"><pre>def announce(func):
     def wrapper(route):
         print("--- posting ---")
@@ -258,9 +258,9 @@ def post(route):
 loud_post = announce(post)
 print("ready")
 loud_post(routes[0])</pre></div>
-<p>Three functions are involved and they do not all run at the same time, so read the order carefully. <code>announce(post)</code> runs first. Inside it, <code>func</code> holds the <code>post</code> function itself, because <code>post</code> was passed with no parentheses. <code>announce</code> then builds <code>wrapper</code> and hands it back without calling it, so <code>loud_post</code> holds that <code>wrapper</code> and nothing inside <code>wrapper</code> has run yet.</p>
-<p>The last line does all the printing, and it runs two functions, not one. <code>loud_post(routes[0])</code> calls <code>wrapper</code>, which prints <code>--- posting ---</code>, then calls <code>func(route)</code>. <code>func</code> is <code>post</code>, so <code>post</code> prints the route line. Then <code>wrapper</code> prints <code>--- posted ---</code>. Two of those three lines come from <code>wrapper</code> and one comes from <code>post</code>.</p>
-<p><code>wrapper</code> still has <code>func</code> even though <code>announce</code> finished two lines earlier. A function defined inside another function keeps access to the outer function's variables after that outer function returns, so <code>wrapper</code> carries <code>func</code> with it. <code>post</code> was never edited and <code>announce</code> never mentions routes; the line <code>loud_post = announce(post)</code> joins them. A function handed back this way is a <strong>wrapper</strong>, because it wraps around the original.</p>
+<p>Three functions are involved, and they do not all run at the same time, so read the order carefully. <code>announce(post)</code> runs first. Inside <code>announce</code>, <code>func</code> holds the <code>post</code> function itself, because <code>post</code> was passed with no parentheses. <code>announce</code> then builds <code>wrapper</code> and hands <code>wrapper</code> back without calling it, so <code>loud_post</code> holds that <code>wrapper</code>, and nothing inside <code>wrapper</code> has run yet.</p>
+<p>The last line does all the printing, and that line runs two functions, not one. <code>loud_post(routes[0])</code> calls <code>wrapper</code>, which prints <code>--- posting ---</code>, then calls <code>func(route)</code>. <code>func</code> is <code>post</code>, so <code>post</code> prints the route line. Then <code>wrapper</code> prints <code>--- posted ---</code>. Two of those three lines come from <code>wrapper</code> and one comes from <code>post</code>.</p>
+<p><code>wrapper</code> still has <code>func</code> even though <code>announce</code> finished two lines earlier. A function defined inside another function keeps access to the outer function's variables after that outer function returns, so <code>wrapper</code> carries <code>func</code> with it. <code>post</code> was never edited, and <code>announce</code> never mentions routes; the line <code>loud_post = announce(post)</code> is what joins the two. A function handed back this way is a <strong>wrapper</strong>, because that function wraps around the original.</p>
 
 <div class="mlrk-card">
 <p><strong>Put the four printed lines in the order the program actually prints them.</strong> Click a line to add it to your sequence, and click it again to take it back out.</p>
@@ -274,29 +274,29 @@ loud_post(routes[0])</pre></div>
 <div id="wrap-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Find which line is the first one Python actually <em>runs</em>, rather than the first one written. <code>loud_post = announce(post)</code> builds a function and stores it, and building a function prints nothing, so look at what the next line does.</p>
+<p>Look for the first line Python actually <em>runs</em>, not the first line written. <code>loud_post = announce(post)</code> builds a function and stores it, and Python prints nothing while building a function, so look at what the next line does.</p>
 </details>
 
-<p style="margin-top:1.4rem">You will meet this written a shorter way, with an <code>@</code> above a definition:</p>
+<p style="margin-top:1.4rem">Python has a shorter spelling for handing <code>post</code> to <code>announce</code>, with an <code>@</code> above the definition:</p>
 <div class="mlrk-code"><pre>@announce
 def post(route):
     print(f"{route['name']}: {route['boxes']} boxes")</pre></div>
-<p>That is a <strong>decorator</strong>. It means exactly <code>post = announce(post)</code>: a function was handed to another function, and what came back took the original's name.</p>
+<p>That is a <strong>decorator</strong>. The <code>@announce</code> line means exactly <code>post = announce(post)</code>: a function was handed to another function, and what came back took the original's name.</p>
 </section>
 
 <section class="mlrk-section">
 <h2>7. Summary &amp; reflection</h2>
-<p>A function is a value, so it can live in a variable, in a dictionary, or in another function's argument list, and it can be handed back out of a function. A function that takes or returns a function is a higher-order function, and the one you hand it is the callback. Pass that callback by its bare name; parentheses run it on the spot and hand over its return value, which for a printing function is <code>None</code>. Westside Pantry got its lost route back the moment <code>sorted</code> sorted the routes themselves.</p>
+<p>A function is a value, so it can live in a variable, in a dictionary, or in another function's argument list, and it can be handed back out of a function. A function that takes or returns a function is a higher-order function, and the function you hand to it is the callback. Pass that callback by its bare name; parentheses run the callback on the spot and hand over its return value, which for a printing function is <code>None</code>. Pine Court showed up on the printed list again as soon as <code>sorted</code> sorted the routes themselves.</p>
 <label for="reflect"><strong>In 2-3 sentences:</strong> <code>announce</code> never mentions routes, and <code>post</code> never mentions the dashed lines, yet together they print both. Think of a program you have written or used. What is one extra step you would want to add around several different functions at once, without editing any of them?</label>
 <textarea id="reflect" class="mlrk-response" data-save></textarea>
 </section>
 
 <section class="mlrk-section">
 <h2>8. Go further (optional)</h2>
-<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<p>Want more practice, or a different explanation of higher-order functions? Two places to go next:</p>
 <ul>
-  <li><a href="https://pythontutor.com/python-compiler.html" target="_blank" rel="noopener">Python Tutor</a> — paste the <code>announce</code> and <code>post</code> code from section 6 in and step through it one line at a time; it draws the arrow from <code>loud_post</code> to the <code>wrapper</code> function, which is the part that is hardest to picture.</li>
-  <li><a href="https://www.youtube.com/watch?v=IljPHDyBRog" target="_blank" rel="noopener">Learn Python LAMBDA in 6 minutes!</a> (Bro Code, 6:49) — a slower walkthrough of <code>lambda</code> with several worked examples, if the one-expression rule in section 5 still feels thin.</li>
+  <li><a href="https://pythontutor.com/python-compiler.html" target="_blank" rel="noopener">Python Tutor</a> — paste the <code>announce</code> and <code>post</code> code from section 6 into the editor and step through it one line at a time; Python Tutor draws the arrow from <code>loud_post</code> to the <code>wrapper</code> function, which is the hardest part to picture.</li>
+  <li><a href="https://www.youtube.com/watch?v=IljPHDyBRog" target="_blank" rel="noopener">Learn Python LAMBDA in 6 minutes!</a> (Bro Code, 6:49) — a slower walkthrough of <code>lambda</code> with several worked examples, if the one-expression rule in section 5 needs another pass.</li>
 </ul>
 </section>
 
@@ -359,13 +359,13 @@ def post(route):
       hofDone = true;
     } else if(/^callback$/.test(val)){
       hofFb.className = "mlrk-feedback mlrk-show mlrk-bad";
-      hofFb.innerHTML = "<strong>Close.</strong> <code>callback</code> on its own is the function, and writing a function's name by itself inside a loop builds nothing and prints nothing. Add the parentheses that tell Python to run it." +
+      hofFb.innerHTML = "<strong>Close.</strong> <code>callback</code> on its own is the function, and a function's name by itself does not run that function, so the loop would print nothing. Add the parentheses that tell Python to run that function." +
         (hofAttempts >= 2 ? " <strong>The answer is <code>callback()</code>.</strong>" : '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>');
       if(hofAttempts >= 2){ K.Scoring.award("act-hof-fillblank", 0); hofDone = true; }
     } else if(hofAttempts >= 2){
       K.Scoring.award("act-hof-fillblank", 0);
       hofFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
-      hofFb.innerHTML = "<strong>Here's the answer:</strong> <code>callback()</code>. The parameter <code>callback</code> holds a function, and the parentheses run it. <code>repeat</code> names no job of its own, which is what lets it repeat any job it is handed.";
+      hofFb.innerHTML = "<strong>Here's the answer:</strong> <code>callback()</code>. The parameter <code>callback</code> holds a function, and the parentheses run that function. <code>repeat</code> names no job of its own, which is what lets it repeat any job it is handed.";
       hofDone = true;
     } else {
       hofFb.className = "mlrk-feedback mlrk-show mlrk-bad";
@@ -383,9 +383,9 @@ def post(route):
     correct: "once",
     answerLabel: "One label prints, then TypeError: 'NoneType' object is not callable",
     feedback: {
-      once: "Python works out every argument before starting the call it belongs to, so print_label() runs first and prints one label. print_label has no return statement, so that call is worth None. Python then starts repeat(None, 3), and callback() inside repeat means None(). None is not a function, so Python raises TypeError: 'NoneType' object is not callable. The single printed label is the clue that the callback ran too early.",
+      once: "Python works out every argument before starting the call that argument belongs to, so print_label() runs first and prints one label. print_label has no return statement, so that call is worth None. Python then starts repeat(None, 3), and callback() inside repeat means None(). None is not a function, so Python raises TypeError: 'NoneType' object is not callable. The single printed label is the clue that the callback ran too early.",
       noprint: "The TypeError is right, and so is the reason: print_label() is worth None, and None cannot be called. The label does print, though. Python runs print_label() before repeat starts, and that run prints one label; the error comes later, inside repeat, when callback() tries to call the None that came back.",
-      fine: "The parentheses change which value repeat receives. Without them, repeat receives the print_label function. With them, Python runs print_label first, which prints one label and, because print_label has no return statement, is worth None. repeat then holds None in callback, and calling None raises TypeError: 'NoneType' object is not callable before the second label is ever printed."
+      fine: "The parentheses change which value repeat receives. Without them, repeat receives the print_label function. With them, Python runs print_label first. That run prints one label and, because print_label has no return statement, is worth None. repeat then holds None in callback, and calling None raises TypeError: 'NoneType' object is not callable before a second label is ever printed."
     }
   });
 
@@ -408,7 +408,7 @@ def post(route):
     if(lenOk && keyOk){
       K.Scoring.award("act-key-fillblank", keyAttempts===1?1:0.5);
       keyFb.className = "mlrk-feedback mlrk-show mlrk-good";
-      keyFb.innerHTML = "<strong>Both correct.</strong> <code>key=len</code> hands the <code>len</code> function to <code>sorted</code>, which calls it on each name and compares the three lengths. <code>key=boxes</code> hands the <code>boxes</code> function to <code>max</code>, which calls <code>boxes(route)</code> on each dictionary and keeps the route whose number came back largest. <code>max</code> hands back the whole dictionary, so <code>busiest['name']</code> prints <code>Oak Row</code>.";
+      keyFb.innerHTML = "<strong>Both correct.</strong> <code>key=len</code> hands the <code>len</code> function to <code>sorted</code>, which calls <code>len</code> on each name and compares the three lengths. <code>key=boxes</code> hands the <code>boxes</code> function to <code>max</code>, which calls <code>boxes(route)</code> on each dictionary and keeps the route whose number came back largest. <code>max</code> hands back the whole dictionary, so <code>busiest['name']</code> prints <code>Oak Row</code>.";
       keyDone = true;
     } else if(keyAttempts >= 2){
       K.Scoring.award("act-key-fillblank", 0);
@@ -418,7 +418,7 @@ def post(route):
     } else {
       const which = lenOk ? "The second blank is not right yet." : (keyOk ? "The first blank is not right yet." : "Neither blank is right yet.");
       keyFb.className = "mlrk-feedback mlrk-show mlrk-bad";
-      keyFb.innerHTML = "<strong>" + which + "</strong> Write the parameter name, an equals sign, then the function's bare name. Parentheses after the function's name would make Python run that function on this line, before <code>sorted</code> or <code>max</code> has an item to give it." +
+      keyFb.innerHTML = "<strong>" + which + "</strong> Write the parameter name, an equals sign, then the function's bare name. Parentheses after the function's name would make Python run that function on this line, before <code>sorted</code> or <code>max</code> has an item to pass to that function." +
         '<div class="mlrk-attempt-note">One more try before the answers are revealed.</div>';
     }
     keyFb.setAttribute("tabindex","-1"); keyFb.focus();

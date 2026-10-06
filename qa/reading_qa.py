@@ -385,6 +385,25 @@ def check_writing_guide(text, html):
     return findings
 
 
+# Angelica, 2026-10-06: drop gendered pronouns for people in examples. A
+# hypothetical student silently became "her" mid-paragraph. Use they/them,
+# repeat the noun, or rewrite around the pronoun.
+GENDERED_PRONOUNS = re.compile(r"\b(?:she|he|her|hers|him|his|herself|himself)\b", re.I)
+
+
+def check_gendered_pronouns(text):
+    hits = []
+    for m in GENDERED_PRONOUNS.finditer(text):
+        snippet = " ".join(text[max(0, m.start() - 40):m.end() + 40].split())
+        hits.append(f'"{m.group(0)}" in: ...{snippet}...')
+    if not hits:
+        return []
+    shown = hits[:4]
+    more = f" (+{len(hits) - len(shown)} more)" if len(hits) > len(shown) else ""
+    return [("WARN", "gendered pronoun for a person — use they/them, repeat the noun, "
+                     "or rewrite around it: " + " | ".join(shown) + more)]
+
+
 def check_no_recall_section(text_lower):
     if re.search(r"\brecall\b.{0,20}\b(before|first|check)\b", text_lower):
         return [("WARN", "found the word 'recall' near 'before/first/check' — this format has no recall/prerequisite-check section, confirm this isn't one")]
@@ -536,6 +555,7 @@ def run(path, skip_links=False):
     findings += check_mod1_key_terms(path, text)
     findings += check_mod1_extra_key_terms(path, html)
     findings += check_writing_guide(text, html)
+    findings += check_gendered_pronouns(text)
     findings += check_no_recall_section(text.lower())
     findings += check_reading_level(html)
     findings += check_ai_sounding_language(text)

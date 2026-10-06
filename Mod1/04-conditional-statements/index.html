@@ -5,9 +5,6 @@
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
 .mlrk-illustration{width:100%;max-width:880px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
-.cs-blank-row{margin:1.1rem 0}
-.cs-blank-row label{display:block;margin-bottom:.45rem}
-.cs-blank-row input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.45rem .7rem;width:18rem;max-width:100%;font-family:var(--mlrk-font-code)}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
 </style>
 </head><body>
@@ -28,13 +25,13 @@
 
 <section class="mlrk-section">
 <h2>1. A week that looked like missing data</h2>
-<p>Ledger Lite is a simulated budgeting app that shows a student one line a week: how much money they spent. During its first week of testing, a student who spent nothing at all opened the app and read <em>"We couldn't find your spending data."</em> She emailed support to ask whether the app had lost her records. The app had not lost anything. It had her number, and her number was <code>0</code>.</p>
+<p>Ledger Lite is a simulated budgeting app that shows a student one line a week: how much money they spent. During its first week of testing, a student who spent nothing at all opened the app and read <em>"We couldn't find your spending data."</em> The student emailed support to ask whether the app had lost a week of records. The app did not lose any data. The student simply hadn't spent anything that week, so the total was <code>0</code>.</p>
 <p>Here is the function that produced that message:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def weekly_summary(total):
     if not total:
         return "We couldn't find your spending data."
     return f"You spent ${total} this week."</pre></div>
-<p>Read <code>if not total:</code> out loud and it sounds like "if there is no total." Python reads that line differently, and the gap between those two readings is what this whole reading is about: which line of a program runs next, and what an <code>if</code> statement really does with the value you hand it.</p>
+<p>Read <code>if not total:</code> out loud and it sounds like "if there is no total." Python reads that line as "if <code>total</code> is zero, empty, or missing," because an <code>if</code> statement first converts the value it is given into <code>True</code> or <code>False</code>. A total of <code>0</code> converts to <code>False</code>, which is how a week of spending nothing produced a missing-data message. The next few sections cover that conversion and the rule Python uses to decide which line runs next.</p>
 </section>
 
 <section class="mlrk-section">
@@ -52,7 +49,7 @@
 
 <section class="mlrk-section">
 <h2>3. Control flow, and why the order of the conditions matters</h2>
-<p>A week of $250 and a week of $20 should not get the same sentence out of Ledger Lite, and a program that runs every one of its lines every time cannot tell them apart. Python does run statements top to bottom by default, and that order is called control flow. An <code>if</code> / <code>elif</code> / <code>else</code> chain changes it. Python tests each condition from the top, runs the first branch whose condition is <code>True</code>, and skips the rest of the chain.</p>
+<p>Spending $250 in a week and spending $20 should not get the same output from Ledger Lite, and a program that runs every one of its lines every time cannot tell those two weeks apart. Python runs statements from top to bottom by default, and that order is called control flow. An <code>if</code> / <code>elif</code> / <code>else</code> chain changes that order: Python tests each condition from the top, runs the first branch whose condition is <code>True</code>, and skips the rest of the chain.</p>
 <p>Ledger Lite uses a chain to label how a week went:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def spending_tier(total):
     if total &gt; 200:
@@ -61,7 +58,7 @@
         return "Getting close"
     else:
         return "On track"</pre></div>
-<p>An <code>elif</code> only gets a turn when every condition above it tested <code>False</code>. That rule is the reason the order of the conditions is part of the logic, not a style choice. A developer who rearranges the chain to read "smallest first" writes this instead:</p>
+<p>Python evaluates an <code>elif</code> only when every condition above it tested <code>False</code>. That rule makes the order of the conditions part of the logic rather than a style choice. A developer who rearranges the chain to read "smallest first" writes this instead:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def spending_tier(total):
     if total &gt; 100:
         return "Getting close"
@@ -69,7 +66,7 @@
         return "Over budget"
     else:
         return "On track"</pre></div>
-<p>Trace $250 through that version. Python tests <code>total &gt; 100</code> first, 250 is greater than 100, so that branch returns "Getting close" and the chain ends before <code>elif total &gt; 200:</code> is ever evaluated. Trace $120 and the same first condition is <code>True</code> again, so it returns "Getting close" too. Both students read the exact same label. The student who spent $250 has already crossed the $200 line the app was built to warn her about, and the one sentence it gives her says she is getting close to that line, which she reads as "not over it yet." The diagram below traces <code>spending_tier(250)</code> through both versions.</p>
+<p>Trace $250 through that version. Python tests <code>total &gt; 100</code> first. 250 is greater than 100, so that branch returns "Getting close" and the chain ends before <code>elif total &gt; 200:</code> is ever evaluated. Trace $120 and the same first condition is <code>True</code> again, so it returns "Getting close" too. Both students read the exact same label. The student who spent $250 has already crossed the $200 line the app was built to warn about, and "Getting close" tells that student the opposite: still under the line, with room left to spend. The diagram below traces <code>spending_tier(250)</code> through both versions.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 880 400" role="img" aria-labelledby="csOrderTitle csOrderDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="csOrderTitle">The same value traced through two orderings of the same conditions</title>
@@ -129,7 +126,7 @@
 </details>
 
 <h3>When the <code>elif</code>s become separate <code>if</code> statements</h3>
-<p>A wrong order hands a student a single label for the wrong tier. A second mistake hands her several labels at once, and it looks even more innocent on the page. Picture a developer tidying up <code>spending_tier</code> who deletes the <code>el</code> from each <code>elif</code> and changes nothing else. Every line still reads like a sensible condition. Here is that version, printing instead of returning so every line that runs is visible:</p>
+<p>Putting the conditions in the wrong order shows one label from the wrong tier. A second mistake shows several labels at once and is harder to spot. Picture a developer tidying up <code>spending_tier</code> who deletes the <code>el</code> from each <code>elif</code> and changes nothing else. Every line still reads like a sensible condition, so nothing in the code looks broken. Here is that version, printing instead of returning so every line that runs is visible:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def label_week(total):
     if total &gt; 100:
         print("Getting close")
@@ -160,26 +157,30 @@ label_week(250)</pre></div>
 <section class="mlrk-section">
 <h2>4. Boolean context: what an <code>if</code> does to the value you give it</h2>
 <p>An <code>if</code> statement does not require a boolean. It creates a boolean context, which means Python first converts whatever value follows <code>if</code> into <code>True</code> or <code>False</code> by calling the <code>bool()</code> function on it.</p>
-<p><code>bool()</code> follows one rule, and it is worth learning as a rule rather than as a list of examples. All values are truthy except for <code>None</code>, <code>False</code>, the numbers <code>0</code> and <code>0.0</code>, the empty string <code>""</code>, and empty collections such as <code>[]</code> and <code>{}</code>. Those are the falsy values. Everything else Python can hold is truthy.</p>
+<p><code>bool()</code> follows a single rule. All values are truthy except for <code>None</code>, <code>False</code>, the numbers <code>0</code> and <code>0.0</code>, the empty string <code>""</code>, and empty collections such as <code>[]</code> and <code>{}</code>. Those are the falsy values. Everything else Python can hold is truthy.</p>
 <div class="mlrk-code"><pre class="mlrk-screen">print(bool(0))        # False
 print(bool(""))       # False
 print(bool(None))     # False
 print(bool([]))       # False  (an empty list)
 print(bool(100))      # True
 print(bool("hello"))  # True</pre></div>
-<p>That rule explains the bug from the start of this reading. The student spent nothing all week, so <code>weekly_summary</code> received <code>total = 0</code>. The <code>if not total:</code> line put <code>0</code> in a boolean context, and <code>bool(0)</code> produced <code>False</code>. The <code>not</code> operator flips a boolean to its opposite, so <code>not False</code> produced <code>True</code> and the <code>return</code> on the next line ran. <code>weekly_summary</code> never asked whether the data existed. It asked whether the number was zero, and <code>bool()</code> gives zero and missing the same answer.</p>
+<p>That rule explains the bug from the start of this reading. The student spent nothing all week, so <code>weekly_summary</code> received <code>total = 0</code>. The <code>if not total:</code> line put <code>0</code> in a boolean context, and <code>bool(0)</code> produced <code>False</code>. The <code>not</code> operator flips a boolean to its opposite, so <code>not False</code> produced <code>True</code> and the <code>return</code> on the next line ran. <code>weekly_summary</code> never asked whether the data existed. It asked whether <code>total</code> was falsy, and <code>0</code> and <code>None</code> are both falsy, so the function could not tell a $0 week apart from a week with no data at all.</p>
 
 <div class="mlrk-card">
-<p><strong>List the falsy values.</strong> Python has a short, fixed set of them, and everything else is truthy. Three are already named below. Type the other three, one per box.</p>
-<p class="mlrk-small">Already named: <code>False</code>, <code>0.0</code>, and empty collections such as <code>[]</code> and <code>{}</code>.</p>
-<div class="cs-blank-row"><label for="cs-blank1">The value that means "nothing is here at all":</label> <input type="text" id="cs-blank1" autocomplete="off" placeholder="first value"></div>
-<div class="cs-blank-row"><label for="cs-blank2">The one falsy whole number:</label> <input type="text" id="cs-blank2" autocomplete="off" placeholder="second value"></div>
-<div class="cs-blank-row"><label for="cs-blank3">The one falsy string, written the way Python writes it:</label> <input type="text" id="cs-blank3" autocomplete="off" placeholder="third value"></div>
-<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="cs-blank-check">Check my answers</button></div>
-<div id="cs-blank-fb" class="mlrk-feedback" tabindex="-1"></div>
+<p><strong>Check every value below that Python treats as falsy.</strong> Each one is written the way Python writes it, and more than one of them is falsy.</p>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="zero"> <span><code>0</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="strzero"> <span><code>"0"</code> (the digit zero inside quote marks)</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="none"> <span><code>None</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="neg"> <span><code>-1</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="emptystr"> <span><code>""</code> (two quote marks with nothing between them)</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="emptylist"> <span><code>[]</code> (an empty list)</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="false"> <span><code>False</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="cs-falsy-box" value="zerofloat"> <span><code>0.0</code></span></label>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="cs-falsy-submit">Check my answers</button></div>
+<div id="cs-falsy-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Every falsy value is a "nothing" of some kind: no value, no quantity, no characters, no items. Name the no-value one, the no-quantity whole number, and the string with no characters between its quote marks.</p>
+<p>Every falsy value is a "nothing" of some kind: no value, no quantity, no characters, no items. Two of the eight are not a nothing of any kind: one is a string that holds a character, and one is a number that is not zero.</p>
 </details>
 
 <p><strong>Predict before you read on.</strong> This snippet catches almost everybody the first time:</p>
@@ -196,7 +197,7 @@ else:
 <div id="cs-strfalse-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 
-<p>That bug and this snippet share a shape: <code>if not total:</code> was the wrong question for Ledger Lite, and it is the right question most of the time. Any function handed something a person may have left empty has to decide first whether there is anything to work with at all:</p>
+<p><code>if not total:</code> was the wrong question for Ledger Lite, but it is the right question most of the time. Any function handed something a person may have left empty has to decide first whether there is anything to work with at all:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def greet(name):
     if not name:
         return "I can't say hi if I don't know your name!"
@@ -204,8 +205,8 @@ else:
 
 print(greet(""))      # I can't say hi if I don't know your name!
 print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
-<p>The empty string is falsy, so <code>bool("")</code> is <code>False</code> and <code>not ""</code> is <code>True</code>, and the first <code>return</code> runs. <code>"Jane"</code> is a non-empty string and so it is truthy, which means <code>not "Jane"</code> evaluates to <code>False</code>, and Python skips past the guard to the greeting. You will meet the shape <code>if not something:</code> in nearly every program that takes input.</p>
-<p>The one thing <code>if not value:</code> cannot do is tell <code>None</code> apart from <code>0</code> or <code>""</code>, since <code>bool()</code> answers <code>False</code> for all three. Ledger Lite needed exactly that difference. When the question really is "is this <code>None</code>?", write <code>if value is None:</code>, which compares the value against <code>None</code> itself instead of converting it to a boolean:</p>
+<p>The empty string is falsy, so <code>bool("")</code> is <code>False</code> and <code>not ""</code> is <code>True</code>, and the first <code>return</code> runs. <code>"Jane"</code> is a non-empty string, so it is truthy. <code>not "Jane"</code> evaluates to <code>False</code>, and Python skips past the guard to the greeting line. You will see <code>if not something:</code> in nearly every program that takes input.</p>
+<p><code>if not value:</code> cannot tell <code>None</code> apart from <code>0</code> or <code>""</code>, because <code>bool()</code> answers <code>False</code> for all three. Ledger Lite needed exactly that difference. When the question really is "is this <code>None</code>?", write <code>if value is None:</code>, which compares the value against <code>None</code> itself instead of converting it to a boolean:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def weekly_summary(total):
     if total is None:
         return "We couldn't find your spending data."
@@ -215,7 +216,7 @@ print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
 
 <section class="mlrk-section">
 <h2>5. Guard clauses: handling the exceptions first</h2>
-<p>Ledger Lite's summary has three things to rule out before it can print a dollar amount. Nobody may be logged in, the week's total may never have been recorded, and the total may come back negative, which happens when a refund gets counted twice. Written as nested <code>if</code> statements, each case pushes the real work one level further to the right:</p>
+<p>Ledger Lite's summary has three things to rule out before it can print a dollar amount. Nobody may be logged in, the week's total may never have been recorded, and the total may come back negative, which happens when a refund gets counted twice. Checking those three cases with nested <code>if</code> statements pushes the real work one level further to the right each time:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def weekly_summary(user, total):
     if user is not None:
         if total is not None:
@@ -228,7 +229,7 @@ print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
     else:
         return "Please log in to see your summary."</pre></div>
 <p>The line that does the actual job sits four levels in. To know when that line runs, a reader has to hold three separate conditions in mind at the same time, and each <code>else</code> sits far below the <code>if</code> it belongs to. A reader who loses track of one condition will believe the function returns a dollar amount in a case where it really returns an error message.</p>
-<p>A guard clause is a single <code>if</code> statement that returns early. A <code>return</code> ends the function the moment it runs, so once a guard returns, not one line below it is evaluated. Each guard takes one exceptional case and leaves, which lets every line below it assume that case is already ruled out. That is what keeps the main path at one indentation level:</p>
+<p>A guard clause is a single <code>if</code> statement that returns early. A <code>return</code> ends the function the moment it runs, so once a guard returns, Python never evaluates a single line below it. Each guard handles one exceptional case and returns, so every line below it can assume that case is already ruled out. That is what keeps the main path at a single indentation level:</p>
 <div class="mlrk-code"><pre class="mlrk-screen">def weekly_summary(user, total):
     if user is None:
         return "Please log in to see your summary."
@@ -237,7 +238,7 @@ print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
     if total &lt; 0:
         return "That total looks wrong. We're checking it."
     return f"You spent ${total} this week."</pre></div>
-<p>Order matters for guards for the same reason it matters in an <code>elif</code> chain: the first guard whose condition is <code>True</code> returns, and the guards below it never run. Write the narrowest condition first.</p>
+<p>Guard order matters for the same reason the order of an <code>elif</code> chain matters: the first guard whose condition is <code>True</code> returns, and the guards below it never run. Write the narrowest condition first.</p>
 <p>The last <code>return</code> needs no <code>if</code> of its own. If the program reaches that line, all three guards tested <code>False</code>, which tells you <code>user</code> exists, <code>total</code> exists, and <code>total</code> is zero or more. Those are exactly the conditions the normal case requires, so there is nothing left for a condition on that line to test. The diagram below shows what the guards do to the shape of the function.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 880 400" role="img" aria-labelledby="csGuardTitle csGuardDesc" xmlns="http://www.w3.org/2000/svg">
@@ -284,7 +285,7 @@ print(greet("Jane"))  # Hi, Jane! Nice to meet you.</pre></div>
 <div id="cs-guard-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Two things pin the order down. Comparing <code>None</code> to a number with <code>&gt;</code> raises an error, so the guard that catches <code>None</code> has to run before any comparison does. And the narrowest-first rule above still applies: the first guard that is <code>True</code> returns, so a wider condition placed over a narrower one will swallow it.</p>
+<p>Two things pin the order down. Comparing <code>None</code> to a number with <code>&gt;</code> raises an error, so the guard that catches <code>None</code> has to run before any comparison does. The narrowest-first rule above still applies too: the first guard that is <code>True</code> returns, so a wider condition placed above a narrower one returns first and the narrower one never runs.</p>
 </details>
 </section>
 
@@ -299,12 +300,12 @@ else:
 
 # Better - a conditional expression picks which value gets assigned
 word = "purchase" if count == 1 else "purchases"</pre></div>
-<p>The form is <code>value_a if condition else value_b</code>, and the whole expression becomes <code>value_a</code> when the condition is <code>True</code> and <code>value_b</code> when it is <code>False</code>. A conditional expression can only hand back a value, so reach for one when both branches feed the same destination and keep the full <code>if</code> / <code>else</code> statement when they run different code.</p>
+<p>The form is <code>value_a if condition else value_b</code>, and the whole expression becomes <code>value_a</code> when the condition is <code>True</code> and <code>value_b</code> when it is <code>False</code>. A conditional expression produces a value and nothing else, so use one when both branches assign to the same variable, and keep the full <code>if</code> / <code>else</code> statement when the two branches need to run different code.</p>
 </section>
 
 <section class="mlrk-section">
 <h2>7. Summary and reflection</h2>
-<p>An <code>if</code> / <code>elif</code> / <code>else</code> chain runs the first branch whose condition is <code>True</code> and skips the rest, so the order you write the conditions in decides where a value lands. Turn those <code>elif</code> statements into separate <code>if</code> statements and Python evaluates every one of them, so several branches can run on a single call. An <code>if</code> also converts the value you hand it with <code>bool()</code>, which is why <code>0</code> and "no data" look identical to <code>if not total:</code>.</p>
+<p>An <code>if</code> / <code>elif</code> / <code>else</code> chain runs the first branch whose condition is <code>True</code> and skips the rest, so the order you write the conditions in decides which label a value gets. Turn those <code>elif</code> statements into separate <code>if</code> statements and Python evaluates every one of them, so several branches can run on a single call. An <code>if</code> also converts the value you hand it with <code>bool()</code>, which is why <code>0</code> and "no data" look identical to <code>if not total:</code>.</p>
 <label for="cs-reflect"><strong>The guard-clause version of <code>weekly_summary</code> in section 5 ends with <code>return f"You spent ${total} this week."</code> and no <code>if</code> of its own.</strong> In 2-3 sentences, say what the three guards above it have already settled about <code>user</code> and <code>total</code> by the time Python reaches that line, and explain why a condition on that line would have nothing left to test.</label>
 <textarea id="cs-reflect" class="mlrk-response" data-save></textarea>
 </section>
@@ -351,7 +352,7 @@ word = "purchase" if count == 1 else "purchases"</pre></div>
     answerLabel: "\"Getting close\"",
     feedback: {
       over: "That is what the original chain returns, where <code>total &gt; 200</code> is tested first. In the swapped version <code>if total &gt; 100:</code> sits above it, and 340 is greater than 100, so Python returns on that first line and never reaches <code>elif total &gt; 200:</code>.",
-      close: "Python tests <code>total &gt; 100</code> first, 340 is greater than 100, so that branch returns and the chain ends there. <code>elif total &gt; 200:</code> is never evaluated, which means every total above 100 gets the same label no matter how far above it goes.",
+      close: "Python tests <code>total &gt; 100</code> first. 340 is greater than 100, so that branch returns and the chain ends there. <code>elif total &gt; 200:</code> is never evaluated, which means every total above 100 gets the same label, whether it is $101 or $10,000.",
       track: "<code>else</code> runs only when every condition above it tested <code>False</code>. Here <code>total &gt; 100</code> tested <code>True</code> for 340, so Python returned on that branch and never reached the <code>else</code>."
     }
   });
@@ -364,14 +365,14 @@ word = "purchase" if count == 1 else "purchases"</pre></div>
     maxAttempts: 2,
     options: [
       {value:"close", label:"Getting close", correct:true,
-        hint:"Work out <code>250 &gt; 100</code> on its own, with nothing above it to stop Python evaluating it.",
+        hint:"Work out <code>250 &gt; 100</code> on its own, with nothing above it to stop Python from evaluating it.",
         explain:"<code>250 &gt; 100</code> is <code>True</code>, so this line prints. In the <code>elif</code> version the function would have stopped right here, but a separate <code>if</code> does not end anything, so Python carries on to the next one."},
       {value:"over", label:"Over budget", correct:true,
-        hint:"A line printing above this one does not stop Python from evaluating this one.",
-        explain:"<code>250 &gt; 200</code> is also <code>True</code>, so this line prints as well. Two messages come out of one call, which is the behaviour an <code>elif</code> chain is there to prevent."},
+        hint:"A line that prints above this one does not stop Python from evaluating this condition.",
+        explain:"<code>250 &gt; 200</code> is also <code>True</code>, so this line prints as well. Two messages come out of one call, which is exactly what an <code>elif</code> chain prevents."},
       {value:"way", label:"Way over", correct:false,
         hint:"Compare 250 against the number in this condition.",
-        explain:"<code>250 &gt; 500</code> is <code>False</code>, so Python skips this line. Separate <code>if</code> statements run every true condition, and this one is not true."},
+        explain:"<code>250 &gt; 500</code> is <code>False</code>, so Python skips this line. Python runs the body of every separate <code>if</code> whose condition is <code>True</code>, and this condition is not <code>True</code>."},
       {value:"track", label:"On track", correct:false,
         hint:"Compare 250 against the number in this condition.",
         explain:"<code>250 &lt;= 100</code> is <code>False</code>, so this line is skipped. Writing the conditions as separate <code>if</code> statements means this last one gets evaluated on every call rather than acting as an <code>else</code>."}
@@ -391,44 +392,77 @@ word = "purchase" if count == 1 else "purchases"</pre></div>
     }
   });
 
-  const blank1 = document.getElementById("cs-blank1");
-  const blank2 = document.getElementById("cs-blank2");
-  const blank3 = document.getElementById("cs-blank3");
-  const blankBtn = document.getElementById("cs-blank-check");
-  const blankFb = document.getElementById("cs-blank-fb");
+  // Falsy select-all. Every option carries its own nudge and its own
+  // explanation, so a student sees specific feedback on each box they got
+  // wrong on the first try and on all eight boxes once the answers are shown.
+  const FALSY_OPTS = [
+    {value:"zero", label:"<code>0</code>", correct:true,
+      hint:"This is the number zero itself, the same value Ledger Lite had when a student spent nothing all week.",
+      explain:"Falsy. <code>bool(0)</code> is <code>False</code>, which is exactly why <code>if not total:</code> treated a $0 week as missing data."},
+    {value:"strzero", label:"<code>\"0\"</code>", correct:false,
+      hint:"Look at the quote marks. This is a string, not a number.",
+      explain:"Truthy. The quote marks make this a string holding one character, and every string with at least one character in it is truthy, so <code>bool(\"0\")</code> is <code>True</code>."},
+    {value:"none", label:"<code>None</code>", correct:true,
+      hint:"This is the value Python uses when there is no value at all.",
+      explain:"Falsy. <code>None</code> is Python's value for \"nothing is here at all\", and <code>bool(None)</code> is <code>False</code>."},
+    {value:"neg", label:"<code>-1</code>", correct:false,
+      hint:"Ask whether this number is zero, not whether it is below zero.",
+      explain:"Truthy. The only falsy numbers are <code>0</code> and <code>0.0</code>. <code>-1</code> is not zero, so <code>bool(-1)</code> is <code>True</code>."},
+    {value:"emptystr", label:"<code>\"\"</code>", correct:true,
+      hint:"Count the characters between the quote marks.",
+      explain:"Falsy. The empty string holds no characters, so <code>bool(\"\")</code> is <code>False</code>. This is what lets <code>if not name:</code> catch a form field someone left blank."},
+    {value:"emptylist", label:"<code>[]</code>", correct:true,
+      hint:"Count the items inside the brackets.",
+      explain:"Falsy. An empty list holds no items, and the same goes for every other empty collection, including the empty dictionary <code>{}</code>. Put one item in the list and it turns truthy."},
+    {value:"false", label:"<code>False</code>", correct:true,
+      hint:"This one is already a boolean, so no conversion happens.",
+      explain:"Falsy. <code>False</code> is already a boolean, so <code>bool()</code> leaves it alone and the <code>if</code> sees <code>False</code>."},
+    {value:"zerofloat", label:"<code>0.0</code>", correct:true,
+      hint:"This is the same quantity as 0, written as a decimal.",
+      explain:"Falsy. <code>0.0</code> is zero written as a decimal, and <code>bool(0.0)</code> is <code>False</code>, the same answer <code>bool(0)</code> gives."}
+  ];
+  const FULL_LIST = "<code>None</code>, <code>False</code>, <code>0</code>, <code>0.0</code>, <code>\"\"</code>, and empty collections such as <code>[]</code> and <code>{}</code>";
+  const falsyBoxes = Array.prototype.slice.call(document.querySelectorAll(".cs-falsy-box"));
+  const falsyBtn = document.getElementById("cs-falsy-submit");
+  const falsyFb = document.getElementById("cs-falsy-fb");
   K.Scoring.register("act-falsy-list", 1, "quiz");
-  let blankAttempts = 0, blankDone = false;
-  function norm(s){ return s.trim().toLowerCase(); }
-  blankBtn.addEventListener("click", function(){
-    if(blankDone) return;
-    blankAttempts++;
-    const v1 = norm(blank1.value);
-    const v2 = norm(blank2.value);
-    const v3 = norm(blank3.value);
-    const ok1 = v1 === "none";
-    const ok2 = v2 === "0";
-    const ok3 = ['""', "''", "empty string", "the empty string"].indexOf(v3) !== -1;
-    if(ok1 && ok2 && ok3){
-      K.Scoring.award("act-falsy-list", blankAttempts === 1 ? 1 : 0.5);
-      blankFb.className = "mlrk-feedback mlrk-show mlrk-good";
-      blankFb.innerHTML = "<strong>Correct.</strong> The full list is <code>None</code>, <code>False</code>, <code>0</code>, <code>0.0</code>, <code>\"\"</code>, and empty collections such as <code>[]</code> and <code>{}</code>. Every other value Python can hold is truthy, which is why you can learn the falsy side and infer the rest.";
-      blankDone = true;
-    } else if(blankAttempts >= 2){
+  let falsyAttempts = 0, falsyDone = false;
+  function falsyBreakdown(){
+    return "<ul>" + FALSY_OPTS.map(function(o){
+      return "<li>" + o.label + " \u2014 " + o.explain + "</li>";
+    }).join("") + "</ul>";
+  }
+  function endFalsy(){
+    falsyDone = true;
+    falsyBoxes.forEach(function(b){ b.disabled = true; });
+    falsyBtn.disabled = true;
+  }
+  falsyBtn.addEventListener("click", function(){
+    if(falsyDone) return;
+    falsyAttempts++;
+    const picked = {};
+    falsyBoxes.forEach(function(b){ picked[b.value] = b.checked; });
+    const missed = FALSY_OPTS.filter(function(o){ return !!picked[o.value] !== o.correct; });
+    if(missed.length === 0){
+      K.Scoring.award("act-falsy-list", falsyAttempts === 1 ? 1 : 0.5);
+      falsyFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      falsyFb.innerHTML = "<strong>Correct" + (falsyAttempts > 1 ? " (2nd try \u2014 0.5 pt)" : " (1st try \u2014 1 pt)") + ".</strong> The falsy values are " + FULL_LIST +
+        ". Every other value Python can hold is truthy, including <code>\"0\"</code>, which is a string rather than a number, and <code>-1</code>, which is a number but not zero." +
+        falsyBreakdown();
+      endFalsy();
+    } else if(falsyAttempts >= 2){
       K.Scoring.award("act-falsy-list", 0);
-      blankFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
-      blankFb.innerHTML = "<strong>Here are the three.</strong> <code>None</code> is the value that means nothing is here at all. <code>0</code> is the one falsy whole number, and <code>0.0</code> is its decimal twin. <code>\"\"</code> is the one falsy string, because it holds no characters, which makes the full list <code>None</code>, <code>False</code>, <code>0</code>, <code>0.0</code>, <code>\"\"</code>, and empty collections such as <code>[]</code> and <code>{}</code>.";
-      blankDone = true;
+      falsyFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      falsyFb.innerHTML = "<strong>Here is every box.</strong> The falsy values are " + FULL_LIST + "." + falsyBreakdown();
+      endFalsy();
     } else {
-      blankFb.className = "mlrk-feedback mlrk-show mlrk-bad";
-      const wrong = [];
-      if(!ok1) wrong.push("the first box, which wants the value that stands for no value at all");
-      if(!ok2) wrong.push("the second box, which wants a whole number");
-      if(!ok3) wrong.push("the third box, which wants a string written with its quote marks and nothing between them");
-      blankFb.innerHTML = "<strong>Not there yet.</strong> Re-check " + wrong.join(", and ") +
-        ". Each falsy value is a \"nothing\" of some kind, so name the one that fits each description." +
-        "<div class=\"mlrk-attempt-note\">One more try before the answers are revealed.</div>";
+      falsyFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      falsyFb.innerHTML = "<strong>Not there yet.</strong> Re-check " +
+        (missed.length === 1 ? "this one:" : "these:") + "<ul>" +
+        missed.map(function(o){ return "<li>" + o.label + " \u2014 " + o.hint + "</li>"; }).join("") +
+        "</ul><div class=\"mlrk-attempt-note\">One more try before the answers are revealed.</div>";
     }
-    blankFb.setAttribute("tabindex","-1"); blankFb.focus();
+    falsyFb.setAttribute("tabindex","-1"); falsyFb.focus();
   });
 
   K.orderSteps("#cs-guard-order", {
