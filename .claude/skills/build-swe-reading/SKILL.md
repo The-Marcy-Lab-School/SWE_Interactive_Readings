@@ -80,6 +80,64 @@ No numbered "Recall" section, otherwise similar shape to the DA readings:
    Doesn't count toward the reading's stated time estimate — it's optional and outside the timed activities. It goes last, after the summary/reflection, not before it — a student closes out the required content first, then sees the optional "if you want more" links on their way to the score chip.
 9. **Score chip** (`ReadingKit.Scoring.renderChip`) + **Copy Plain Text Answers** and **Download as .txt** buttons side by side in one `.mlrk-actions` row (`ReadingKit.copyPlainText` + `ReadingKit.downloadPlainText`) + copyright footer.
 
+## Mod 1: one reading per GitBook lesson (added 2026-10-05)
+
+Mod 1 is no longer a loose set of Python topics. It mirrors the fellowship's
+own GitBook, **one reading per lesson, 1.1 through 1.13**, and the mapping is
+machine-readable in `curriculum/mod1-lessons.json` — generated from the
+GitBook and cross-checked against `SWE_Mod1_LOs_KeyTerms.docx`, which carries
+an identical term list. Read that file before building or editing any Mod 1
+reading; don't re-derive the lesson list from memory or from folder names.
+
+- **Folder slug comes from the manifest's `slug`** (`Mod1/04-conditional-statements/`).
+  Numbers are **zero-padded** so that `build_readme.py`'s path sort produces the
+  real teaching order — the GitBook's own unpadded slugs (`10-...` before `2-...`)
+  would not. The displayed lesson number stays `1.4`, matching what students see.
+- **Every key term in that lesson's `key_terms` must be defined in the reading**,
+  in the vocabulary flip-card section, using the GitBook's own wording as the
+  basis. This overrides the general "only the terms actually needed" guidance
+  above: for Mod 1, the lesson's key-term list *is* the required set, no more and
+  no less. `qa/reading_qa.py`'s `check_mod1_key_terms` ERRORs on a missing term.
+- **Don't invent a different split.** A reading covers its lesson and stops.
+  Strings belong to 1.6 Inputs and Outputs, not to 1.4 Conditional Statements,
+  even though an older reading mixed them.
+- The lesson's `gitbook_sections` show what the lesson actually covers and in
+  what order. A reading is not a transcript of the GitBook page — it still opens
+  on a real scenario and teaches one mechanism — but it must not contradict the
+  page or skip a concept the page treats as central.
+
+## Writing rules (from Ben's AI writing guide, 2026-10-05)
+
+These came out of comparing Claude-written explanatory prose against Ben's
+rewrite of the same paragraph. They apply to all explanatory prose and
+especially to quiz feedback, hint text, and reveal text, where the reasoning
+gets compressed hardest.
+
+1. **State the problem before the solution.** Say what goes wrong, and for whom,
+   before saying what the code does about it. A solution means little until the
+   reader has seen the problem.
+2. **Spell out the consequence, not just the judgment.** Don't call an outcome
+   bad, unclear, or confusing without saying what a person would wrongly believe
+   or do because of it.
+3. **Every "so", "because", and "therefore" must follow from a premise already
+   on the page.** If the step that justifies the connective is missing, write
+   the step.
+4. **State the rule, not only the result.** Name the rule that allows the
+   behavior ("a `for` loop is allowed to iterate over an empty list"), not only
+   what happened ("a `for` loop over an empty list runs zero times").
+5. **Prefer positive statements to "not X, but Y".** Use the contrast only when
+   the reader is likely to hold X, and check first whether stating the positive
+   rule already clears up the misconception.
+6. **Make the subject of an explanation the actual code element, with an active
+   verb.** Write "the `if` statement causes the program to display…", not "it is
+   there so that…". Name the exact piece of code, not a word the code never uses
+   ("the check").
+
+The failure these guard against is brevity that drops a step of reasoning
+between sentences. Sentences that each read fine on their own, with the links
+between them missing, is the exact signature of AI-written explanation — a
+sentence here is allowed to be longer if it carries the link.
+
 ## Time estimate methodology (10-15 min ceiling, video included)
 Build the top-of-page time pill from real counts:
 - ~40 seconds per quiz/question-style item.

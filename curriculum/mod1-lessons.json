@@ -1,0 +1,668 @@
+{
+  "_comment": "Mod 1 lesson sequence and key terms, extracted verbatim from the Marcy GitBook and cross-checked against SWE_Mod1_LOs_KeyTerms.docx, which carries an identical term list. One reading per lesson; folder slug = `slug` below. A reading must define every term in its own lesson's `key_terms`; qa/reading_qa.py's check_mod1_key_terms enforces this. Regenerate from the GitBook rather than hand-editing. `parent` marks a term the GitBook nests under a broader one, such as the six operator families under Operators. Definitions are the GitBook's own wording with a leading copula trimmed, so they read as a sentence fragment completing '<term> ...' — rewrite them for students, don't paste verbatim into a flip card.",
+  "_source_url": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals",
+  "lessons": [
+    {
+      "lesson": "1.1",
+      "slug": "01-intro-to-programming",
+      "title": "Intro to Programming",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/1-intro-to-programming",
+      "gitbook_sections": [
+        "Setup",
+        "What is a program?",
+        "Running a file with the Python interpreter",
+        "Printing to the Terminal with `print()`",
+        "Control Flow",
+        "Code Style and Readability"
+      ],
+      "key_terms": [
+        {
+          "term": "program",
+          "definition": "A is a text file containing instructions that a computer executes to accomplish a task."
+        },
+        {
+          "term": "Comments",
+          "definition": "used to document and explain code. They are ignored when a program is executed. A comment line begins with the # symbol and can be placed on its own line or following valid code."
+        },
+        {
+          "term": "Expressions",
+          "definition": "any piece of code that evaluates to a single value. They are often the result of using operators (+, *, >, == etc...) or invoking functions (len(\"hi\"))."
+        },
+        {
+          "term": "Statements",
+          "definition": "change the program. Creating a variable increases the memory used by the program. if statements change the \"control flow\" of a program by skipping lines of code."
+        },
+        {
+          "term": "State",
+          "definition": "the data stored by a program at a point in time."
+        },
+        {
+          "term": "Python interpreter",
+          "definition": "The is the program that reads a .py file and executes it, one statement at a time. You start it with the python3 command."
+        },
+        {
+          "term": "print()",
+          "definition": "The function is a built-in function that displays text to the Terminal output. It is used to view the result of code operations, primarily for debugging purposes."
+        },
+        {
+          "term": "f-string",
+          "definition": "An is a string with an f before the opening quote. Any expression written inside {} is evaluated and its value is placed into the text."
+        },
+        {
+          "term": "Control Flow",
+          "definition": "the order in which lines of code are executed. Control flow runs from the top of a file to the bottom."
+        },
+        {
+          "term": "Code Style",
+          "definition": "the formatting of the code in a way that makes it easier to read and understand. Python's style conventions are written down in a document called PEP 8."
+        }
+      ]
+    },
+    {
+      "lesson": "1.2",
+      "slug": "02-data-types-variables-operators",
+      "title": "Data Types, Variables, and Operators",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/2-data-types-variables",
+      "gitbook_sections": [
+        "Computation is All About Data",
+        "Data Types",
+        "Operators",
+        "Variables",
+        "Operators in Depth"
+      ],
+      "key_terms": [
+        {
+          "term": "State",
+          "definition": "the data stored by a program at a point in time."
+        },
+        {
+          "term": "Data types",
+          "definition": "categories of values in Python. There are 5 basic types (str, int, float, bool, None) and 3 types that hold other data or code (list, dict, and functions). Knowing the type of a value helps determines how you can use that value. Choosing the right type to represent your data is essential."
+        },
+        {
+          "term": "Operators",
+          "definition": "symbols (e.g. +, >=, and) that generate new data from existing values."
+        },
+        {
+          "term": "Arithmetic operators",
+          "definition": "(+, -, *, /, //, %, **) calculate a new value from numbers.",
+          "parent": "Operators"
+        },
+        {
+          "term": "Comparison operators",
+          "definition": "(==, !=, <, >, <=, >=) compare two values and produce a boolean.",
+          "parent": "Operators"
+        },
+        {
+          "term": "Logical operators",
+          "definition": "(and, or, not) combine or reverse conditions.",
+          "parent": "Operators"
+        },
+        {
+          "term": "Membership operators",
+          "definition": "(in, not in) check whether a value is inside a string, list, or dictionary.",
+          "parent": "Operators"
+        },
+        {
+          "term": "Identity operators",
+          "definition": "(is, is not) check whether two names refer to the very same object.",
+          "parent": "Operators"
+        },
+        {
+          "term": "Assignment operators",
+          "definition": "(=, +=, -=, and the rest) store a value in a variable.",
+          "parent": "Operators"
+        },
+        {
+          "term": "Operator precedence",
+          "definition": "the order in which Python evaluates the operators in an expression, such as multiplication before addition. Parentheses change that order: whatever is inside them is evaluated first."
+        },
+        {
+          "term": "Variables",
+          "definition": "named containers for data. You can reference and reassign variables to store and update information in your program. A variable is created the first time it is assigned. Names in ALL_CAPS are a signal to readers that a value is a constant and should not be reassigned."
+        },
+        {
+          "term": "snake_case",
+          "definition": "the Python convention for naming variables and functions: lowercase words joined by underscores, like days_in_each_month."
+        }
+      ]
+    },
+    {
+      "lesson": "1.3",
+      "slug": "03-functions",
+      "title": "Functions",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/3-functions",
+      "gitbook_sections": [
+        "What is `print()`?",
+        "Don't Repeat Yourself (DRY)",
+        "Functions",
+        "Functions Create Local Variable Scope"
+      ],
+      "key_terms": [
+        {
+          "term": "Don't Repeat Yourself (DRY)",
+          "definition": "a principle of software engineering aimed at making it easier to maintain, update, and debug code."
+        },
+        {
+          "term": "Functions",
+          "definition": "named containers for statements that can be invoked to execute code, improving readability and reducing repetition."
+        },
+        {
+          "term": "Built-in functions",
+          "definition": "like print(), len(), and type() come with Python, so they can be called without being defined first."
+        },
+        {
+          "term": "docstring",
+          "definition": "A is a string written on the first line of a function's body that describes what the function does. VS Code and the built-in help() function show it to whoever is about to call the function."
+        },
+        {
+          "term": "Parameters",
+          "definition": "placeholders for inputs given to the function. Parameters can be used by their function to change the function's behavior."
+        },
+        {
+          "term": "Arguments",
+          "definition": "the actual values given when invoking a function."
+        },
+        {
+          "term": "Return statements",
+          "definition": "allow functions to produce values that can be used elsewhere in your program and terminate function execution. A function with no return statement returns None."
+        },
+        {
+          "term": "default values",
+          "definition": "Parameters can have , and arguments can be passed by keyword as well as by position."
+        },
+        {
+          "term": "NameError",
+          "definition": "A is raised when a line uses a name that does not exist at the moment that line runs: the name is misspelled, it belongs to a different function's scope, or it is assigned (or its function is defined) further down the file than the line that uses it."
+        },
+        {
+          "term": "TypeError",
+          "definition": "A is raised when a value is the wrong type for what the code asks of it, such as adding a string to a number, or when a function is called with the wrong number of arguments."
+        },
+        {
+          "term": "Scope",
+          "definition": "determines where variables can be accessed."
+        },
+        {
+          "term": "Global scope",
+          "definition": "the file, outside of any function. A variable assigned there is reachable anywhere in that file.",
+          "parent": "Scope"
+        },
+        {
+          "term": "Local scope",
+          "definition": "the inside of a function. A variable or parameter assigned there exists only while that function is running and is reachable only within it.",
+          "parent": "Scope"
+        }
+      ]
+    },
+    {
+      "lesson": "1.4",
+      "slug": "04-conditional-statements",
+      "title": "Conditional Statements",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/4-conditional-statements",
+      "gitbook_sections": [
+        "Conditional Statements"
+      ],
+      "key_terms": [
+        {
+          "term": "Control Flow",
+          "definition": "the order in which statements of a program are executed, typically top-to-bottom."
+        },
+        {
+          "term": "Conditional statements",
+          "definition": "(if, elif, else) let you control the flow of your program based on data values. The order of conditions matters, and only the first true condition in a chain will execute."
+        },
+        {
+          "term": "Guard clauses",
+          "definition": "single if statements that return early from a function, simplifying conditional logic."
+        },
+        {
+          "term": "boolean context",
+          "definition": "An if statement creates a where non-boolean values are converted to Booleans using the bool() function."
+        },
+        {
+          "term": "truthy",
+          "definition": "Non-boolean values used in a boolean context are considered if they evaluate to True or falsy if they evaluate to False. All values are truthy except for None, False, the numbers 0 and 0.0, the empty string \"\", and empty collections such as [] and {}."
+        },
+        {
+          "term": "Conditional expressions",
+          "definition": "provide a concise way to choose between two values based on a condition."
+        }
+      ]
+    },
+    {
+      "lesson": "1.5",
+      "slug": "05-loops",
+      "title": "Loops",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/5-loops",
+      "gitbook_sections": [
+        "Intro to Iteration",
+        "The `for` loop",
+        "While Loops and Infinite Loops",
+        "Nested Loops"
+      ],
+      "key_terms": [
+        {
+          "term": "Loops",
+          "definition": "allow you to repeat code multiple times, making it easy to automate repetitive tasks and process collections of data."
+        },
+        {
+          "term": "for loop",
+          "definition": "The with range() is best for repeating a process a known number of times, such as counting."
+        },
+        {
+          "term": "iterable",
+          "definition": "An is any value a for loop can walk through one element at a time. A range() and a string are both iterables."
+        },
+        {
+          "term": "while loop",
+          "definition": "The is useful for repeating a process an unknown number of times, continuing until a condition is no longer true."
+        },
+        {
+          "term": "Infinite loops",
+          "definition": "occur when the loop's condition never becomes false; use break to exit early and continue to skip to the next iteration."
+        },
+        {
+          "term": "Nested loops",
+          "definition": "let you loop inside another loop, useful for working with multi-dimensional data or complex processes. Loop challenges help you practice using loops to solve real problems, such as counting results or repeating until something happens."
+        }
+      ]
+    },
+    {
+      "lesson": "1.6",
+      "slug": "06-inputs-and-outputs",
+      "title": "Inputs and Outputs",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/6-inputs-outputs",
+      "gitbook_sections": [
+        "Strings",
+        "Output with `print()`",
+        "Input with `input()`",
+        "Type Conversion",
+        "Madlib Challenge"
+      ],
+      "key_terms": [
+        {
+          "term": "Strings",
+          "definition": "sequences of characters enclosed in quotes (single or double). Strings are immutable, meaning their characters cannot be changed directly."
+        },
+        {
+          "term": "bracket notation",
+          "definition": "You can *access* individual characters of a string with ."
+        },
+        {
+          "term": "len(str)",
+          "definition": "You can check the length of a string with (and you can use this method on lists and dictionaries too!)."
+        },
+        {
+          "term": "method",
+          "definition": "A is a function that is attached to a value. Methods are invoked using dot notation: value.method()."
+        },
+        {
+          "term": "String methods",
+          "definition": "like startswith, endswith, find, upper, replace, strip, and split allow you to search, analyze, and manipulate string data."
+        },
+        {
+          "term": "in operator",
+          "definition": "The checks whether one string contains another."
+        },
+        {
+          "term": "print()",
+          "definition": "takes any number of values. It puts sep between them, a space unless you say otherwise, and end after them, a new line unless you say otherwise."
+        },
+        {
+          "term": "f-strings",
+          "definition": "interpolate the value of any expression written inside {} into a string. A format specifier after a colon, like {price:.2f}, controls how the value is displayed."
+        },
+        {
+          "term": "input()",
+          "definition": "The function gets input from the user. It always returns a string, so converting it to another type is your job."
+        },
+        {
+          "term": "Type conversion",
+          "definition": "with str(), int(), float(), bool() turns a value of one type into another."
+        },
+        {
+          "term": "hard-coded",
+          "definition": "A program is if the program code must be modified in order to produce a new result."
+        }
+      ]
+    },
+    {
+      "lesson": "1.7",
+      "slug": "07-lists",
+      "title": "Lists",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/7-lists",
+      "gitbook_sections": [
+        "List Basics",
+        "Mutable Values and References",
+        "Advanced List Syntax"
+      ],
+      "key_terms": [
+        {
+          "term": "Lists",
+          "definition": "ordered collections of values. Like strings, they have indexes starting at 0, support bracket notation and slicing, and work with len() and the in operator."
+        },
+        {
+          "term": "mutable",
+          "definition": "Unlike strings, lists are . Methods like append, insert, pop, and remove change a list in place."
+        },
+        {
+          "term": "reference",
+          "definition": "A variable does not hold a list. It holds a to the list. Two variables can reference the same list, and a function receiving a list receives a reference to the caller's list."
+        },
+        {
+          "term": "pure function",
+          "definition": "A returns the same output for the same input and has no side effects. Functions that mutate the list they are given are impure. To keep a function pure, make a copy first with list(arr), arr[:], or [*arr]."
+        },
+        {
+          "term": "2D lists",
+          "definition": "Lists can contain other lists (), and a list can be unpacked into several variables at once. A tuple is a list that cannot change, written with parentheses."
+        }
+      ]
+    },
+    {
+      "lesson": "1.8",
+      "slug": "08-dictionaries",
+      "title": "Dictionaries",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/8-dictionaries",
+      "gitbook_sections": [
+        "The basics",
+        "Dictionaries are Mutable and Held by Reference",
+        "Iterating Over Keys and Values of a Dictionary",
+        "Lists of Dictionaries",
+        "Dictionaries and Functions"
+      ],
+      "key_terms": [
+        {
+          "term": "Dictionaries",
+          "definition": "data structures that store multiple pieces of data as key-value pairs, useful for representing real-world entities like users or products."
+        },
+        {
+          "term": "key",
+          "definition": "A is the name a value is stored under and looked up by. Each key appears only once in a dictionary.",
+          "parent": "Dictionaries"
+        },
+        {
+          "term": "value",
+          "definition": "A is the data stored under a key. It can be any type, including a list or another dictionary.",
+          "parent": "Dictionaries"
+        },
+        {
+          "term": "bracket notation",
+          "definition": "Dictionary values are accessed using (my_dict[\"key\"]), which raises a KeyError for a missing key, or with the .get() method, which returns None (or a default you choose) instead."
+        },
+        {
+          "term": "mutable",
+          "definition": "Dictionaries are , meaning you can add, modify, or delete key-value pairs after creation using assignment, del, or .pop()."
+        },
+        {
+          "term": "nested data",
+          "definition": "Dictionaries can contain including lists and other dictionaries, allowing for complex data structures."
+        },
+        {
+          "term": "reference",
+          "definition": "Like lists, dictionaries are held by . Copy one with dict(my_dict) before changing it inside a pure function."
+        },
+        {
+          "term": ".keys()",
+          "definition": ".values(), and .items() let you loop over a dictionary. .items() hands you each key and value together."
+        }
+      ]
+    },
+    {
+      "lesson": "1.9",
+      "slug": "09-modules-environments-pytest",
+      "title": "Modules, Virtual Environments, and pytest",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/9-modules-environments-pytest",
+      "gitbook_sections": [
+        "Modules",
+        "What Happens When You Import a File?",
+        "The Standard Library",
+        "Third-Party Packages and PyPI",
+        "Virtual Environments with `venv`",
+        "Installing Packages with `pip`",
+        "Dependencies and Sub-Dependencies",
+        "`requirements.txt`",
+        "Developer Dependencies",
+        "Testing Your Code with pytest",
+        "The Commands, All Together"
+      ],
+      "key_terms": [
+        {
+          "term": "module",
+          "definition": "A is a file containing code, which can then be imported and utilized in other parts of a larger program or system. Every function and variable defined at the top level of a file can be imported by another file. A module is imported with import module_name, or specific names are imported with from module_name import name."
+        },
+        {
+          "term": "runs",
+          "definition": "Importing a file it, top to bottom. The variable __name__ tells a file whether it is being run directly (\"__main__\") or imported by another file. The if __name__ == \"__main__\": guard is how a file says \"only run this part when I am the program being run\"."
+        },
+        {
+          "term": "standard library",
+          "definition": "The is the collection of modules that come with Python. random, math, time, and json are examples. They need import but no installation."
+        },
+        {
+          "term": "package",
+          "definition": "A is a folder of modules that someone has published so that other people can install it and import it. pytest is a package."
+        },
+        {
+          "term": "library",
+          "definition": "A is a collection of code written for other programs to use rather than to be run on its own. The standard library is Python's own library, and many packages, like pytest, are libraries too."
+        },
+        {
+          "term": "Python Package Index (PyPI)",
+          "definition": "Third-party packages are published on the and installed with pip, Python's package installer."
+        },
+        {
+          "term": "virtual environment",
+          "definition": "A is a private copy of Python and its packages for one project. You create one with python3 -m venv .venv and turn it on with source .venv/bin/activate. Installing a package inside an activated virtual environment installs it only there."
+        },
+        {
+          "term": "sub-dependencies",
+          "definition": "A package can have , other packages it needs, and pip installs those too.",
+          "parent": "virtual environment"
+        },
+        {
+          "term": "requirements.txt",
+          "definition": "a file listing the packages a project needs. pip freeze > requirements.txt writes it; pip install -r requirements.txt reads it."
+        },
+        {
+          "term": ".gitignore",
+          "definition": "A file lists the files and folders in a project that Git should not track. The .venv/ and __pycache__/ folders go in it. The .venv folder is never committed; it is rebuilt from requirements.txt instead."
+        },
+        {
+          "term": "JSON",
+          "definition": "a text format for storing lists and dictionaries in a file. The standard library's json module writes them with json.dump() and reads them back with json.load()."
+        },
+        {
+          "term": "Developer dependencies",
+          "definition": "like pytest are packages used by the developer(s) of a project but not needed by the people who run it."
+        },
+        {
+          "term": "unit test",
+          "definition": "A is a small program that calls one function with a known input and checks that the output is what you expected. A collection of them is a test suite."
+        },
+        {
+          "term": "test file",
+          "definition": "A is a file whose name starts with test_ that imports functions from your source code and tests them. Keeping tests in their own files, in a tests/ folder beside src/, is separation of concerns applied to testing."
+        },
+        {
+          "term": "pytest",
+          "definition": "the third-party package that finds and runs test files. It is installed into the project's virtual environment and run with python3 -m pytest."
+        },
+        {
+          "term": "test function",
+          "definition": "A is any function in a test file whose name starts with test_. It is named after the function it tests, and the docstring on its first line describes what the test checks."
+        },
+        {
+          "term": "assert",
+          "definition": "The statement checks that an expression is truthy. If it is not, it raises an AssertionError and pytest reports the test as failed. The expression is an ordinary comparison: == for most values, is for True, False, and None, and pytest.approx() for decimal numbers."
+        }
+      ]
+    },
+    {
+      "lesson": "1.10",
+      "slug": "10-reading-unfamiliar-code",
+      "title": "Reading Unfamiliar Code",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/10-reading-unfamiliar-code",
+      "gitbook_sections": [
+        "The Orientation Questions",
+        "A Method for Reading Code You Did Not Write",
+        "Worked Example: The Corner Shop",
+        "Reading Code a Model Wrote",
+        "Practice: The Bill Splitter"
+      ],
+      "key_terms": [
+        {
+          "term": "building a model of someone else's intent",
+          "definition": "Reading code means from the artifacts they left behind: files, names, and behavior. You are not trying to memorize the code. You are trying to be able to predict it."
+        },
+        {
+          "term": "orientation questions",
+          "definition": "The give you a place to stand before you dive in: what is this supposed to do, where does the behavior show up, which files matter, what do I know versus what am I guessing."
+        },
+        {
+          "term": "run it, find the entry point, find the data, trace one action, predict then run, and write down what you know and what you are guessing",
+          "definition": "The method has six steps: . Names are the author's notes to you. A function's name and its parameters tell you its intent; the body tells you whether it lives up to it. Reading code a model wrote is the same activity with more suspicion. Generated code is confident and plausible, and plausible is not the same as correct."
+        }
+      ]
+    },
+    {
+      "lesson": "1.11",
+      "slug": "11-errors-and-tracebacks",
+      "title": "Errors and Tracebacks",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/11-errors-tracebacks",
+      "gitbook_sections": [
+        "What is an error? Why are they \"raised\"?",
+        "What causes an error? Syntax and Runtime Errors",
+        "Types of Errors",
+        "How to Read a Traceback",
+        "Handling Errors",
+        "Raising Your Own Errors"
+      ],
+      "key_terms": [
+        {
+          "term": "Errors",
+          "definition": "code that prevents a program from running successfully and are \"raised\" when something goes wrong, providing valuable debugging information."
+        },
+        {
+          "term": "Syntax errors",
+          "definition": "occur when code is invalid and can't be executed (e.g., missing quotes, wrong indentation), while runtime errors occur when code executes but encounters faulty logic or improper data type usage. Python calls runtime errors exceptions."
+        },
+        {
+          "term": "SyntaxError",
+          "definition": "Common error types include (invalid Python), NameError (undefined variables), TypeError (wrong data types), ValueError (right type, wrong value), IndexError and KeyError (missing positions and keys), and FileNotFoundError (operating system constraints)."
+        },
+        {
+          "term": "traceback",
+          "definition": "A is the report Python prints when an error is raised. Reading it from the bottom up tells you the error type, the message, and the chain of function calls that led there. Errors can be manually raised using the raise keyword, and uncaught errors will cause programs to crash. try and except let a program catch an error and decide what to do instead."
+        },
+        {
+          "term": "pytest.raises(ErrorType)",
+          "definition": "how a test checks that a function raises the error it should."
+        }
+      ]
+    },
+    {
+      "lesson": "1.12",
+      "slug": "12-first-class-functions-hofs",
+      "title": "First-Class Functions and Higher-Order Functions",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/12-first-class-functions-hof",
+      "gitbook_sections": [
+        "Functions are \"First-Class\" Values",
+        "Higher-Order Functions Built Into Python",
+        "Wrapping a Function"
+      ],
+      "key_terms": [
+        {
+          "term": "Functions are \"first-class\" values",
+          "definition": "meaning they can be stored in variables and data structures (lists/dictionaries), passed to functions as arguments, and returned from functions."
+        },
+        {
+          "term": "method",
+          "definition": "A is a function attached to a value, like \"abc\".upper(). In Mod 2 you will write your own."
+        },
+        {
+          "term": "Higher-order functions (HOFs)",
+          "definition": "functions that accept other functions as input and/or return functions, enabling powerful programming patterns and code reuse."
+        },
+        {
+          "term": "Callback functions",
+          "definition": "functions passed as arguments to higher-order functions, allowing you to customize behavior without modifying the HOF itself. When passing callbacks to HOFs, avoid invoking them (don't use parentheses) - the HOF will handle the invocation with the correct parameters."
+        },
+        {
+          "term": "lambda",
+          "definition": "creates a small anonymous function in one expression, a concise way to define callbacks when they won't be reused elsewhere. sorted(), min(), and max() are built-in higher-order functions. Their key parameter takes a callback that says what to compare."
+        },
+        {
+          "term": "wrapper",
+          "definition": "A is a function returned by another function that calls the original and adds behavior around it. Written with an @ above a definition, it is called a decorator."
+        }
+      ]
+    },
+    {
+      "lesson": "1.13",
+      "slug": "13-comprehensions-builtin-iteration",
+      "title": "Comprehensions and Built-in Iteration",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/13-comprehensions-builtin-iteration",
+      "gitbook_sections": [
+        "Imperative vs. Declarative Code: Why We Use Built-in Iteration",
+        "The Toolkit",
+        "Tips and Tricks",
+        "Refactoring with Tests",
+        "Test-Driven Development",
+        "Banking System Challenge",
+        "Extension / Practice"
+      ],
+      "key_terms": [
+        {
+          "term": "List comprehensions",
+          "definition": "provide declarative ways to build new lists from existing ones, making code more readable and reducing the need for explicit loops."
+        },
+        {
+          "term": "transforms",
+          "definition": "[expression for item in items] each element and returns a new list with the transformed values, useful for converting data formats or applying calculations."
+        },
+        {
+          "term": "filters",
+          "definition": "[item for item in items if test] , creating a new list containing only elements that pass a test condition."
+        },
+        {
+          "term": "dictionary comprehension",
+          "definition": "A , {key: value for item in items}, builds a new dictionary the same way a list comprehension builds a new list."
+        },
+        {
+          "term": "first",
+          "definition": "Finding the element that passes a test is a for loop with an early return or break."
+        },
+        {
+          "term": "sum()",
+          "definition": "min(), max(), and len() combine a whole list into a single value. When none of them fits, the accumulator pattern does: start a variable, update it in a loop, return it."
+        },
+        {
+          "term": "sorted()",
+          "definition": "returns a new sorted list and .sort() sorts a list in place. Both take a key callback that says what to compare and reverse=True for descending order."
+        },
+        {
+          "term": "enumerate()",
+          "definition": "zip(), any(), and all() cover the other everyday loop shapes without an index in sight."
+        },
+        {
+          "term": "==",
+          "definition": "compares the contents of two values. is and is not compare identity: whether two names refer to the very same object. A test for a pure function uses == to check the returned contents and is not to check that a new list came back rather than the original."
+        },
+        {
+          "term": "refactor",
+          "definition": "To is to change how code works without changing what it does. Passing tests are what let you refactor with confidence, for example from a for loop to a list comprehension."
+        },
+        {
+          "term": "Test-driven development (TDD)",
+          "definition": "a workflow that writes the test first, watches it fail (red), writes just enough code to pass (green), and then refactors while the tests stay green."
+        },
+        {
+          "term": "isinstance(value, type)",
+          "definition": "asks whether a value is of a given type, and accepts a tuple of types."
+        }
+      ]
+    }
+  ]
+}

@@ -248,6 +248,56 @@ def check_meta_sidecar(path):
     return []
 
 
+def check_mod1_key_terms(path, text):
+    """Mod 1 readings map 1:1 onto the GitBook's lessons 1.1-1.13, and each one
+    owes its lesson's full key-term list. The manifest at curriculum/
+    mod1-lessons.json is generated from the GitBook, so this check is really
+    "has the GitBook moved out from under this reading?"
+
+    Only Mod1 folders whose name matches a manifest slug are checked, so Mod0,
+    Mod2, and any scratch folder are unaffected.
+    """
+    folder = Path(path).parent.name
+    manifest_path = Path(__file__).parent.parent / "curriculum" / "mod1-lessons.json"
+    if not manifest_path.exists():
+        return []
+    try:
+        lessons = json.loads(manifest_path.read_text(encoding="utf-8"))["lessons"]
+    except (json.JSONDecodeError, KeyError) as e:
+        return [("WARN", f"curriculum/mod1-lessons.json unreadable, key-term check skipped: {e}")]
+
+    lesson = next((L for L in lessons if L["slug"] == folder), None)
+    if lesson is None:
+        if Path(path).parent.parent.name == "Mod1":
+            known = ", ".join(L["slug"] for L in lessons)
+            return [("ERROR", f"Mod1 folder '{folder}' matches no lesson in "
+                              f"curriculum/mod1-lessons.json. Expected one of: {known}")]
+        return []
+
+    # Compare on a loosened form: the reading is allowed to write "f-strings"
+    # for the manifest's "f-string", or drop the () from "print()".
+    def norm(s):
+        return re.sub(r"[^a-z0-9]", "", s.lower())
+
+    haystack = norm(text)
+    missing = []
+    for t in lesson["key_terms"]:
+        term = t["term"]
+        n = norm(term)
+        # A term over ~45 chars is a run-on prose bullet in the GitBook rather
+        # than a real vocabulary word (lesson 1.10 has these); don't demand it
+        # appear verbatim.
+        if len(n) > 45:
+            continue
+        if n and n not in haystack and norm(term.rstrip("s")) not in haystack:
+            missing.append(term)
+    if missing:
+        return [("ERROR",
+                 f"lesson {lesson['lesson']} ({lesson['title']}) key term(s) never defined "
+                 f"in the reading: {', '.join(missing)}")]
+    return []
+
+
 def check_no_recall_section(text_lower):
     if re.search(r"\brecall\b.{0,20}\b(before|first|check)\b", text_lower):
         return [("WARN", "found the word 'recall' near 'before/first/check' — this format has no recall/prerequisite-check section, confirm this isn't one")]
@@ -396,6 +446,7 @@ def run(path, skip_links=False):
     findings += check_time_estimate(html, word_count)
     findings += check_copyright(text)
     findings += check_meta_sidecar(path)
+    findings += check_mod1_key_terms(path, text)
     findings += check_no_recall_section(text.lower())
     findings += check_reading_level(html)
     findings += check_ai_sounding_language(text)
