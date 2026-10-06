@@ -35,14 +35,46 @@ def _escape_md_cell(text):
     return str(text).replace("|", "\\|")
 
 
+def load_gitbook_lessons():
+    """Lesson number -> the GitBook chapter it maps to, from curriculum/
+    mod1-lessons.json. That file is generated from the curriculum source repo,
+    so the README's GitBook column stays honest about which chapter a reading
+    actually covers. Readings with no chapter behind them (Mod 0's setup pair,
+    the Mod 2 OOP set, which the GitBook still lists as under construction)
+    get a dash.
+    """
+    path = ROOT / "curriculum" / "mod1-lessons.json"
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    return {L["lesson"]: L for L in data.get("lessons", [])}
+
+
 def build_readme_table(readings):
     if not readings:
         return "_No readings published yet._"
-    lines = ["| Reading | Skill | Topic Area | Est. time | Link |",
-             "|---|---|---|---|---|"]
+    # "Lesson" is the GitBook's own number (1.1, 1.2, ...) from each
+    # reading.meta.json's `lesson` field, so the table reads in teaching order
+    # and matches what Fellows see in the curriculum. Readings with no lesson
+    # behind them (Mod 0's setup pair) show a dash and say so in Skill.
+    gitbook = load_gitbook_lessons()
+    lines = ["| Lesson | Reading | GitBook Lesson | Skill | Topic Area | Est. time | Link |",
+             "|---|---|---|---|---|---|---|"]
     for r in readings:
+        lesson = r.get("lesson") or "—"
+        skill = r.get("skill", "?")
+        if r.get("supplementary"):
+            skill = f"{skill} (supplementary)"
+        gb = gitbook.get(r.get("lesson"))
+        gb_cell = (f"[{_escape_md_cell(gb['title'])}]({gb['gitbook_page']})"
+                   if gb else "—")
         lines.append(
-            f"| {_escape_md_cell(r['title'])} | {_escape_md_cell(r.get('skill','?'))} | "
+            f"| {_escape_md_cell(lesson)} | {_escape_md_cell(r['title'])} | "
+            f"{gb_cell} | "
+            f"{_escape_md_cell(skill)} | "
             f"{_escape_md_cell(r.get('topic_area','?'))} | "
             f"{r.get('time_minutes','?')} min | [Open]({r['url']}) |"
         )

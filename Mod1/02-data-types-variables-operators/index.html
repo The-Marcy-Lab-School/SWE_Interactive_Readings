@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Gene That Became a Date — Python Variables &amp; Types</title>
+<title>The Gene That Became a Date</title>
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
@@ -8,6 +8,20 @@
 .mlrk-fillblank{display:flex;align-items:center;gap:.5rem;margin:.5rem 0}
 .mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:14rem;font-family:var(--mlrk-font-code)}
 .var-predict-row{margin:.9rem 0 0.2rem}
+/* Nearly every snippet here is one to five lines, and the shared 110px floor
+   on .mlrk-screen leaves a block of dead space under a one-line snippet. The
+   1rem padding on .mlrk-code already keeps short blocks from looking cramped. */
+.mlrk-code pre.mlrk-screen{min-height:0}
+/* Reference tables (the five basic types, the six operator families). Both are
+   lookup grids rather than prose, so they get their own horizontal scroll
+   container instead of forcing the page body to scroll sideways on a phone. */
+.dt-tablewrap{overflow-x:auto;margin:1.1rem 0}
+.dt-table{border-collapse:collapse;width:100%;min-width:30rem}
+.dt-table caption{text-align:left;padding-bottom:.5rem}
+.dt-table th,.dt-table td{border:1px solid var(--mlrk-divider-on-light);padding:.6rem .75rem;text-align:left;vertical-align:top}
+.dt-table thead th{background:var(--mlrk-bg-brand-deep);color:var(--mlrk-text-on-dark);font-weight:800}
+.dt-table tbody tr:nth-child(odd){background:var(--mlrk-white)}
+.dt-table tbody tr:nth-child(even){background:var(--mlrk-bg-light-alt)}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}.mlrk-fillblank input{width:10rem}}
 </style>
 </head><body>
@@ -16,7 +30,7 @@
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>The Gene That Became a Date</h1>
 <div class="mlrk-meta">
-  <span class="mlrk-pill">~10 minutes</span>
+  <span class="mlrk-pill">~13 minutes</span>
   <span class="mlrk-pill">Interactive</span>
   <span class="mlrk-pill">No setup needed to read</span>
 </div>
@@ -28,14 +42,15 @@
 
 <section class="mlrk-section">
 <h2>1. When a spreadsheet decided a gene was a date</h2>
-<p>Human genes have short official symbols — <code>SEPT2</code>, <code>MARCH1</code>, <code>DEC1</code>. In 2016, researchers found that about 20% of published genetics papers with a gene list had at least one name changed by accident. <code>SEPT2</code> had become the date "2-Sep." <code>MARCH1</code> had become "1-Mar." No one had typed a date — Microsoft Excel saw text that looked date-shaped and rewrote it automatically, before anyone saved the file. Once a symbol becomes a date, it's a different value entirely, and sorting or matching it against other data silently breaks with no error to warn anyone.</p>
-<p>The real fix wasn't a smarter spreadsheet setting. In 2020, the group that officially names human genes renamed the ones most often mistaken for dates, so software could no longer confuse them — <code>MARCH1</code> became <code>MARCHF1</code>, for example. Even so, a 2021 study found the problem still showing up in about 30% of newer papers. Excel wasn't being careless: every value has to be treated as <em>some</em> type, and when nothing states that type explicitly, the program guesses for you. That's exactly the problem this reading solves on purpose, in Python, before it ever gets the chance to guess.</p>
+<p>Human genes have short official symbols: <code>SEPT2</code>, <code>MARCH1</code>, <code>DEC1</code>. In 2016 a team checked published genetics papers and found that about 20% of the ones with a gene list had at least one name changed by accident. <code>SEPT2</code> had become the date "2-Sep". Nobody typed a date. Microsoft Excel saw text that looked date-shaped and rewrote it on its own, before anyone saved the file.</p>
+<p>Excel was not being careless. Every value has to be treated as <em>some</em> kind of thing: text, a whole number, a date. When nothing says which kind, the program picks one for you. In 2020 the committee that names human genes renamed the worst offenders so software would stop confusing them, and a 2021 follow-up still found the problem in about 30% of newer papers. Python takes the other approach. You say what kind of thing a value is, and Python stops the program when an operation makes no sense for that kind instead of guessing.</p>
+<p class="mlrk-small">Source: Ziemann, Eren &amp; El-Osta, "Gene name errors are widespread in the scientific literature," <em>Genome Biology</em> (2016); Abeysooriya et al., <em>PLOS Computational Biology</em> (2021).</p>
 
 <div class="mlrk-card">
-<p><strong>Quick check:</strong> why did <code>SEPT2</code> and <code>MARCH1</code> turn into dates?</p>
+<p><strong>Why did <code>SEPT2</code> and <code>MARCH1</code> turn into dates?</strong></p>
 <div id="scn-quiz">
   <button type="button" class="mlrk-choice" data-a="typo">Excel's spellchecker "corrected" what it thought were typos</button>
-  <button type="button" class="mlrk-choice" data-a="guess">Excel's default type-guessing read the text as date-shaped and silently converted it</button>
+  <button type="button" class="mlrk-choice" data-a="guess">Excel guessed the type of each value, read the text as date-shaped, and converted it</button>
   <button type="button" class="mlrk-choice" data-a="mistake">The scientists accidentally typed the wrong gene names</button>
 </div>
 <div id="scn-fb" class="mlrk-feedback" tabindex="-1"></div>
@@ -43,27 +58,43 @@
 </section>
 
 <section class="mlrk-section">
-<h2>2. Vocabulary</h2>
-<p>Flip each card before the sections below.</p>
-<div class="mlrk-grid">
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>variable</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Variable</strong><br>A name that points at a value Python is holding in memory. Not a box that "is" the value — a label attached to it.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>assignment</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Assignment (<code>=</code>)</strong><br>The operation that makes a name point at a value, e.g. <code>age = 27</code>. Read it as "point <code>age</code> at 27," not "age equals 27."</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>type</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Type</strong><br>What kind of value something is — a whole number, a decimal, text, or a true/false — which determines what operations on it actually do.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>int</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>int (integer)</strong><br>A whole number, positive or negative, with no decimal point: <code>27</code>, <code>-4</code>, <code>0</code>.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>float</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>float (floating-point number)</strong><br>A number with a decimal point: <code>19.99</code>, <code>3.0</code>, <code>-0.5</code>.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>str</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>str (string)</strong><br>Text, always wrapped in quotes: <code>"Ada Lovelace"</code>, <code>"10027"</code>. Digits inside quotes are still text, not a number.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>bool</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>bool (boolean)</strong><br>Exactly one of two values: <code>True</code> or <code>False</code> — capitalized, no quotes.</span></button>
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card. These six terms are the ones the rest of the reading uses.</p>
+<div class="mlrk-grid" id="dt-flipcards">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Data types</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Data types</strong><br>Categories of values in Python. There are 5 basic types (<code>str</code>, <code>int</code>, <code>float</code>, <code>bool</code>, <code>None</code>) and 3 types that hold other data or code (<code>list</code>, <code>dict</code>, and functions). Knowing the type of a value tells you how you can use that value.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Operators</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Operators</strong><br>Symbols such as <code>+</code>, <code>&gt;=</code>, and <code>and</code> that generate new data from existing values. Python has six families of them: arithmetic, comparison, logical, membership, identity, and assignment operators.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Operator precedence</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Operator precedence</strong><br>The order in which Python evaluates the operators in an expression, such as multiplication before addition. Parentheses change that order: whatever is inside them is evaluated first.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Variables</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Variables</strong><br>Named containers for data. You can reference and reassign variables to store and update information in your program. A variable is created the first time it is assigned. Names in <code>ALL_CAPS</code> are a signal to readers that a value is a constant and should not be reassigned.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>State</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>State</strong><br>The data stored by a program at a point in time. Every value currently held by the program's variables, taken together, is its state.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>snake_case</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong><code>snake_case</code></strong><br>The Python convention for naming variables and functions: lowercase words joined by underscores, like <code>days_in_each_month</code>.</span></button>
 </div>
 </section>
 
 <section class="mlrk-section">
-<h2>3. A variable is a name, not a box</h2>
-<p>It's tempting to picture <code>x = 5</code> as a box holding a 5. That breaks when you write <code>x = "hello"</code> right after — did the 5 turn into text? No. Python never changes a value in place. What really happens: the name <code>x</code> points at a value in memory, first the integer 5, then a different value, the string <code>"hello"</code> — nothing points at the 5 anymore. A variable is a name attached to a value, not a box that becomes it.</p>
-<p>This matters because two values can look identical yet behave nothing alike, depending only on their type. <code>count = 5</code> and <code>code = "5"</code> print the same character, but <code>count</code> points at an integer and <code>code</code> points at a string — so the same <code>+</code> operator does something different to each:</p>
+<h2>3. Every value has a type</h2>
+<p>A type is the category a value belongs to, and it decides what you are allowed to do with that value. You can do math on numbers and you can glue text together, and those are not the same job. Python has five basic types to start with.</p>
+
+<div class="dt-tablewrap">
+<table class="dt-table">
+<caption class="mlrk-small">The five basic Python data types, with the kind of real data each one usually holds.</caption>
+<thead><tr><th scope="col">Type</th><th scope="col">A value of that type</th><th scope="col">Real data it holds</th></tr></thead>
+<tbody>
+<tr><td><code>str</code> (string)</td><td><code>"SEPT2"</code>, <code>"@abc123"</code></td><td>Text of any kind: usernames, chat messages, gene symbols, search queries</td></tr>
+<tr><td><code>int</code> (integer)</td><td><code>50</code>, <code>-2</code></td><td>Whole numbers: likes on a post, a game score, a count of items</td></tr>
+<tr><td><code>float</code></td><td><code>10.5</code>, <code>0.99</code></td><td>Numbers with a decimal point: prices, averages, percentages, timers</td></tr>
+<tr><td><code>bool</code> (boolean)</td><td><code>True</code>, <code>False</code></td><td>One of two answers: dark mode on or off, logged in or not, won or lost</td></tr>
+<tr><td><code>None</code></td><td><code>None</code></td><td>A value left empty on purpose: no result yet, nothing selected</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Three more types hold other data or hold code: a list such as <code>["apple", "banana"]</code>, a dictionary such as <code>{"name": "Alex", "age": 25}</code>, and a function such as <code>def greet(): print("Hi!")</code>. Later lessons use all three.</p>
+
+<p>Two values can look the same on screen and behave nothing alike, because only the type decides what an operator does to them. <code>count = 5</code> and <code>code = "5"</code> both show a 5, but <code>count</code> holds an integer and <code>code</code> holds a string:</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 660 430" role="img" aria-labelledby="varTitle varDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="varTitle">The same operator behaving differently depending on type</title>
-  <desc id="varDesc">count is a name pointing at the integer value 5. code is a name pointing at the string value 5, written in quotes. Adding count to itself with the plus operator produces 10, integer addition. Adding code to itself with the plus operator produces the two characters 55, string concatenation, because plus means something different for text than it does for numbers.</desc>
+  <desc id="varDesc">count is a name holding the integer value 5. code is a name holding the string value 5, written in quotes. Adding count to itself with the plus operator produces 10, integer addition. Adding code to itself with the plus operator produces the two characters 55, string concatenation, because plus means something different for text than it does for numbers.</desc>
   <defs>
     <marker id="varArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#261F1D"/>
@@ -98,34 +129,77 @@
   </g>
 </svg>
 
-<p>On numbers, <code>+</code> means addition. On strings, it means concatenation — gluing two pieces of text together. Same symbol, different behavior, decided by type. It's the same trap as the gene-name story: a US ZIP code like <code>"02134"</code> has to be stored as a <code>str</code>, since as an <code>int</code> it would lose its leading zero and quietly become <code>2134</code> — a different, wrong ZIP code, with no error to flag it.</p>
+<p>On numbers, <code>+</code> adds. On strings, <code>+</code> concatenates, which means it glues two pieces of text into one. Same symbol, different job, decided by the type. This is why a US ZIP code like <code>"02134"</code> has to be a <code>str</code>. Stored as an <code>int</code> it loses the leading zero and becomes <code>2134</code>, a different and wrong ZIP code, and nothing warns you.</p>
+
+<div class="mlrk-card" id="type-activity">
+<p><strong>Drag each value into the type it actually is.</strong> Go by what is written, not by what it looks like it means.</p>
+<div class="mlrk-drag-source" id="type-chips">
+  <span class="mlrk-draggable" id="chip-1"><code>42</code></span>
+  <span class="mlrk-draggable" id="chip-2"><code>"42"</code></span>
+  <span class="mlrk-draggable" id="chip-3"><code>3.14</code></span>
+  <span class="mlrk-draggable" id="chip-4"><code>True</code></span>
+  <span class="mlrk-draggable" id="chip-5"><code>"hello"</code></span>
+  <span class="mlrk-draggable" id="chip-6"><code>None</code></span>
+</div>
+<div class="mlrk-grid">
+  <div class="mlrk-dropzone" id="zone-int"><strong>int</strong></div>
+  <div class="mlrk-dropzone" id="zone-float"><strong>float</strong></div>
+  <div class="mlrk-dropzone" id="zone-str"><strong>str</strong></div>
+  <div class="mlrk-dropzone" id="zone-bool"><strong>bool</strong></div>
+  <div class="mlrk-dropzone" id="zone-none"><strong>None</strong></div>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="type-check">Check my answers</button></div>
+<div id="type-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Quotation marks are the tell. A value with quotes around it is a <code>str</code> no matter what the characters inside spell, which is exactly how a gene symbol like <code>SEPT2</code> is supposed to stay text instead of turning into a date.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. The six families of operators</h2>
+<p>An operator is a symbol that makes a new value out of values you already have. Python groups its operators into six families, and each family answers a different kind of question.</p>
+
+<div class="dt-tablewrap">
+<table class="dt-table">
+<caption class="mlrk-small">The six operator families, what each one does, and one example with the value it produces.</caption>
+<thead><tr><th scope="col">Family</th><th scope="col">What it does</th><th scope="col">Example</th></tr></thead>
+<tbody>
+<tr><td><strong>Arithmetic operators</strong></td><td>Calculate a new value from numbers: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>//</code>, <code>%</code>, <code>**</code></td><td><code>7 % 2</code> produces <code>1</code></td></tr>
+<tr><td><strong>Comparison operators</strong></td><td>Compare two values and produce a boolean: <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></td><td><code>5 &gt;= 5</code> produces <code>True</code></td></tr>
+<tr><td><strong>Logical operators</strong></td><td>Combine or reverse conditions: <code>and</code>, <code>or</code>, <code>not</code></td><td><code>True and False</code> produces <code>False</code></td></tr>
+<tr><td><strong>Membership operators</strong></td><td>Check whether a value is inside a string, list, or dictionary: <code>in</code>, <code>not in</code></td><td><code>"a" in "apple"</code> produces <code>True</code></td></tr>
+<tr><td><strong>Identity operators</strong></td><td>Check whether two names refer to the very same object: <code>is</code>, <code>is not</code></td><td><code>score is None</code> produces <code>True</code> when <code>score</code> holds <code>None</code></td></tr>
+<tr><td><strong>Assignment operators</strong></td><td>Store a value in a variable: <code>=</code>, <code>+=</code>, <code>-=</code>, and the rest</td><td><code>likes += 1</code> adds 1 to <code>likes</code> and stores the result</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Two of these families surprise people the first time, so they are worth stating as rules.</p>
+<p><strong>Rule 1: <code>+</code> adds two numbers or joins two strings, and it has no third meaning.</strong> Two numbers of different kinds still add fine, because Python knows how to line them up: <code>5 + 2.5</code> produces <code>7.5</code>, and <code>True + 1</code> produces <code>2</code>, since <code>True</code> counts as 1 and <code>False</code> counts as 0 in arithmetic. Mixing a string with a number is the one case <code>+</code> has no answer for. <code>"3" + 5</code> stops the program with a <code>TypeError</code>, because Python will not guess whether you wanted the text <code>"35"</code> or the number <code>8</code>.</p>
+<p><strong>Rule 2: comparison operators work on strings, and they compare character by character using each character's position in Python's character table.</strong> That table is not the dictionary order you learned in school. Every uppercase letter sits before every lowercase letter in it, so <code>"B" &gt; "A"</code> is <code>True</code> and <code>"apple" &gt; "Banana"</code> is also <code>True</code>, even though a dictionary would put Banana first.</p>
 
 <div class="mlrk-card">
-<p><strong>Predict the output:</strong> type what each snippet prints, then check all four together.</p>
+<p><strong>Type what each line prints.</strong> One of the four does not print anything, because Python stops instead. Write the name of the error for that one.</p>
 
 <div class="var-predict-row">
-<div class="mlrk-code"><div class="mlrk-screen">x = 5
-y = 5
-print(x + y)</div></div>
+<div class="mlrk-code"><pre class="mlrk-screen">print(5 + 2.5)</pre></div>
 <div class="mlrk-fillblank"><label for="pred-1">Prints:</label> <input type="text" id="pred-1" autocomplete="off" placeholder="?"></div>
 </div>
 
 <div class="var-predict-row">
-<div class="mlrk-code"><div class="mlrk-screen">x = "5"
-y = "5"
-print(x + y)</div></div>
+<div class="mlrk-code"><pre class="mlrk-screen">print("apple" &gt; "Banana")</pre></div>
 <div class="mlrk-fillblank"><label for="pred-2">Prints:</label> <input type="text" id="pred-2" autocomplete="off" placeholder="?"></div>
 </div>
 
 <div class="var-predict-row">
-<div class="mlrk-code"><div class="mlrk-screen">price = "19.99"
-print(price * 2)</div></div>
+<div class="mlrk-code"><pre class="mlrk-screen">print(3 &gt; 1 and 3 &gt; 5)</pre></div>
 <div class="mlrk-fillblank"><label for="pred-3">Prints:</label> <input type="text" id="pred-3" autocomplete="off" placeholder="?"></div>
 </div>
 
 <div class="var-predict-row">
-<div class="mlrk-code"><div class="mlrk-screen">is_ready = True
-print(is_ready)</div></div>
+<div class="mlrk-code"><pre class="mlrk-screen">print("3" + 5)</pre></div>
 <div class="mlrk-fillblank"><label for="pred-4">Prints:</label> <input type="text" id="pred-4" autocomplete="off" placeholder="?"></div>
 </div>
 
@@ -134,62 +208,146 @@ print(is_ready)</div></div>
 </div>
 
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p><code>*</code> on a string repeats the text that many times, the same way <code>+</code> on two strings glues them together — neither one does math, because <code>price</code> here is a <code>str</code>, not a number. And Python's boolean values print exactly as <code>True</code> or <code>False</code>, capitalized, with no quotes.</p>
+<p>Rule 1 settles <code>print(5 + 2.5)</code> and <code>print("3" + 5)</code>. Rule 2 settles <code>print("apple" &gt; "Banana")</code>. For <code>print(3 &gt; 1 and 3 &gt; 5)</code>, work out <code>3 &gt; 1</code> and <code>3 &gt; 5</code> separately first, then ask what <code>and</code> does with those two answers. Python writes its booleans as <code>True</code> and <code>False</code>, capitalized and with no quotes.</p>
 </details>
 </section>
 
 <section class="mlrk-section">
-<h2>4. What type is this?</h2>
-<p>Drag each value into the type it actually is — go by what's really written, not by what it looks like it means.</p>
+<h2>5. Which operator goes first</h2>
+<p>Put several operators in one line and Python does not run them left to right. It runs them in a fixed order called operator precedence. Get that order wrong and the line still runs, still produces a number, and still prints with no error, so the only sign that anything is wrong is that the number is wrong.</p>
+<p>Here is a line meant to convert 212 degrees Fahrenheit to 100 degrees Celsius:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">fahrenheit = 212
+celsius = fahrenheit - 32 * 5 / 9
+print(celsius)  # 194.22222222222223</pre></div>
+<p>Python's order, highest first:</p>
+<ol class="mlrk-steplist">
+  <li>Anything inside parentheses <code>()</code>, then function calls.</li>
+  <li>Arithmetic. <code>**</code> runs before <code>*</code>, <code>/</code>, <code>//</code>, <code>%</code>, which run before <code>+</code> and <code>-</code>. Operators at the same level run left to right.</li>
+  <li>Comparison: <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>==</code>, <code>!=</code>.</li>
+  <li>Logical: <code>not</code> first, then <code>and</code>, then <code>or</code>.</li>
+  <li>Assignment with <code>=</code>, last of all.</li>
+</ol>
+<p>Walk the Celsius line through that order. <code>32 * 5</code> runs first and produces <code>160</code>, because <code>*</code> outranks <code>-</code>. <code>160 / 9</code> is at the same level as <code>*</code>, so it goes next, left to right, and produces about <code>17.8</code>. Then <code>212 - 17.8</code> produces about <code>194.2</code>. Assignment runs last and stores that in <code>celsius</code>. Python followed its own rules at every step. The formula needs the subtraction to happen first, and nothing in that line said so.</p>
+<p>Parentheses outrank everything, so a pair of them is how you move an operation to the front of the line:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">fahrenheit = 212
+celsius = (fahrenheit - 32) * 5 / 9
+print(celsius)  # 100.0</pre></div>
+<p>Now <code>212 - 32</code> produces <code>180</code>, then <code>180 * 5</code> produces <code>900</code>, then <code>900 / 9</code> produces <code>100.0</code>. The two versions differ at the very first step, and everything after that follows from which operator got to go first.</p>
 
-<div class="mlrk-card" id="type-activity">
-<div class="mlrk-drag-source" id="type-chips">
-  <span class="mlrk-draggable" id="chip-1"><code>42</code></span>
-  <span class="mlrk-draggable" id="chip-2"><code>"42"</code></span>
-  <span class="mlrk-draggable" id="chip-3"><code>3.14</code></span>
-  <span class="mlrk-draggable" id="chip-4"><code>True</code></span>
-  <span class="mlrk-draggable" id="chip-5"><code>"hello"</code></span>
-  <span class="mlrk-draggable" id="chip-6"><code>0.0</code></span>
+<div class="mlrk-card">
+<p><strong>A different conversion, same problem.</strong> This line is meant to turn a price in dollars into cents after a $2 discount, so <code>price = 10</code> should produce <code>800</code> cents. It produces <code>-190</code> instead.</p>
+<div class="mlrk-code"><pre class="mlrk-screen">price = 10
+cents = price - 2 * 100
+print(cents)  # -190</pre></div>
+<p><strong>Which version of the <code>cents</code> line produces 800?</strong></p>
+<div id="paren-quiz">
+  <button type="button" class="mlrk-choice" data-a="a"><code>cents = (price - 2 * 100)</code></button>
+  <button type="button" class="mlrk-choice" data-a="b"><code>cents = (price - 2) * 100</code></button>
+  <button type="button" class="mlrk-choice" data-a="c"><code>cents = price - (2 * 100)</code></button>
 </div>
-<div class="mlrk-grid">
-  <div class="mlrk-dropzone" id="zone-int"><strong>int</strong></div>
-  <div class="mlrk-dropzone" id="zone-float"><strong>float</strong></div>
-  <div class="mlrk-dropzone" id="zone-str"><strong>str</strong></div>
-  <div class="mlrk-dropzone" id="zone-bool"><strong>bool</strong></div>
+<div id="paren-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
-<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="type-check">Check my answers</button></div>
-<div id="type-fb" class="mlrk-feedback" tabindex="-1"></div>
-</div>
-
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Quotation marks are the tell: if a value has quotes around it, it's a <code>str</code> no matter what the text inside looks like — that's exactly how a gene name like <code>SEPT2</code> is supposed to stay text instead of becoming a date.</p>
+<p>Parentheses only help when they change which operator runs first. Work out each of the three lines by hand with <code>price = 10</code>, and notice that two of them produce the same answer as the line with no parentheses at all.</p>
 </details>
 </section>
 
 <section class="mlrk-section">
-<h2>5. Summary &amp; reflection</h2>
-<p>A variable is a name pointing at a value, and assignment (<code>=</code>) is what points it there. Every value has a type — <code>int</code>, <code>float</code>, <code>str</code>, or <code>bool</code> among the basics — and that type decides what an operation like <code>+</code> actually does, not the symbol alone. Leaving a value's type to a guess is exactly what turned real gene names into calendar dates in thousands of spreadsheets; naming and typing a value on purpose is how a program avoids the same fate.</p>
-<label for="var-reflect"><strong>In 2–3 sentences:</strong> pick one value you'd expect to see in a program you might build (a price, a username, a score, anything) and explain which of the four types it should be, and what would break if it were stored as the wrong one.</label>
-<textarea id="var-reflect" class="mlrk-response" data-save></textarea>
+<h2>6. Variables: assign, reassign, reference</h2>
+<p>A variable is a name for a piece of data. Naming data is what lets a program do one calculation, keep the answer, and build the next calculation on top of it. All the values a program is holding right now are its state, and variables are how that state is stored.</p>
+<p>There are three things you do with a variable, and each one has a word:</p>
+<div class="mlrk-code"><pre class="mlrk-screen"># Assign: create the variable count and give it the value 0
+count = 0
+
+# Reference: use the value the variable is holding
+print(f"count starts at {count}")
+
+# Reassign: give the same variable a new value
+count = 1
+print(f"count is now {count}")</pre></div>
+<p>That script prints:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">count starts at 0
+count is now 1</pre></div>
+<p>You can reference a variable's current value inside the line that reassigns it. The right side runs first, all the way to a single value, and only then does <code>=</code> store it:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">count = 0
+count = count + 1   # the right side produces 1. count becomes 1
+count += 1          # same work, written shorter. count becomes 2
+count += 3          # any amount works. count becomes 5
+count *= 2          # -=, *= and /= work the same way. count becomes 10</pre></div>
+<p><code>+=</code> is called augmented assignment. <code>count += 1</code> and <code>count = count + 1</code> do exactly the same work, and you will see the short form far more often, because counting something up is one of the most common things a program does.</p>
+
+<div class="mlrk-card">
+<p><strong>What does this script print?</strong> The second line combines augmented assignment with two operators, so precedence decides the answer.</p>
+<div class="mlrk-code"><pre class="mlrk-screen">msg = "hello"
+msg += "world" + "!" * 3
+print(msg)</pre></div>
+<div id="aug-quiz">
+  <button type="button" class="mlrk-choice" data-a="a"><code>helloworld!!!</code></button>
+  <button type="button" class="mlrk-choice" data-a="b"><code>hello world!!!</code></button>
+  <button type="button" class="mlrk-choice" data-a="c"><code>helloworld!</code></button>
+</div>
+<div id="aug-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p><code>*</code> runs before <code>+</code>, and the whole right side finishes before <code>+=</code> stores anything. <code>*</code> on a string repeats that string, the same way <code>+</code> on two strings glues them together.</p>
+</details>
+
+<h3>Naming the variable</h3>
+<p>Python's convention is <code>snake_case</code>: lowercase words joined by underscores. The name should say what the data is, because a reader who cannot tell what a variable holds has to trace the whole program to find out.</p>
+<div class="mlrk-code"><pre class="mlrk-screen"># Unclear what these numbers count
+numbers = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+# Clear
+days_in_each_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+# Descriptive, but hard to read
+daysineachmonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+# Readable, but not Python's convention
+daysInEachMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]</pre></div>
+<p>One name is written differently on purpose. A variable whose value should never change is written in <code>ALL_CAPS</code>, and every Python programmer reads those capitals as "do not reassign me". A variable like that is called a constant.</p>
+<div class="mlrk-code"><pre class="mlrk-screen">MAX_GUESSES = 5
+
+# Python does not stop you from doing this, so the capitals are a message to
+# the next person reading the code, not a lock.
+MAX_GUESSES = 10</pre></div>
+
+<div class="mlrk-card">
+<p><strong>Check every name that is a good <code>snake_case</code> name for a value your program will change as it runs.</strong></p>
+<label class="mlrk-selectall-option"><input type="checkbox" class="dt-name-box" value="days"> <span><code>days_in_each_month</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="dt-name-box" value="camel"> <span><code>daysInEachMonth</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="dt-name-box" value="total"> <span><code>total_price</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="dt-name-box" value="caps"> <span><code>MAX_GUESSES</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="dt-name-box" value="d"> <span><code>d</code></span></label>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="name-submit">Check my answers</button></div>
+<div id="name-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Go further (optional)</h2>
+<h2>7. Summary and reflection</h2>
+<p>Every value in Python has a type, and the type decides what each operator does to it, which is why <code>+</code> adds two numbers and glues two strings but refuses a string and a number. When several operators share a line, precedence sets the order, and parentheses are how you change it. A variable gives a value a name so the rest of the program can reference it, reassign it, or update it in place with <code>+=</code>.</p>
+<label for="dt-reflect"><strong>In 2-3 sentences:</strong> pick one value a program you might build would store, such as a price, a username, a score, or an on/off setting. Name the type it should be and one operator from the six families you would use on it. Then say what would go wrong if that value were stored as a <code>str</code> instead.</label>
+<textarea id="dt-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>8. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
-  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in a few lines of assignments and step through them, watching each name point at its value in memory instead of imagining a "box."</li>
-  <li><a href="https://www.youtube.com/watch?v=cQT33yu9pY8" target="_blank" rel="noopener">Python Variables — Programming with Mosh</a> — a ~7-minute walkthrough of variables and basic types from a well-known Python teaching channel.</li>
+  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in a few assignments and <code>+=</code> lines, then step through them one at a time and watch each variable's value change on the right.</li>
+  <li><a href="https://codingbat.com/python/Warmup-1" target="_blank" rel="noopener">CodingBat, Warmup-1 (Python)</a> — short auto-graded problems built almost entirely out of comparison and logical operators on <code>int</code> and <code>str</code> values, so a wrong prediction about an operator shows up immediately.</li>
 </ul>
 </section>
 
 <section class="mlrk-section">
-<div id="var-scorechip" class="mlrk-score-chip"></div>
+<div id="dt-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
 <div class="mlrk-actions">
-<button type="button" class="mlrk-btn mlrk-btn-primary" id="var-copy">Copy Plain Text Answers</button>
-<button type="button" class="mlrk-btn" id="var-download">Download as .txt</button>
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="dt-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="dt-download">Download as .txt</button>
 </div>
-<p id="var-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+<p id="dt-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
 
@@ -201,65 +359,23 @@ print(is_ready)</div></div>
 <script>
 (function(){
   const K = ReadingKit;
-  const READING_ID = "variables-data-types-reading";
-  const TITLE = "The Gene That Became a Date — Python Variables & Types";
+  const READING_ID = "data-types-variables-operators-reading";
+  const TITLE = "The Gene That Became a Date";
   K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
 
-  K.flipCards(document, "act-flipcards");
+  K.flipCards("#dt-flipcards", "act-flipcards");
 
   K.quiz({
     id: "act-scenario-quiz",
     buttonSelector: "#scn-quiz .mlrk-choice",
     feedbackSelector: "#scn-fb",
     correct: "guess",
-    maxAttempts: 2,
+    answerLabel: "Excel guessed the type of each value",
     feedback: {
-      typo: "Spellcheck flags words, not gene symbols shaped like dates — and it doesn't rewrite the file automatically.",
-      guess: "Right. Excel's default type-guessing decided the text matched a date pattern and silently converted it, before anyone chose that.",
-      mistake: "The scientists typed the correct gene symbols — the conversion happened after, inside the spreadsheet."
+      typo: "A spellchecker flags words it does not recognize and waits for a person to accept the change. Excel changed these values with nobody accepting anything, which means the change came from its type guessing rather than from spellcheck.",
+      guess: "Excel decided the type of each cell for itself. <code>SEPT2</code> matched the shape Excel uses for dates, so Excel converted it to one, and from then on the cell held a date instead of a gene symbol.",
+      mistake: "The scientists typed the correct symbols. The conversion happened afterwards, inside the spreadsheet, which is why nobody caught it by proofreading the names."
     }
-  });
-
-  const predictAnswers = {
-    "pred-1": "10",
-    "pred-2": "55",
-    "pred-3": "19.9919.99",
-    "pred-4": "True"
-  };
-  const predictBtn = document.getElementById("predict-check");
-  const predictFb = document.getElementById("predict-fb");
-  K.Scoring.register("act-predict-output", 1, "activity");
-  let predictAttempts = 0, predictDone = false;
-  predictBtn.addEventListener("click", function(){
-    if (predictDone) return;
-    predictAttempts++;
-    const ids = Object.keys(predictAnswers);
-    const results = ids.map(function(id){
-      const val = document.getElementById(id).value.trim();
-      return val === predictAnswers[id];
-    });
-    const numCorrect = results.filter(Boolean).length;
-    if (numCorrect === ids.length) {
-      K.Scoring.award("act-predict-output", predictAttempts === 1 ? 1 : 0.5);
-      predictFb.className = "mlrk-feedback mlrk-show mlrk-good";
-      predictFb.innerHTML = "<strong>All four correct" + (predictAttempts > 1 ? " (2nd try)" : "") + ".</strong> The type of each value decided what its operator actually did.";
-      predictDone = true;
-    } else if (predictAttempts >= 2) {
-      K.Scoring.award("act-predict-output", numCorrect / ids.length * 0.5);
-      predictFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
-      predictFb.innerHTML = "<strong>Here are the answers:</strong><ul>" +
-        "<li><code>print(x + y)</code> with two ints, prints <code>10</code></li>" +
-        "<li><code>print(x + y)</code> with two strs, prints <code>55</code></li>" +
-        "<li><code>print(price * 2)</code> with a str, prints <code>19.9919.99</code></li>" +
-        "<li><code>print(is_ready)</code> prints <code>True</code></li></ul>";
-      predictDone = true;
-    } else {
-      predictFb.className = "mlrk-feedback mlrk-show mlrk-bad";
-      predictFb.innerHTML = numCorrect + " of " + ids.length + " correct so far. Adjust and check once more before the answers are shown.";
-    }
-    predictFb.setAttribute("tabindex", "-1");
-    predictFb.focus();
-    K.Storage.save(READING_ID, K.snapshot(READING_ID, TITLE));
   });
 
   K.dragDrop("#type-activity", "act-type-classify");
@@ -272,19 +388,127 @@ print(is_ready)</div></div>
       "chip-3": {expectedId: "zone-float", label: "3.14", expectedLabel: "float"},
       "chip-4": {expectedId: "zone-bool", label: "True", expectedLabel: "bool"},
       "chip-5": {expectedId: "zone-str", label: '"hello"', expectedLabel: "str"},
-      "chip-6": {expectedId: "zone-float", label: "0.0", expectedLabel: "float"}
+      "chip-6": {expectedId: "zone-none", label: "None (no quotes, so it is the None value itself)", expectedLabel: "None"}
     }
   });
 
-  K.freeResponse({id: "act-reflect", selector: "#var-reflect", minWords: 10});
+  // Typed prediction across three operator families plus the TypeError case.
+  // Each answer accepts a small set of spellings so a student is graded on the
+  // value, not on whether they typed quote marks around it.
+  const PREDICT = {
+    "pred-1": {accept: ["7.5"],
+      line: "<code>print(5 + 2.5)</code> prints <code>7.5</code>.",
+      why: "<code>5</code> is an <code>int</code> and <code>2.5</code> is a <code>float</code>, and Python adds two numbers of different kinds without complaint. The result is a <code>float</code> because one of the two was."},
+    "pred-2": {accept: ["true"],
+      line: "<code>print(\"apple\" &gt; \"Banana\")</code> prints <code>True</code>.",
+      why: "Python compares the strings character by character. <code>\"a\"</code> sits after <code>\"B\"</code> in Python's character table, because every uppercase letter comes before every lowercase one, so <code>\"apple\"</code> is the greater string."},
+    "pred-3": {accept: ["false"],
+      line: "<code>print(3 &gt; 1 and 3 &gt; 5)</code> prints <code>False</code>.",
+      why: "<code>3 &gt; 1</code> is <code>True</code> and <code>3 &gt; 5</code> is <code>False</code>. <code>and</code> produces <code>True</code> only when both sides are <code>True</code>, so one <code>False</code> side settles it."},
+    "pred-4": {accept: ["typeerror", "type error", "a typeerror", "error"],
+      line: "<code>print(\"3\" + 5)</code> prints nothing. It raises a <code>TypeError</code>.",
+      why: "<code>+</code> adds two numbers or joins two strings, and <code>\"3\"</code> is a string while <code>5</code> is a number. Python will not guess between the text <code>\"35\"</code> and the number <code>8</code>, so it stops the program on that line."}
+  };
+  const predictBtn = document.getElementById("predict-check");
+  const predictFb = document.getElementById("predict-fb");
+  K.Scoring.register("act-predict-output", 1, "activity");
+  let predictAttempts = 0, predictDone = false;
+  function normalizeAnswer(s){
+    return s.trim().toLowerCase().replace(/^["']|["']$/g, "");
+  }
+  function predictBreakdown(){
+    return "<ul>" + Object.keys(PREDICT).map(function(id){
+      const p = PREDICT[id];
+      return "<li>" + p.line + " " + p.why + "</li>";
+    }).join("") + "</ul>";
+  }
+  predictBtn.addEventListener("click", function(){
+    if (predictDone) return;
+    predictAttempts++;
+    const ids = Object.keys(PREDICT);
+    const wrong = ids.filter(function(id){
+      return PREDICT[id].accept.indexOf(normalizeAnswer(document.getElementById(id).value)) === -1;
+    });
+    if (wrong.length === 0) {
+      K.Scoring.award("act-predict-output", predictAttempts === 1 ? 1 : 0.5);
+      predictFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      predictFb.innerHTML = "<strong>All four correct" + (predictAttempts > 1 ? " (2nd try)" : "") +
+        ".</strong> The type of each value decided what its operator did, and in the last line it decided that the operator had no meaning at all." + predictBreakdown();
+      predictDone = true;
+    } else if (predictAttempts >= 2) {
+      K.Scoring.award("act-predict-output", (ids.length - wrong.length) / ids.length * 0.5);
+      predictFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      predictFb.innerHTML = "<strong>Here are all four answers.</strong>" + predictBreakdown();
+      predictDone = true;
+    } else {
+      predictFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      predictFb.innerHTML = "<strong>" + (ids.length - wrong.length) + " of " + ids.length +
+        " correct.</strong> Re-read the two rules in this section for the ones still blank or wrong, then check once more before the answers are shown.";
+    }
+    predictFb.setAttribute("tabindex", "-1");
+    predictFb.focus();
+    K.Storage.save(READING_ID, K.snapshot(READING_ID, TITLE));
+  });
 
-  K.Scoring.onChange(function(){ K.Scoring.renderChip("#var-scorechip"); });
-  K.Scoring.renderChip("#var-scorechip");
+  K.quiz({
+    id: "act-parentheses",
+    buttonSelector: "#paren-quiz .mlrk-choice",
+    feedbackSelector: "#paren-fb",
+    correct: "b",
+    answerLabel: "<code>cents = (price - 2) * 100</code>",
+    feedback: {
+      a: "Those parentheses wrap the whole expression, so they change nothing about which operator runs first. <code>2 * 100</code> still produces <code>200</code>, then <code>10 - 200</code> produces <code>-190</code>, the same wrong answer as the line with no parentheses.",
+      b: "The parentheses move the subtraction to the front, so <code>10 - 2</code> produces <code>8</code>, then <code>8 * 100</code> produces <code>800</code>. The discount comes off the dollar amount before the conversion to cents, which is the order the formula needed.",
+      c: "These parentheses wrap <code>2 * 100</code>, which is the operation Python was already doing first. The line produces <code>-190</code> again. Parentheses only change an answer when they move a lower-precedence operator ahead of a higher one."
+    }
+  });
 
-  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#var-download"});
+  K.quiz({
+    id: "act-augmented-assignment",
+    buttonSelector: "#aug-quiz .mlrk-choice",
+    feedbackSelector: "#aug-fb",
+    correct: "a",
+    answerLabel: "<code>helloworld!!!</code>",
+    feedback: {
+      a: "The whole right side runs before <code>+=</code> stores anything. <code>\"!\" * 3</code> goes first and produces <code>\"!!!\"</code>, because <code>*</code> outranks <code>+</code>. Then <code>\"world\" + \"!!!\"</code> produces <code>\"world!!!\"</code>, and <code>+=</code> glues that onto <code>\"hello\"</code>.",
+      b: "<code>+</code> joins two strings exactly as they are written, and neither string here contains a space. If you want a space between the words, you have to put one inside one of the strings.",
+      c: "<code>\"!\" * 3</code> repeats the string three times and produces <code>\"!!!\"</code>, not a single <code>!</code>. Multiplying a string by an integer repeats it, the same way multiplying two numbers scales one of them."
+    }
+  });
 
-  K.copyPlainText({readingId: READING_ID, title: TITLE, buttonSelector: "#var-copy", onDone: function(ok){
-    document.getElementById("var-copyfb").textContent = ok
+  K.selectAll({
+    id: "act-naming",
+    boxSelector: ".dt-name-box",
+    submitSelector: "#name-submit",
+    feedbackSelector: "#name-fb",
+    options: [
+      {value:"days", label:"<code>days_in_each_month</code>", correct:true,
+        hint:"Check it against the two things a good name needs: lowercase words joined by underscores, and words that say what the data is.",
+        explain:"Lowercase words joined by underscores, and the words say exactly what the list holds."},
+      {value:"camel", label:"<code>daysInEachMonth</code>", correct:false,
+        hint:"This name is readable. Look at how the words are separated.",
+        explain:"The words are separated by capital letters instead of underscores, so this is not <code>snake_case</code>. The name is readable, and that is not the test. Python's convention is underscores, and following it is what makes your code look like the rest of the Python a teammate reads."},
+      {value:"total", label:"<code>total_price</code>", correct:true,
+        hint:"Check it against the two things a good name needs: lowercase words joined by underscores, and words that say what the data is.",
+        explain:"Lowercase, joined by an underscore, and it names the data rather than describing it vaguely."},
+      {value:"caps", label:"<code>MAX_GUESSES</code>", correct:false,
+        hint:"This one follows a real Python convention. Ask what that convention tells a reader about the value.",
+        explain:"<code>ALL_CAPS</code> is a real convention, and it means the opposite of what this question asked for: it tells readers the value is a constant and should not be reassigned."},
+      {value:"d", label:"<code>d</code>", correct:false,
+        hint:"There is nothing to fix about the capitalization here. Ask what a reader learns from the name.",
+        explain:"A one-letter name is lowercase, but it says nothing about the data. Anyone reading the program has to trace every line that touches <code>d</code> to find out what it holds."}
+    ]
+  });
+
+  K.freeResponse({id: "act-reflect", selector: "#dt-reflect", minWords: 12});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#dt-scorechip"); });
+  K.Scoring.renderChip("#dt-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#dt-download"});
+
+  K.copyPlainText({readingId: READING_ID, title: TITLE, buttonSelector: "#dt-copy", onDone: function(ok){
+    document.getElementById("dt-copyfb").textContent = ok
       ? "Copied! Paste it anywhere you're keeping your notes."
       : "Couldn't copy automatically — select the page text and copy manually.";
   }});

@@ -1,6 +1,7 @@
 {
-  "title": "The Gene That Became a Date — Python Variables & Types",
-  "skill": "variables & data types",
+  "title": "The Gene That Became a Date",
+  "skill": "types, variables & operators",
   "topic_area": "Python Fundamentals",
-  "time_minutes": 10
+  "time_minutes": 13,
+  "lesson": "1.2"
 }

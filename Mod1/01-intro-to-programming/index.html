@@ -4,8 +4,17 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:900px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
-@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+.mlrk-illustration{width:100%;max-width:880px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
+.mlrk-fillblank{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-top:.9rem}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:24rem;font-family:var(--mlrk-font-code)}
+.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}.mlrk-fillblank input{width:100%}}
+/* Two labelled code blocks side by side at the point of contrast, so neither
+   version has to be held in the reader's head. Stacks below 900px. */
+.ip-compare{display:grid;grid-template-columns:1fr;gap:1.4rem;margin:1.1rem 0;align-items:start}
+@media(min-width:900px){.ip-compare{grid-template-columns:1fr 1fr;gap:1.6rem}}
+.ip-compare-label{margin:0 0 .5rem;line-height:1.4}
+.ip-compare>div{min-width:0}
 </style>
 </head><body>
 
@@ -13,9 +22,9 @@
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>What Is a Program, Really?</h1>
 <div class="mlrk-meta">
-  <span class="mlrk-pill">~11 minutes</span>
+  <span class="mlrk-pill">~13 minutes</span>
   <span class="mlrk-pill">Interactive</span>
-  <span class="mlrk-pill">No coding experience needed</span>
+  <span class="mlrk-pill">No setup needed to read</span>
 </div>
 </div></header>
 
@@ -25,122 +34,247 @@
 
 <section class="mlrk-section">
 <h2>1. The book that cost more than a house</h2>
-<p>In 2011, an out-of-print biology book called <em>The Making of a Fly</em> was listed on Amazon by two used-book sellers, profnath and bordeebook. Each ran a simple pricing program: profnath set its price to 0.99 times bordeebook's current price, always slightly cheaper; bordeebook set its price to 1.27 times profnath's, always pricier. Neither program had a bug — each did exactly what it was told, once a day, using whatever price the other had just posted.</p>
-<p>That is a loop with no exit condition. Each output became the other's next input, growing a little bigger every round, until the price hit $23,698,655.93 on April 18th. A person finally noticed and reset profnath's price by hand, and bordeebook's program obediently multiplied that new price too. The missing piece was never "multiply by this number"; it was "stop if the result looks ridiculous," an instruction nobody thought to write. That single gap — a computer doing exactly what its instructions say with zero judgment about whether the result makes sense — is the foundation everything else in programming sits on top of.</p>
-<p class="mlrk-small">Source: the full price log survives; biologist Michael Eisen first spotted the listing and <a href="https://www.michaeleisen.org/blog/p/358/" target="_blank" rel="noopener">wrote up exactly what he found</a>.</p>
+<p>In 2011 an out-of-print biology book called <em>The Making of a Fly</em> was listed on Amazon for $23,698,655.93. Nobody typed that price in. Two used-book sellers, profnath and bordeebook, each ran a small pricing script once a day. profnath set its price to 0.99 times bordeebook's price, always a little cheaper. bordeebook set its price to 1.27 times profnath's price, always a little pricier. Each script ran its lines in the order they were written and did exactly what each line said. Day after day the two prices pushed each other up, until a used paperback cost more than a house.</p>
+<p>Neither script was broken. A program is a text file of lines, and a computer runs those lines in the order they appear, from the top of the file to the bottom. "Stop if this number gets ridiculous" is a line a person has to write, and a computer never adds it on its own. This reading takes apart a pricing script of the same shape: the kinds of line it is made of, the command that runs it, and the one function that lets you read a value before a customer does.</p>
+<p class="mlrk-small">Source: biologist Michael Eisen spotted the listing and <a href="https://www.michaeleisen.org/blog/p/358/" target="_blank" rel="noopener">published the full price log</a>.</p>
 </section>
 
 <section class="mlrk-section">
 <h2>2. Technical vocabulary</h2>
-<p>Flip each card before the practice below.</p>
+<p>Flip each card. These ten terms are the ones the rest of the reading uses.</p>
 <div class="mlrk-grid">
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>program</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Program</strong><br>A complete set of instructions written for a computer to carry out, in order, to accomplish some goal. Profnath's pricing program was only a few instructions long, and it still ran for weeks without anyone checking on it.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>instruction</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Instruction</strong><br>One single exact action inside a program: "multiply this number by 1.27," "compare these two prices," "print this line." A program is a sequence of these, nothing more.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>algorithm</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Algorithm</strong><br>A numbered sequence of exact steps that reaches a goal, independent of any particular programming language. A recipe is an algorithm for a dish; a program is one specific way of writing an algorithm down for a computer to run.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>execute</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Execute / execution</strong><br>What a computer does with an instruction: carries it out literally and immediately, with no interpretation of what you probably meant instead of what you actually wrote.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>program</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Program</strong><br>A text file containing instructions that a computer executes to accomplish a task. profnath's pricing script was only a few lines long, and it still ran every day for weeks.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Comments</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Comments</strong><br>Lines used to document and explain code. They are ignored when a program is executed. A comment begins with the <code>#</code> symbol and can be placed on its own line or following valid code.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Expressions</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Expressions</strong><br>Any piece of code that evaluates to a single value. Expressions are often the result of using operators (<code>+</code>, <code>*</code>, <code>&gt;</code>, <code>==</code>) or of calling functions, such as <code>len("hi")</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Statements</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Statements</strong><br>Instructions that change the program. Creating a variable increases the memory used by the program. An <code>if</code> statement changes the control flow of a program by skipping lines of code.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>State</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>State</strong><br>The data stored by a program at a point in time. After <code>our_price = 19.80</code> runs, <code>19.80</code> is part of the program's state.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Python interpreter</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Python interpreter</strong><br>The program that reads a <code>.py</code> file and executes it, one statement at a time. You start it with the <code>python3</code> command.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>print()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong><code>print()</code></strong><br>A built-in function that displays text to the Terminal output. It is used to view the result of code operations, mainly for debugging.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>f-string</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>f-string</strong><br>A string with an <code>f</code> before the opening quote. Any expression written inside <code>{}</code> is evaluated and its value is placed into the text.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Control Flow</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Control flow</strong><br>The order in which lines of code are executed. Control flow runs from the top of a file to the bottom.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Code Style</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Code style</strong><br>The formatting of code in a way that makes it easier to read and understand. Python's style conventions are written down in a document called PEP 8.</span></button>
 </div>
 </section>
 
 <section class="mlrk-section">
-<h2>3. Instructions run in order, exactly as written</h2>
-<p>Two things are true of every program: instructions run in the exact order they're written, and each one runs exactly as written, with no pausing to guess your intent. Swap two steps and you often get a broken result, even though each instruction is still correct alone. Leave a step vague, or skip one the computer needs, and nothing quietly patches the gap. A person fills in a vague recipe with common sense without noticing; a computer has no such fallback.</p>
+<h2>3. A program is made of three kinds of line</h2>
+<p>Every line in a Python file is a comment, an expression, or a statement.</p>
+<p><strong>Comments</strong> start with <code>#</code>. The Python interpreter skips them completely, so a comment can say anything you want and the program behaves the same way. Comments exist for the next person to read the file, including you in six months.</p>
+<p><strong>Expressions</strong> are any piece of code that evaluates to a single value. <code>5 + 5</code> evaluates to <code>10</code>. <code>len("hi")</code> evaluates to <code>2</code>. A plain value like <code>"hello"</code> is an expression too, because it evaluates to itself. An expression on its own does nothing useful; it becomes useful once a statement does something with the value.</p>
+<p><strong>Statements</strong> are instructions that change the program. Storing a value under a name adds that value to the program's <strong>state</strong>, which is the data the program is holding at that moment. An <code>if</code> statement changes which line runs next.</p>
+<p>Here is <code>repricer.py</code>, a script shaped like profnath's:</p>
+<div class="mlrk-code"><pre># repricer.py: match the competitor, a penny under
+competitor_price = 20.00
+our_price = competitor_price * 0.99</pre></div>
+<p>The first line is a comment, so the interpreter ignores it. The second and third lines are statements: each one stores a value under a name and changes the program's state. <code>competitor_price * 0.99</code> on the third line is an expression. It evaluates to the single value <code>19.8</code>, and then the statement stores that value under the name <code>our_price</code>.</p>
 
-<p>The classic way to see this is with a task everyone already knows how to do: making a peanut butter sandwich. Compare a vague version of the instructions against an exact one.</p>
-
-<svg class="mlrk-illustration" viewBox="0 0 900 910" role="img" aria-labelledby="sandTitle sandDesc" xmlns="http://www.w3.org/2000/svg">
-  <title id="sandTitle">Vague sandwich instructions compared with exact sandwich instructions</title>
-  <desc id="sandDesc">Vague instructions read: get the bread out, put peanut butter on, add the jelly, put it together. Followed literally with no common sense to fill gaps, the result is that no amount or method was ever given, so the sandwich never actually gets made. Exact instructions read: take two slices from the bag, unscrew the peanut butter jar, spread one tablespoon with a knife, press the two slices together. Followed literally, the result is the same finished sandwich, made the exact same way every time.</desc>
-  <g font-family="Helvetica, Arial, sans-serif">
-    <rect x="20" y="20" width="860" height="420" rx="14" fill="#F7DFDF" stroke="#C92929" stroke-width="3"/>
-    <text x="450" y="66" text-anchor="middle" font-size="32" font-weight="700" fill="#261F1D">Vague instructions</text>
-    <text x="45" y="128" font-size="28" fill="#261F1D">1. Get the bread out</text>
-    <text x="45" y="173" font-size="28" fill="#261F1D">2. Put peanut butter on</text>
-    <text x="45" y="218" font-size="28" fill="#261F1D">3. Add the jelly</text>
-    <text x="45" y="263" font-size="28" fill="#261F1D">4. Put it together</text>
-    <line x1="45" y1="288" x2="855" y2="288" stroke="#C92929" stroke-width="1.5"/>
-    <text x="45" y="326" font-size="28" font-weight="700" fill="#B72525">Result:</text>
-    <text x="45" y="364" font-size="26" fill="#261F1D">No amount or method given, sandwich never actually gets made</text>
-
-    <rect x="20" y="470" width="860" height="420" rx="14" fill="#A6C2B4" stroke="#264326" stroke-width="3"/>
-    <text x="450" y="516" text-anchor="middle" font-size="32" font-weight="700" fill="#261F1D">Exact instructions</text>
-    <text x="45" y="578" font-size="28" fill="#261F1D">1. Take 2 slices from the bag</text>
-    <text x="45" y="623" font-size="28" fill="#261F1D">2. Unscrew the peanut butter jar</text>
-    <text x="45" y="668" font-size="28" fill="#261F1D">3. Spread 1 tbsp with a knife</text>
-    <text x="45" y="713" font-size="28" fill="#261F1D">4. Press the two slices together</text>
-    <line x1="45" y1="738" x2="855" y2="738" stroke="#264326" stroke-width="1.5"/>
-    <text x="45" y="776" font-size="28" font-weight="700" fill="#264326">Result:</text>
-    <text x="45" y="814" font-size="26" fill="#261F1D">Same finished sandwich, made the exact same way every time</text>
-  </g>
-</svg>
-
-<p>Notice "put peanut butter on" isn't a real instruction: on what, with what, how much? A human fills in "the bread, a knife, a reasonable amount" without noticing the gap; a computer has nothing to fill it with unless someone wrote that down. It's the same gap that sent profnath and bordeebook's prices to $23 million: "multiply by this number" is exact on its own, but "stop if this looks ridiculous" never got written down.</p>
-
-<p><strong>Try it:</strong> here's a different everyday task, broken into steps but shuffled out of order. Put them back in the order a person (or a program) actually has to perform them.</p>
-<div class="mlrk-card">
-<ul class="mlrk-orderlist" id="tea-order">
-  <li class="mlrk-orderitem" data-step="fill"><span class="mlrk-order-num"></span> Fill the kettle with cold water</li>
-  <li class="mlrk-orderitem" data-step="boil"><span class="mlrk-order-num"></span> Turn on the kettle and wait for the water to boil</li>
-  <li class="mlrk-orderitem" data-step="bag"><span class="mlrk-order-num"></span> Put a tea bag in the mug</li>
-  <li class="mlrk-orderitem" data-step="pour"><span class="mlrk-order-num"></span> Pour the boiling water into the mug</li>
-  <li class="mlrk-orderitem" data-step="steep"><span class="mlrk-order-num"></span> Wait 3-4 minutes, then take the tea bag out</li>
-</ul>
-<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="tea-check">Check my order</button></div>
-<div id="tea-orderfb" class="mlrk-feedback" tabindex="-1"></div>
+<p><strong>Try it.</strong> Drag each line into the kind of line it is.</p>
+<div class="mlrk-card" id="kind-activity">
+<div class="mlrk-drag-source" id="kind-chips">
+  <span class="mlrk-draggable" id="chip-todaycomment"><code># set today's price</code></span>
+  <span class="mlrk-draggable" id="chip-mult"><code>20.00 * 0.99</code></span>
+  <span class="mlrk-draggable" id="chip-assign"><code>competitor_price = 20.00</code></span>
+  <span class="mlrk-draggable" id="chip-len"><code>len("hi")</code></span>
+  <span class="mlrk-draggable" id="chip-if"><code>if our_price &gt; 1000:</code></span>
+  <span class="mlrk-draggable" id="chip-todo"><code># TODO: cap the price</code></span>
+</div>
+<div class="mlrk-grid">
+  <div class="mlrk-dropzone" id="zone-comment"><strong>Comment</strong></div>
+  <div class="mlrk-dropzone" id="zone-expression"><strong>Expression</strong></div>
+  <div class="mlrk-dropzone" id="zone-statement"><strong>Statement</strong></div>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="kind-check">Check my answers</button></div>
+<div id="kind-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Nothing can boil before there's water in the kettle, and nothing can be poured before it's finished boiling. The tea bag can go in the mug any time before the pour, but it can't do anything on its own after that except sit and steep.</p>
+<p>Ask one question per line. Does it start with <code>#</code>? Then it is a comment. Does it work out to a single value and stop there? Then it is an expression. Does it store something or decide which line runs next? Then it is a statement.</p>
 </details>
 </section>
 
 <section class="mlrk-section">
-<h2>4. Predict what happens</h2>
-<div class="mlrk-card" id="card-order">
-<p><strong>The tea steps run in this order instead: first pour the boiling water into the mug, then turn on the kettle and wait for the water to boil.</strong> <strong>What actually happens?</strong></p>
-<button type="button" class="mlrk-choice" data-a="right">Nothing pours correctly. There's no boiling water yet at that point, so the "pour" step has nothing to act on and the instruction just fails.</button>
-<button type="button" class="mlrk-choice" data-a="commonsense">The computer notices the kettle hasn't boiled yet, waits automatically, and pours once it's actually ready.</button>
-<button type="button" class="mlrk-choice" data-a="sameresult">It doesn't matter. All five steps still happen eventually, so the tea comes out the same either way.</button>
-<div id="orderfb" class="mlrk-feedback" tabindex="-1"></div>
+<h2>4. Running the file with the Python interpreter</h2>
+<p>A <code>.py</code> file on its own is just text. The <strong>Python interpreter</strong> is the program that reads a <code>.py</code> file and executes it, one statement at a time, top to bottom. You start the interpreter from the Terminal by typing <code>python3</code> and the name of the file you want it to read:</p>
+<div class="mlrk-code"><pre>python3 repricer.py</pre></div>
+<p>Run <code>repricer.py</code> that way and the Terminal gives you nothing back. That is the right result, and it catches almost everybody the first time. The interpreter read all three lines and stored both values. A program shows you a value only when a line of the program asks it to, and <code>repricer.py</code> has no such line.</p>
+<p>The simulator here has three files in it. <code>repricer.py</code> stores two values and says nothing. <code>repricer_v2.py</code> does the same work and then displays the price. <code>counter.py</code> adds 1 to a number one hundred million times and also says nothing, which takes real seconds of real work. Run these five commands, in order:</p>
+<ol class="mlrk-small mlrk-steplist">
+  <li><code>ls</code> — see which files are in this folder</li>
+  <li><code>cat repricer.py</code> — read a file without running it</li>
+  <li><code>python3 repricer.py</code> — run it, and notice what comes back; the simulator writes <code>(no output)</code> where a real Terminal just returns you to the prompt</li>
+  <li><code>python3 repricer_v2.py</code> — run the version that displays its price</li>
+  <li><code>time python3 counter.py</code> — ask the Terminal to time a file that displays nothing</li>
+</ol>
+<div class="mlrk-terminal" id="ip-terminal">
+  <div class="mlrk-terminal-log" aria-live="polite"></div>
+  <div class="mlrk-terminal-row"><span class="mlrk-terminal-prompt"></span><input class="mlrk-terminal-input" type="text" aria-label="Terminal input" autocomplete="off" spellcheck="false"></div>
+</div>
+
+<div class="mlrk-card" id="card-myth">
+<p><strong><code>counter.py</code> takes about four seconds to finish and displays nothing at all.</strong> <strong>What does that tell you?</strong></p>
+<button type="button" class="mlrk-choice" data-a="ran">The interpreter read and ran every line. <code>counter.py</code> has no <code>print()</code> in it, so there is nothing for you to see.</button>
+<button type="button" class="mlrk-choice" data-a="broken">The interpreter could not run the file, so none of its lines did anything.</button>
+<div id="myth-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 </section>
 
 <section class="mlrk-section">
-<h2>5. What would actually happen</h2>
-<p>A common way people demonstrate this idea for fun: have a kid write step-by-step sandwich instructions, then have an adult follow them "exactly as written," refusing to fix anything with common sense the way a computer wouldn't. Select every statement below that's actually true about how a literal instruction-follower, human or computer, behaves.</p>
-<div class="mlrk-card"><p><strong>Select every TRUE statement.</strong></p>
-<label class="mlrk-selectall-option"><input type="checkbox" class="sa-box" value="a"> "Add sugar to taste" gives no exact amount, so a literal program has no way to know when to stop.</label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="sa-box" value="b"> In a "follow it exactly" sandwich demo, the adult usually ends up with a perfect sandwich by quietly using common sense.</label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="sa-box" value="c"> In the 2011 Amazon story, one seller's program would have stopped itself once the price passed a million dollars.</label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="sa-box" value="d"> Two bug-free programs can still produce a result nobody wanted, if the instructions never covered that situation.</label>
-<button type="button" id="sasubmit" class="mlrk-btn">Check my selections</button>
-<div id="safb" class="mlrk-feedback" tabindex="-1"></div>
+<h2>5. Reading a value with <code>print()</code></h2>
+<p><code>print()</code> is a built-in function that displays text in the Terminal. Its main job is letting you read a value the program worked out, so you can tell whether the program worked it out correctly. profnath's price climbed for weeks because no person read the new number each day; a <code>print()</code> line puts that number where a person can read it.</p>
+<p>Add one line to <code>repricer.py</code> and the price appears:</p>
+<div class="mlrk-code"><pre># repricer.py: match the competitor, a penny under
+competitor_price = 20.00
+our_price = competitor_price * 0.99
+print(our_price)</pre></div>
+<p>Output:</p>
+<div class="mlrk-code"><pre>19.8</pre></div>
+<p><code>19.8</code> on its own tells you the number but not what the number is. Most of the time you want words around it. Put an <code>f</code> in front of the opening quote and Python evaluates any expression you write inside curly braces, then places its value into the text. A string written that way is an <strong>f-string</strong>.</p>
+<p>The two versions differ by one character, the <code>f</code>, and they display different things:</p>
+<div class="ip-compare">
+<div>
+<p class="ip-compare-label"><strong>With the <code>f</code></strong><br>Python fills in the value</p>
+<div class="mlrk-code"><pre>print(f"Our new price is ${our_price}")</pre></div>
+<p class="ip-compare-label">Output:</p>
+<div class="mlrk-code"><pre>Our new price is $19.8</pre></div>
 </div>
+<div>
+<p class="ip-compare-label"><strong>Without the <code>f</code></strong><br>the braces are ordinary characters</p>
+<div class="mlrk-code"><pre>print("Our new price is ${our_price}")</pre></div>
+<p class="ip-compare-label">Output:</p>
+<div class="mlrk-code"><pre>Our new price is ${our_price}</pre></div>
+</div>
+</div>
+<p>The <code>$</code> is just a character in the text either way. The <code>f</code> is what tells Python to treat <code>{our_price}</code> as an expression to evaluate rather than as four characters to display.</p>
+
+<p><strong>Try it.</strong> This script has to display <code>Price: $19.8</code>. Type the missing argument to <code>print()</code>.</p>
+<div class="mlrk-card">
+<div class="mlrk-code"><pre>our_price = 19.8
+
+print(______________)</pre></div>
+<p>Wanted output:</p>
+<div class="mlrk-code"><pre>Price: $19.8</pre></div>
+<div class="mlrk-fillblank"><input type="text" id="fstr-input" autocomplete="off" placeholder="type the missing argument"> <button type="button" class="mlrk-btn" id="fstr-check">Check</button></div>
+<div id="fstr-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Start with <code>f</code>, then an opening quote. Write the words you want exactly as they should appear, and put <code>our_price</code> inside curly braces at the spot where the number belongs.</p>
+</details>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
-<p>Two sellers' pricing programs multiplied a number back and forth until a used book hit $23.7 million, not because either program had a bug, but because "stop if this gets ridiculous" was never written down as an instruction. Every program, from that pricing bot to the first line of Python this fellowship writes, works the same way: instructions run in the exact order they're written, each one exactly as written, with no common-sense fallback for anything left vague or missing.</p>
-<label for="intro-reflect"><strong>In 2-3 sentences:</strong> describe a time you gave someone (a sibling, a coworker, anyone) an instruction they followed "exactly" in a way you didn't intend. What detail was missing that a computer would also need spelled out?</label>
-<textarea id="intro-reflect" class="mlrk-response" data-save></textarea>
+<h2>6. Control flow: which line runs next</h2>
+<p><strong>Control flow</strong> is the order in which lines of code are executed. A computer runs one statement at a time, and the default order is the order you wrote them in: the top of the file first, the bottom of the file last.</p>
+<div class="mlrk-code"><pre>print("1")
+print("2")
+print("3")</pre></div>
+<p>Output:</p>
+<div class="mlrk-code"><pre>1
+2
+3</pre></div>
+<p>Two kinds of statement change that order. An <code>if</code> statement can cause lines to be skipped. A loop can cause the same lines to run more than once. Nothing else in a Python file moves the interpreter off the straight path down the page.</p>
+<p>Here is the sanity rule profnath's script never had, written as an <code>if</code> statement in a file named <code>check_price.py</code>:</p>
+<div class="mlrk-code"><pre>our_price = 19.80
+
+if our_price &gt; 1000:
+    print("Check this price.")
+print("Done.")</pre></div>
+<p>Output:</p>
+<div class="mlrk-code"><pre>Done.</pre></div>
+<p><code>19.80 &gt; 1000</code> is <code>False</code>, so the interpreter skips the indented <code>print("Check this price.")</code> line entirely and carries on with <code>print("Done.")</code>. Give <code>our_price</code> a value of 23698655.93 instead and that same <code>if</code> statement runs the line it skipped before, and somebody finds out. The diagram compares the two paths.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 880 400" role="img" aria-labelledby="ipFlowTitle ipFlowDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="ipFlowTitle">Default top-to-bottom control flow compared with an if statement skipping a line</title>
+  <desc id="ipFlowDesc">Two panels side by side. The left panel, labelled default order, stacks three boxes: print of 1 runs first, print of 2 runs second, print of 3 runs third, and a closing box states that every statement ran. The right panel, labelled an if statement skips a line, stacks four boxes for check_price.py: the assignment our_price equals 19.80 runs first; the line if our_price is greater than 1000 runs second and tests False; the indented print of Check this price is greyed out and skipped; print of Done runs third; and a closing box states that one statement was skipped.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="8" y="24" font-size="19" font-weight="700" fill="#261F1D">Default order</text>
+    <rect x="8" y="40" width="412" height="62" rx="9" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="22" y="66" font-size="18" font-weight="700" fill="#261F1D">print("1")</text>
+    <text x="22" y="90" font-size="18" fill="#261F1D">runs 1st</text>
+
+    <rect x="8" y="112" width="412" height="62" rx="9" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="22" y="138" font-size="18" font-weight="700" fill="#261F1D">print("2")</text>
+    <text x="22" y="162" font-size="18" fill="#261F1D">runs 2nd</text>
+
+    <rect x="8" y="184" width="412" height="62" rx="9" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="22" y="210" font-size="18" font-weight="700" fill="#261F1D">print("3")</text>
+    <text x="22" y="234" font-size="18" fill="#261F1D">runs 3rd</text>
+
+    <rect x="8" y="328" width="412" height="52" rx="9" fill="#E9EFEB" stroke="#264326" stroke-width="2.5"/>
+    <text x="22" y="360" font-size="18" font-weight="700" fill="#204D3C">Every statement ran</text>
+
+    <text x="452" y="24" font-size="19" font-weight="700" fill="#261F1D">An if statement skips a line</text>
+    <rect x="452" y="40" width="412" height="62" rx="9" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="466" y="66" font-size="18" font-weight="700" fill="#261F1D">our_price = 19.80</text>
+    <text x="466" y="90" font-size="18" fill="#261F1D">runs 1st</text>
+
+    <rect x="452" y="112" width="412" height="62" rx="9" fill="#FFEECA" stroke="#83671C" stroke-width="2.5"/>
+    <text x="466" y="138" font-size="18" font-weight="700" fill="#261F1D">if our_price &gt; 1000:</text>
+    <text x="466" y="162" font-size="18" fill="#675116">runs 2nd, tests False</text>
+
+    <rect x="452" y="184" width="412" height="62" rx="9" fill="#E4E7EB" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="490" y="210" font-size="18" font-weight="700" fill="#261F1D">print("Check this price.")</text>
+    <text x="490" y="234" font-size="18" fill="#261F1D">skipped</text>
+
+    <rect x="452" y="256" width="412" height="62" rx="9" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="466" y="282" font-size="18" font-weight="700" fill="#261F1D">print("Done.")</text>
+    <text x="466" y="306" font-size="18" fill="#261F1D">runs 3rd</text>
+
+    <rect x="452" y="328" width="412" height="52" rx="9" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="466" y="360" font-size="18" font-weight="700" fill="#1E659D">One statement was skipped</text>
+  </g>
+</svg>
+
+<p>A loop changes the order the other way. <code>counter.py</code> from the simulator is four lines long, and the line that does the adding is written once:</p>
+<div class="mlrk-code"><pre># counter.py: count to 100 million and say nothing about it
+x = 0
+for i in range(100_000_000):
+    x += 1</pre></div>
+<p>The interpreter runs <code>x += 1</code> one hundred million times before it reaches the end of the file. That is why <code>time python3 counter.py</code> reports seconds of work for a file that displays nothing.</p>
+
+<div class="mlrk-card">
+<p><strong>Check every line that changes the order Python runs statements in.</strong> More than one is possible.</p>
+<label class="mlrk-selectall-option"><input type="checkbox" class="ip-cf-box" value="if"> <span><code>if total &gt; 100:</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="ip-cf-box" value="comment"> <span><code># raise the price</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="ip-cf-box" value="loop"> <span><code>for i in range(3):</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="ip-cf-box" value="assign"> <span><code>price = 19.80</code></span></label>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="ip-cf-submit">Check my answers</button></div>
+<div id="ip-cf-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Two of the four change the program in some way without touching the order. One changes nothing at all, because the interpreter never reads it as code. Ask of each line: could the interpreter end up skipping a line, or running a line twice, because of it?</p>
+</details>
 </section>
 
 <section class="mlrk-section">
-<h2>7. Go further (optional)</h2>
+<h2>7. Code style</h2>
+<p><strong>Code style</strong> is the formatting of code in a way that makes it easier to read and understand. Python's conventions are written down in a document called <a href="https://peps.python.org/pep-0008/" target="_blank" rel="noopener">PEP 8</a>: four spaces per level of indentation, spaces around operators such as <code>&lt;=</code>, and lowercase names joined by underscores, like <code>our_price</code>.</p>
+<p>Indentation is the one part of that list the interpreter cares about. Whenever a line ends with a colon, the lines that belong to it have to be indented underneath it, which is how the interpreter knows that <code>print("Check this price.")</code> belongs to the <code>if</code> in <code>check_price.py</code> and <code>print("Done.")</code> does not. Get the indentation wrong and the interpreter raises an <code>IndentationError</code> and refuses the whole file before running a single line.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>8. Summary and reflection</h2>
+<p>A program is a text file of comments, expressions, and statements. The Python interpreter reads that file when you type <code>python3</code> and the file name, and it executes the statements one at a time, from the top of the file to the bottom. That order is called control flow, and only two kinds of statement change it: an <code>if</code> statement can skip lines, and a loop can repeat them. A program displays a value only where a <code>print()</code> line asks it to, which is why a script can run for weeks, do a great deal of work, and show nobody what it is doing.</p>
+<label for="ip-reflect"><strong>profnath's script ran once a day for weeks and the price climbed the whole time.</strong> In 2-3 sentences: write the one <code>print()</code> line you would add to <code>repricer.py</code>, say what it would display each day, and say what a person reading that line would have noticed.</label>
+<textarea id="ip-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>9. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
-  <li><a href="https://blockly.games/maze?lang=en" target="_blank" rel="noopener">Blockly Games: Maze</a> — a hands-on puzzle game where you snap together instruction blocks to move a character through a maze; it makes the reading's central point concrete, since the character does exactly what your blocks say, in exactly that order, with no guessing.</li>
-  <li><a href="https://www.youtube.com/watch?v=DQwOo6Wa3l8" target="_blank" rel="noopener">What is an Algorithm?</a> (upGrad KnowledgeHut, ~7 min) — a short video on what an algorithm is and how it relates to a program, expanding on the vocabulary from section 2 above.</li>
+  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in <code>check_price.py</code> from section 6 and press Next one line at a time; the tool highlights the statement about to run, so you watch control flow walk down the file and step straight over the skipped line.</li>
+  <li><a href="https://www.youtube.com/watch?v=o0mvgsPQ8Jg" target="_blank" rel="noopener">Quick Intro to F-Strings in Python</a> (Pretty Printed, 4 min 28 s) — a second pass on f-strings, typed out live, if seeing someone build one is more useful than reading two versions side by side.</li>
 </ul>
 </section>
 
 <section class="mlrk-section">
-<h2>8. Your score &amp; keep a copy of your work</h2>
-<div id="intro-scorechip" class="mlrk-score-chip"></div>
+<h2>10. Your score &amp; keep a copy of your work</h2>
+<div id="ip-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
 <div class="mlrk-actions">
-<button type="button" class="mlrk-btn mlrk-btn-primary" id="intro-copy">Copy Plain Text Answers</button>
-<button type="button" class="mlrk-btn" id="intro-download">Download as .txt</button>
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="ip-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="ip-download">Download as .txt</button>
 </div>
-<p id="intro-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+<p id="ip-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
 
@@ -158,39 +292,147 @@
 
   K.flipCards(document, "act-flipcards");
 
-  K.orderSteps("#tea-order", {id:"act-tea-order", correctOrder:["fill","boil","bag","pour","steep"], feedbackSelector:"#tea-orderfb", checkSelector:"#tea-check"});
+  /* ---- section 3: comment, expression, or statement ---- */
+  K.dragDrop("#kind-activity", "act-kind-classify");
+  K.selfCheck({
+    buttonSelector: "#kind-check",
+    feedbackSelector: "#kind-fb",
+    mapping: {
+      "chip-todaycomment": {expectedId: "zone-comment", label: "# set today's price", expectedLabel: "Comment, because it starts with #"},
+      "chip-todo": {expectedId: "zone-comment", label: "# TODO: cap the price", expectedLabel: "Comment, because it starts with # (the interpreter ignores it, so this rule never runs)"},
+      "chip-mult": {expectedId: "zone-expression", label: "20.00 * 0.99", expectedLabel: "Expression, because it evaluates to the single value 19.8"},
+      "chip-len": {expectedId: "zone-expression", label: 'len("hi")', expectedLabel: "Expression, because the function call evaluates to the single value 2"},
+      "chip-assign": {expectedId: "zone-statement", label: "competitor_price = 20.00", expectedLabel: "Statement, because storing a value under a name changes the program's state"},
+      "chip-if": {expectedId: "zone-statement", label: "if our_price > 1000:", expectedLabel: "Statement, because it decides which line the interpreter runs next"}
+    }
+  });
 
-  K.quiz({id:"q-order", buttonSelector:"#card-order .mlrk-choice", feedbackSelector:"#orderfb", correct:"right",
-    feedback:{
-      right:"Exactly. The instruction \"pour the boiling water\" only means something once water has actually boiled. Out of order, a literal executor doesn't skip ahead or guess your intent, it just fails or does something nonsensical.",
-      commonsense:"This is exactly the common-sense fallback a computer does not have. Reordering the steps changes what the program actually does, and nothing pauses to notice the order looks wrong.",
-      sameresult:"The order steps run in is part of what an algorithm actually is. The same steps in a different order can produce a broken result instead of the same one."
-    }});
+  /* ---- section 4: no output does not mean nothing happened ---- */
+  K.terminal("#ip-terminal", {
+    id: "act-terminal",
+    startPath: "/home/student/1-intro-to-programming",
+    minCommands: 4,
+    filesystem: {
+      "/home/student/1-intro-to-programming": {type:"dir", children:["repricer.py","repricer_v2.py","counter.py"]},
+      "/home/student/1-intro-to-programming/repricer.py": {type:"file", contents:"# repricer.py: match the competitor, a penny under\ncompetitor_price = 20.00\nour_price = competitor_price * 0.99"},
+      "/home/student/1-intro-to-programming/repricer_v2.py": {type:"file", contents:'# repricer_v2.py: the same work, plus a line that displays the result\ncompetitor_price = 20.00\nour_price = competitor_price * 0.99\nprint(f"Our new price is ${our_price}")'},
+      "/home/student/1-intro-to-programming/counter.py": {type:"file", contents:"# counter.py: count to 100 million and say nothing about it\nx = 0\nfor i in range(100_000_000):\n    x += 1"}
+    },
+    commands: {
+      python(args){
+        return "command not found: python\nThis machine only has python3 installed. Try: python3 " + (args[0] || "<file>.py");
+      },
+      python3(args, state){
+        return runPython(args, state);
+      },
+      time(args, state){
+        if(args[0] !== "python3") return "usage: time python3 <file>.py";
+        const out = runPython(args.slice(1), state);
+        const secs = args[1] === "counter.py" ? "3.82s user 0.02s system 99% cpu 3.840 total"
+                                              : "0.03s user 0.01s system 92% cpu 0.042 total";
+        return (out ? out + "\n" : "") + "python3 " + (args[1] || "") + "  " + secs;
+      }
+    }
+  });
 
-  K.selectAll({id:"q-selectall", boxSelector:".sa-box", submitSelector:"#sasubmit", feedbackSelector:"#safb", options:[
-    {value:"a", label:"If an instruction says \"add sugar to taste\" and never gives an exact amount or stopping point, a program executing it literally has no way to know when to stop.", correct:true,
-      hint:"Think about whether \"to taste\" gives an exact number a computer could check against.",
-      explain:"Exactly why \"add sugar to taste\" isn't a real instruction a computer could run at all. There's no exact quantity and no exact stopping condition, only a human's intuition."},
-    {value:"b", label:"In a \"follow the instructions exactly\" sandwich demonstration, the adult usually ends up with a perfect sandwich, because they quietly fix any vague step using common sense.", correct:false,
-      hint:"Think about why these demonstrations are funny in the first place. Would that still be true if the adult fixed vague steps as they went?",
-      explain:"The opposite is what actually happens, and it's the whole reason these demonstrations are entertaining: the adult refuses to use any judgment a computer wouldn't have, so a vague step produces a mess, not a fix."},
-    {value:"c", label:"In the 2011 Amazon pricing story, one seller's program would have stopped raising its price on its own once it passed a million dollars, since that's obviously unreasonable for a used book.", correct:false,
-      hint:"Go back to section 1: did either pricing program have a rule for \"stop if the price is too high,\" or only a rule for \"multiply by a fixed number\"?",
-      explain:"Nothing like that was ever true. Each program only knew how to multiply the competitor's price by a fixed number, once a day, forever. \"Unreasonable\" isn't a concept a computer has unless a person writes a specific rule for it."},
-    {value:"d", label:"Two programs that each run exactly as written, with no bugs in the code itself, can still produce a result nobody wanted, if the instructions never accounted for the situation they ended up in.", correct:true,
-      hint:"This is the reading's central idea, stated directly at the end of section 1 and section 3.",
-      explain:"This is the core lesson of the whole reading: a program can be entirely bug-free and still misbehave badly if what it was actually told to do doesn't cover the situation it ends up in."}
-  ]});
+  function runPython(args, state){
+    if(!args[0]) return "usage: python3 <file>.py";
+    const path = state.cwd + "/" + args[0];
+    const n = state.fs[path];
+    if(!n || n.type !== "file") return "python3: can't open file '" + args[0] + "': [Errno 2] No such file or directory";
+    if(args[0] === "repricer_v2.py") return "Our new price is $19.8";
+    return "";
+  }
 
-  K.freeResponse({id:"act-reflect", selector:"#intro-reflect", minWords:10});
+  K.quiz({
+    id: "q-print-myth",
+    buttonSelector: "#card-myth .mlrk-choice",
+    feedbackSelector: "#myth-fb",
+    correct: "ran",
+    maxAttempts: 1,
+    answerLabel: "the interpreter read and ran every line",
+    feedback: {
+      ran: "The interpreter executed all three statements of <code>counter.py</code>, and the loop added 1 to <code>x</code> one hundred million times, which is where the four seconds went. A program displays a value only where a <code>print()</code> line asks it to, and <code>counter.py</code> has no <code>print()</code> line at all.",
+      broken: "A file the interpreter cannot run produces an error message in the Terminal, and it produces that message immediately rather than four seconds later. Those four seconds are the interpreter running the loop in <code>counter.py</code> one hundred million times. A program displays a value only where a <code>print()</code> line asks it to."
+    }
+  });
 
-  K.Scoring.onChange(function(){ K.Scoring.renderChip("#intro-scorechip"); });
-  K.Scoring.renderChip("#intro-scorechip");
+  /* ---- section 5: write the f-string ---- */
+  function normalize(s){
+    return s.trim().toLowerCase().replace(/\s+/g, "").replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
+  }
+  const fstrBtn = document.getElementById("fstr-check");
+  const fstrInput = document.getElementById("fstr-input");
+  const fstrFb = document.getElementById("fstr-fb");
+  K.Scoring.register("act-fstring-fillblank", 1, "quiz");
+  let fstrAttempts = 0, fstrDone = false;
+  const GOOD = /^f(["'])price:\$\{our_price\}\1$/;
+  const NO_F = /^(["'])price:\$\{our_price\}\1$/;
+  const HARDCODED = /^f?(["'])price:\$19\.8\1$/;
+  const REVEAL = 'The answer is <code>f"Price: ${our_price}"</code>. The <code>f</code> tells Python to evaluate whatever is inside the curly braces, <code>our_price</code> holds <code>19.8</code>, and every other character between the quote marks is displayed exactly as typed.';
+  fstrBtn.addEventListener("click", function(){
+    if(fstrDone) return;
+    fstrAttempts++;
+    const val = normalize(fstrInput.value);
+    if(GOOD.test(val)){
+      K.Scoring.award("act-fstring-fillblank", fstrAttempts === 1 ? 1 : 0.5);
+      fstrFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      fstrFb.innerHTML = "<strong>Correct" + (fstrAttempts > 1 ? " (2nd try — 0.5 pt)" : " (1st try — 1 pt)") + ".</strong> Python evaluates <code>our_price</code> inside the braces and places <code>19.8</code> into the text, so the Terminal shows <code>Price: $19.8</code>. Change what <code>our_price</code> holds and the same line displays the new number.";
+      fstrDone = true;
+    } else if(NO_F.test(val)){
+      fstrFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      fstrFb.innerHTML = "<strong>Close.</strong> The words and the braces are right, and the <code>f</code> before the opening quote is missing. Without it the braces are ordinary characters, so this line displays <code>Price: ${our_price}</code> instead of the number." +
+        (fstrAttempts >= 2 ? " <strong>" + REVEAL + "</strong>" : '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>');
+      if(fstrAttempts >= 2){ K.Scoring.award("act-fstring-fillblank", 0); fstrDone = true; }
+    } else if(HARDCODED.test(val)){
+      fstrFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      fstrFb.innerHTML = "<strong>That displays the right text today only.</strong> Typing <code>19.8</code> between the quote marks makes it part of the text, so the line keeps displaying <code>19.8</code> after <code>our_price</code> changes to something else. Put the name <code>our_price</code> inside the braces and Python fills in whatever that name holds when the line runs." +
+        (fstrAttempts >= 2 ? " <strong>" + REVEAL + "</strong>" : '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>');
+      if(fstrAttempts >= 2){ K.Scoring.award("act-fstring-fillblank", 0); fstrDone = true; }
+    } else if(fstrAttempts >= 2){
+      K.Scoring.award("act-fstring-fillblank", 0);
+      fstrFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      fstrFb.innerHTML = "<strong>Here's the answer:</strong> " + REVEAL;
+      fstrDone = true;
+    } else {
+      fstrFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      fstrFb.innerHTML = "<strong>Not there yet.</strong> The argument is one f-string: an <code>f</code>, then an opening quote, then the text <code>Price: $</code>, then <code>our_price</code> inside curly braces, then a closing quote." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    fstrFb.setAttribute("tabindex", "-1"); fstrFb.focus();
+  });
 
-  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#intro-download"});
+  /* ---- section 6: which lines change control flow ---- */
+  K.selectAll({
+    id: "q-control-flow",
+    boxSelector: ".ip-cf-box",
+    submitSelector: "#ip-cf-submit",
+    feedbackSelector: "#ip-cf-fb",
+    options: [
+      {value:"if", label:"if total > 100:", correct:true,
+        hint:"Ask whether the interpreter can end up stepping over the lines indented underneath this one.",
+        explain:"An <code>if</code> statement runs the lines indented under it only when its condition is <code>True</code>, so it can make the interpreter skip lines of the file."},
+      {value:"comment", label:"# raise the price", correct:false,
+        hint:"Ask what the interpreter does when it reaches a line starting with <code>#</code>.",
+        explain:"A comment is ignored when the program is executed. The interpreter reads straight past it, so nothing about the order changes, no matter what the comment says."},
+      {value:"loop", label:"for i in range(3):", correct:true,
+        hint:"Ask how many times the lines indented under this one get executed.",
+        explain:"A loop runs the lines indented under it once per pass, so one line written once can be executed three times, or one hundred million times."},
+      {value:"assign", label:"price = 19.80", correct:false,
+        hint:"This line changes the program, but ask whether it changes which line comes next.",
+        explain:"Storing a value under a name changes the program's state, and the interpreter still moves on to the very next line. Changing state and changing control flow are two different things."}
+    ]
+  });
 
-  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#intro-copy", onDone:function(ok){
-    document.getElementById("intro-copyfb").textContent = ok
+  K.freeResponse({id:"act-reflect", selector:"#ip-reflect", minWords:12});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#ip-scorechip"); });
+  K.Scoring.renderChip("#ip-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#ip-download"});
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#ip-copy", onDone:function(ok){
+    document.getElementById("ip-copyfb").textContent = ok
       ? "Copied! Paste it anywhere you're keeping your notes."
       : "Couldn't copy automatically — select the page text and copy manually.";
   }});

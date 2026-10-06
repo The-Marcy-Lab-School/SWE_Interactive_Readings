@@ -4,12 +4,15 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:700px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
-.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:20rem;font-family:var(--mlrk-font-code)}
+.mlrk-illustration{width:100%;max-width:880px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:24rem;max-width:100%;font-family:var(--mlrk-font-code)}
 .mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
-.fn-checklist{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0}
-.fn-checklist label{display:flex;gap:.55rem;align-items:flex-start;cursor:pointer}
-.fn-checklist input{margin-top:.3rem}
+/* Two labelled versions side by side, both on screen at the point of contrast,
+   so neither has to be held in the reader's head. Stacks below 900px. */
+.fn-compare{display:grid;grid-template-columns:1fr;gap:1.4rem;margin:1.1rem 0;align-items:start}
+@media(min-width:900px){.fn-compare{grid-template-columns:1fr 1fr;gap:1.6rem}}
+.fn-compare-label{margin:0 0 .5rem;line-height:1.4}
+.fn-compare>div{min-width:0}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
 </style>
 </head><body>
@@ -30,7 +33,7 @@
 
 <section class="mlrk-section">
 <h2>1. The bug that one function would have prevented</h2>
-<p>Roast &amp; Co. is a small coffee shop with a simple loyalty program: regulars get a discount on every size. Here's the script an employee wrote to calculate it. They wrote the loyalty-discount math once, for a small order, then copy-pasted that same block twice more for medium and large — changing only the price each time:</p>
+<p>Roast &amp; Co. is a small coffee shop. Regulars get a loyalty discount on every drink, and one of the baristas wrote a short Python script to work out the discounted price. The barista wrote the math once for a small order, then copy-pasted those same three lines twice and changed the price each time.</p>
 <div class="mlrk-code"><pre># small order
 price = 3.50
 total = price * 0.90
@@ -45,11 +48,12 @@ print(total)
 price = 4.75
 total = price * 0.90
 print(total)</pre></div>
-<p>That worked fine until the shop raised the loyalty discount from 10% off to 15% off, meaning the multiplier needed to change from <code>0.90</code> (pay 90% of the price) to <code>0.85</code> (pay 85%). Someone opened the script, found the line, updated it, and then had to remember to find the <em>same</em> line two more times, in two more blocks that looked almost identical. They caught two of the three. The diagram below shows exactly where it went wrong, and what replacing all three blocks with one function actually looks like.</p>
+<p>Then the shop raised the loyalty discount from 10% off to 15% off. The multiplier had to change from <code>0.90</code> (pay 90% of the price) to <code>0.85</code> (pay 85%). Someone opened the script, updated the medium block and the large block, and missed the small one. Small orders kept ringing up at the old discount for three weeks, and nothing in the script looked broken.</p>
+<p>Software engineers have a name for the rule this script breaks: <strong>Don't Repeat Yourself (DRY)</strong>. The same three lines live in three places, so every change has to be made three times and every bug has to be fixed three times. A function is Python's tool for writing those lines once. The diagram traces what went wrong and what one function does about it.</p>
 
 <svg class="mlrk-illustration" viewBox="0 0 760 580" role="img" aria-labelledby="fnDiagTitle fnDiagDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="fnDiagTitle">Three copy-pasted discount calculations collapsing into one Python function called three times</title>
-  <desc id="fnDiagDesc">Before: three separate code blocks each calculate an order total by multiplying price by a discount rate. The small-order block still uses the old 0.90 rate while the medium and large blocks were updated to 0.85 — a mismatch caused by having to edit the same formula in three separate places. After: one function, order_total, defines the formula exactly once and is called three times with three different price arguments, so there is only one place left to update when the rate changes again.</desc>
+  <desc id="fnDiagDesc">Before: three separate code blocks each calculate an order total by multiplying price by a discount rate. The small-order block still uses the old 0.90 rate while the medium and large blocks were updated to 0.85, a mismatch caused by having to edit the same formula in three separate places. After: one function, order_total, defines the formula exactly once and is called three times with three different price arguments, so there is only one place left to update when the rate changes again.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
     <text x="380" y="26" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">Before: the same formula, copied three times</text>
 
@@ -93,131 +97,263 @@ print(total)</pre></div>
     <rect x="510" y="450" width="210" height="60" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
     <text x="615" y="487" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">order_total(4.75)</text>
 
-    <text x="380" y="545" text-anchor="middle" font-size="16" fill="#264326">Change the rate once, right here — every call immediately uses the new number.</text>
+    <text x="380" y="545" text-anchor="middle" font-size="16" fill="#264326">Change the rate once, right here, and every call uses the new number.</text>
   </g>
 </svg>
-
-<p>This pattern — the same logic, copy-pasted with a couple of numbers changed each time — is one of the most common ways bugs like Roast &amp; Co.'s actually happen. Programmers have a name for the fix: <strong>DRY</strong>, short for "don't repeat yourself." A function is Python's basic tool for it. Write the logic once, then run it as many times as you need, with different inputs each time.</p>
 </section>
 
 <section class="mlrk-section">
 <h2>2. Technical vocabulary</h2>
-<p>Flip each card before the practice below.</p>
-<div class="mlrk-grid">
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>function</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Function</strong><br>A named, reusable block of code that performs one task. Write it once, then run it as many times as you want.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>def</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>def</strong><br>The Python keyword that starts a function definition, short for "define." Everything indented underneath the <code>def</code> line is the function's body.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>parameter</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Parameter</strong><br>The name written inside the parentheses in a function's definition — a placeholder for whatever value gets passed in later. In <code>def order_total(price):</code>, <code>price</code> is the parameter.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>argument</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Argument</strong><br>The actual value handed to a function when it's called. In <code>order_total(4.25)</code>, <code>4.25</code> is the argument — it fills in the <code>price</code> parameter for that one call.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>return</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>return</strong><br>Hands a value back out of the function to wherever it was called, so that value can be stored, printed, or used in more code. A function stops running the moment it hits a <code>return</code>.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>call</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Calling a function</strong><br>Actually running it, by writing its name followed by parentheses with any arguments inside — e.g. <code>order_total(4.25)</code>. Defining a function with <code>def</code> doesn't run it; calling it does.</span></button>
+<p>Flip each card. These are the terms the rest of the reading uses.</p>
+<div class="mlrk-grid" id="fn-flipcards">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Don't Repeat Yourself (DRY)</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Don't Repeat Yourself (DRY)</strong><br>A principle of software engineering aimed at making it easier to maintain, update, and debug code. Write a piece of logic in one place instead of copying it into several.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Functions</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Functions</strong><br>Named containers for statements that can be invoked to execute code, improving readability and reducing repetition.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Built-in functions</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Built-in functions</strong><br>Functions like <code>print()</code>, <code>len()</code>, and <code>type()</code> come with Python, so they can be called without being defined first.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>docstring</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>docstring</strong><br>A string written on the first line of a function's body that describes what the function does. VS Code and the built-in <code>help()</code> function show it to whoever is about to call the function.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Parameters</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Parameters</strong><br>Placeholders for inputs given to the function, written inside the parentheses of the <code>def</code> line. Parameters can be used by their function to change the function's behavior.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Arguments</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Arguments</strong><br>The actual values given when invoking a function. In <code>order_total(4.00)</code>, <code>4.00</code> is the argument.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Return statements</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Return statements</strong><br>Return statements allow functions to produce values that can be used elsewhere in your program, and they terminate function execution. A function with no <code>return</code> statement returns <code>None</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>default values</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>default values</strong><br>Parameters can have default values, used when the caller leaves that argument out. Arguments can be passed by keyword as well as by position, and a keyword argument names the parameter it belongs to.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>NameError</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>NameError</strong><br>Raised when a line uses a name that does not exist at the moment that line runs: the name is misspelled, it belongs to a different function's scope, or it is assigned further down the file than the line that uses it.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>TypeError</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>TypeError</strong><br>Raised when a value is the wrong type for what the code asks of it, such as adding a string to a number, or when a function is called with the wrong number of arguments.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Scope (global and local)</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Scope</strong><br>Scope determines where variables can be accessed. <strong>Global scope</strong> is the file, outside of any function; a variable assigned there is reachable anywhere in that file. <strong>Local scope</strong> is the inside of a function; a variable or parameter assigned there exists only while that function is running and is reachable only within it.</span></button>
 </div>
 </section>
 
 <section class="mlrk-section">
-<h2>3. Writing your own function</h2>
-<p>Here's the function from the diagram above, on its own:</p>
+<h2>3. Writing a function, and what runs when</h2>
+<p>You have already called a function. <code>print()</code> is one. <code>print()</code>, <code>len()</code>, and <code>type()</code> are built-in functions: they come with Python, so you can call them without defining them first. A function you write yourself works the same way once Python has read its definition.</p>
+<p>Here is the Roast &amp; Co. math, written once as a function named <code>order_total</code>:</p>
 <div class="mlrk-code"><pre>def order_total(price):
+    """Return what a loyalty member pays for a drink."""
     return price * 0.85</pre></div>
-<p>Reading it line by line: <code>def</code> starts the definition, <code>order_total</code> is the name being given to this block of logic, and <code>price</code> in the parentheses is the parameter — a stand-in for whatever number gets passed in. The indented line underneath is the function's body: the actual math. Nothing runs yet just from typing this — a <code>def</code> block only <em>runs</em> the moment it gets called, by name, with an argument in the parentheses: <code>order_total(4.25)</code>.</p>
+<p><code>def</code> starts the definition. <code>order_total</code> is the name. <code>price</code> inside the parentheses is the parameter, a stand-in for a number the function does not have yet. A colon ends that first line, and every indented line under it is the function's body. The string on the first body line is a docstring: it says what the function does, and VS Code and the built-in <code>help()</code> function show it to whoever is about to call the function.</p>
+<p>Calling the function by name runs its body. <code>order_total(4.00)</code> hands back <code>3.4</code>.</p>
+
+<h3>Defining a function does not run it</h3>
+<p>Python reads a file from the top line to the bottom line. A <code>def</code> block is the exception. Running the <code>def</code> line creates the function and runs none of the lines inside it. Those lines run later, when a call names the function. Python jumps into the function, runs its body, and comes back to the line that made the call.</p>
+<p>This script defines <code>order_total</code> halfway down the file and calls it twice at the end:</p>
+<div class="mlrk-code"><pre>print("Opening Roast &amp; Co.")
+
+def order_total(price):
+    return price * 0.85
+
+print("Taking orders")
+
+print(order_total(4.00))
+print(order_total(10.00))</pre></div>
 
 <div class="mlrk-card">
-<p><strong>Predict:</strong> using the <code>order_total</code> function above, what does <code>order_total(10)</code> return?</p>
-<div id="fn-predict1">
-  <button type="button" class="mlrk-choice" data-a="8.5">8.5</button>
-  <button type="button" class="mlrk-choice" data-a="10.85">10.85</button>
-  <button type="button" class="mlrk-choice" data-a="1.5">1.5</button>
-  <button type="button" class="mlrk-choice" data-a="9.15">9.15</button>
-</div>
-<div id="fn-predict1fb" class="mlrk-feedback" tabindex="-1"></div>
-</div>
-
-<div class="mlrk-card" style="margin-top:1rem">
-<p><strong>Predict:</strong> what does <code>order_total(20)</code> return?</p>
-<div id="fn-predict2">
-  <button type="button" class="mlrk-choice" data-a="17">17</button>
-  <button type="button" class="mlrk-choice" data-a="20.85">20.85</button>
-  <button type="button" class="mlrk-choice" data-a="3">3</button>
-  <button type="button" class="mlrk-choice" data-a="18.5">18.5</button>
-</div>
-<div id="fn-predict2fb" class="mlrk-feedback" tabindex="-1"></div>
-</div>
-
-<p style="margin-top:1.4rem">Now write one of your own. Roast &amp; Co. also wants a function that adds their flat $0.75 to-go cup fee on top of whatever price comes in:</p>
-<div class="mlrk-card">
-<p><strong>Fill in the blank</strong> so the function takes a price and returns that price plus the $0.75 fee:</p>
-<div class="mlrk-code"><pre>def add_cup_fee(price):
-    ____________</pre></div>
-<div class="mlrk-fillblank"><input type="text" id="fn-cupfee-input" autocomplete="off" placeholder="e.g. return price + 0.75"> <button type="button" class="mlrk-btn" id="fn-cupfee-check">Check</button></div>
-<div id="fn-cupfeefb" class="mlrk-feedback" tabindex="-1"></div>
+<p><strong>This script prints four lines.</strong> <strong>Click the four lines in the order the script prints them.</strong></p>
+<ul class="mlrk-orderlist" id="fn-trace-order">
+  <li class="mlrk-orderitem" data-step="eight"><span class="mlrk-order-num"></span> <code>8.5</code></li>
+  <li class="mlrk-orderitem" data-step="open"><span class="mlrk-order-num"></span> <code>Opening Roast &amp; Co.</code></li>
+  <li class="mlrk-orderitem" data-step="three"><span class="mlrk-order-num"></span> <code>3.4</code></li>
+  <li class="mlrk-orderitem" data-step="taking"><span class="mlrk-order-num"></span> <code>Taking orders</code></li>
+</ul>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="fn-trace-check">Check my order</button></div>
+<div id="fn-trace-fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>The function needs to hand the new total back out to whatever called it — that's the job of one specific keyword from the vocabulary above, followed by the math itself: the parameter, a <code>+</code>, and <code>0.75</code>.</p>
+<p>Creating a function with <code>def</code> prints nothing at all. Find the two <code>print()</code> calls that sit outside <code>order_total</code> first, in the order they are written. The two calls at the end run the function, and each one prints what <code>order_total</code> hands back.</p>
 </details>
 </section>
 
 <section class="mlrk-section">
-<h2>4. return vs. print: the mix-up that trips everyone up</h2>
-<p>The single most common beginner mistake with functions isn't the <code>def</code> line — it's assuming that <code>print()</code> inside a function makes a value available outside it. It doesn't. <code>print()</code> only displays something in the terminal; the value is gone the instant the function finishes. <code>return</code> is the only thing that hands a value back to be stored, reused, or passed into more code.</p>
-<div class="mlrk-grid">
+<h2>4. Parameters, arguments, and calling with the wrong number</h2>
+<p><code>price</code> in <code>def order_total(price):</code> is a parameter: a name the function uses for a value it does not have yet. <code>4.00</code> in <code>order_total(4.00)</code> is an argument: the real value handed over for that one call. Parameters are written in the definition. Arguments are written at the call.</p>
+<p>A function can take more than one parameter. Roast &amp; Co. prints one menu line per item:</p>
+<div class="mlrk-code"><pre>def menu_line(item, price):
+    print(item + " costs $" + str(price))
+
+menu_line("Latte", 4.75)
+menu_line("Scone", 3.25)</pre></div>
+<p>That script prints:</p>
+<div class="mlrk-code"><pre>Latte costs $4.75
+Scone costs $3.25</pre></div>
+<p>The arguments fill the parameters in order. The first argument becomes <code>item</code> and the second becomes <code>price</code>. Python also counts the arguments before it runs a single line of the body. Every parameter without a default value is required, so a call that is one argument short never gets inside the function at all.</p>
+
 <div class="mlrk-card">
-<p><strong>Only prints — the value is lost</strong></p>
+<p><strong>You call <code>menu_line("Latte")</code> with one argument.</strong> <strong>What does Python do?</strong></p>
+<div id="fn-typeerr-choices">
+  <button type="button" class="mlrk-choice" data-a="print">Prints <code>Latte costs $</code> and leaves the price off the end</button>
+  <button type="button" class="mlrk-choice" data-a="type">Raises <code>TypeError: menu_line() missing 1 required positional argument: 'price'</code></button>
+  <button type="button" class="mlrk-choice" data-a="name">Raises <code>NameError: name 'price' is not defined</code></button>
+  <button type="button" class="mlrk-choice" data-a="none">Sets <code>price</code> to <code>None</code> and prints <code>Latte costs $None</code></button>
+</div>
+<div id="fn-typeerr-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<h3>Default values and keyword arguments</h3>
+<p>A parameter can be given a default value, and then the caller is allowed to leave that argument out:</p>
+<div class="mlrk-code"><pre>def menu_line(item, price, size="medium"):
+    print(size + " " + item + " costs $" + str(price))
+
+menu_line("Latte", 4.75)
+menu_line("Latte", 5.25, "large")</pre></div>
+<p>That script prints:</p>
+<div class="mlrk-code"><pre>medium Latte costs $4.75
+large Latte costs $5.25</pre></div>
+<p>An argument can also be passed by keyword, which names the parameter it belongs to. Order stops mattering once you do: <code>menu_line(price=4.75, item="Latte")</code> prints <code>medium Latte costs $4.75</code>, the same line as the first call.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Turning repeated code into a function</h2>
+<p>Roast &amp; Co. hands out loyalty points too, at 10 points per dollar spent. The script that works them out has the same shape as the discount script: three blocks, one value changing between them.</p>
+<div class="mlrk-code"><pre>amy_spend = 20
+amy_points = amy_spend * 10
+print(amy_points)
+
+ben_spend = 35
+ben_points = ben_spend * 10
+print(ben_points)
+
+cara_spend = 8
+cara_points = cara_spend * 10
+print(cara_points)</pre></div>
+<p>The amount spent is the only thing that differs, so the amount spent becomes the parameter. The body and the three calls are already written for you.</p>
+<div class="mlrk-card">
+<p><strong>Write the <code>def</code> line that completes this function.</strong></p>
+<div class="mlrk-code"><pre>________________________________
+    return spend * 10
+
+print(points_for(20))   # 200
+print(points_for(35))   # 350
+print(points_for(8))    # 80</pre></div>
+<div class="mlrk-fillblank"><input type="text" id="fn-def-input" autocomplete="off" placeholder="Click here to type the def line"> <button type="button" class="mlrk-btn" id="fn-def-check">Check</button></div>
+<div id="fn-def-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>A <code>def</code> line has four parts: the keyword <code>def</code>, the name, the parameter in parentheses, and a colon. The three calls tell you the name the function has to have, and the body tells you what the parameter has to be called.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>6. What <code>return</code> does, and what happens without it</h2>
+<p>A <code>return</code> statement does two things. It hands a value back to the place the call was made from, and it ends the function right there. No line after a <code>return</code> runs.</p>
+<div class="mlrk-code"><pre>def order_total(price):
+    return price * 0.85
+    print("This line never runs.")</pre></div>
+<p><code>order_total(4.00)</code> hands back <code>3.4</code> and the function ends on the <code>return</code>. Python never reaches that <code>print()</code>.</p>
+<p>A function with no <code>return</code> statement still produces a value: Python produces <code>None</code> for it. That trips up almost everyone the first time, because a <code>print()</code> inside a function looks like it is handing a value back. <code>print()</code> shows a value to the person at the terminal. <code>return</code> hands a value back to the program. Here are both versions of the same calculation:</p>
+<div class="fn-compare">
+<div>
+<p class="fn-compare-label"><strong>The <code>show_total</code> version</strong><br>prints, and returns nothing</p>
 <div class="mlrk-code"><pre>def show_total(price):
     print(price * 0.85)
 
-result = show_total(10)
+result = show_total(10.00)
 print(result)</pre></div>
-<p class="mlrk-small">The terminal shows <code>8.5</code> once (from inside the function), then <code>None</code> — because <code>show_total</code> never handed anything back, so <code>result</code> was never actually set to <code>8.5</code>.</p>
+<p class="mlrk-small">Prints:</p>
+<div class="mlrk-code"><pre>8.5
+None</pre></div>
 </div>
-<div class="mlrk-card">
-<p><strong>Returns — the value survives</strong></p>
+<div>
+<p class="fn-compare-label"><strong>The <code>get_total</code> version</strong><br>returns the number</p>
 <div class="mlrk-code"><pre>def get_total(price):
     return price * 0.85
 
-result = get_total(10)
+result = get_total(10.00)
 print(result)</pre></div>
-<p class="mlrk-small">The terminal shows <code>8.5</code> once — because <code>result</code> now actually holds the returned number, which <code>print(result)</code> is just displaying.</p>
+<p class="mlrk-small">Prints:</p>
+<div class="mlrk-code"><pre>8.5</pre></div>
 </div>
 </div>
+<p><code>show_total</code> prints <code>8.5</code> from inside the function and hands back nothing, so <code>result</code> holds <code>None</code> and the last line shows that <code>None</code>. <code>get_total</code> hands <code>8.5</code> back to the call, so <code>result</code> holds <code>8.5</code> and the last line shows the number.</p>
 
-<div class="mlrk-card" style="margin-top:1rem">
-<p>Given this function:</p>
+<div class="mlrk-card">
+<p>A different function, <code>greet</code>, has the same shape as <code>show_total</code>:</p>
 <div class="mlrk-code"><pre>def greet(name):
     print("Hello, " + name)
 
 result = greet("Amir")
 print(result)</pre></div>
-<p>Select every statement below that's actually true about what happens when this code runs:</p>
-<div class="fn-checklist">
-<label class="mlrk-selectall-option"><input type="checkbox" class="fn-greet-box" value="a"> <span>Calling <code>greet("Amir")</code> prints "Hello, Amir" to the console.</span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="fn-greet-box" value="b"> <span><code>result</code> ends up storing the string "Hello, Amir" so it can be reused later.</span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="fn-greet-box" value="c"> <span><code>print(result)</code> outputs <code>None</code>, because <code>greet</code> never uses <code>return</code>.</span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="fn-greet-box" value="d"> <span>To make <code>result</code> actually equal "Hello, Amir", <code>greet</code> would need a <code>return</code> statement.</span></label>
-</div>
+<p><strong>Check every statement that is true about what happens when this script runs.</strong></p>
+<label class="mlrk-selectall-option"><input type="checkbox" class="fn-greet-box" value="a"> <span>Calling <code>greet("Amir")</code> prints <code>Hello, Amir</code>.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="fn-greet-box" value="b"> <span><code>result</code> holds the string <code>"Hello, Amir"</code> afterwards.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="fn-greet-box" value="c"> <span><code>print(result)</code> outputs <code>None</code>.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="fn-greet-box" value="d"> <span>Giving <code>greet</code> a <code>return</code> statement would let <code>result</code> hold the greeting.</span></label>
 <div class="mlrk-actions"><button type="button" class="mlrk-btn" id="fn-greet-check">Check my answers</button></div>
 <div id="fn-greetfb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 </section>
 
 <section class="mlrk-section">
-<h2>5. Watch: the return statement in under four minutes</h2>
-<div class="mlrk-video-wrap"><div id="fn-video"></div></div>
-<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=ZnBQfF5JFDM" target="_blank" rel="noopener">Watch on YouTube</a>
-<p>Watch for the same pattern from section 4 above: a function that computes a value, hands it back with <code>return</code>, and only then gets passed into <code>print()</code> from the outside.</p>
+<h2>7. Scope: where a name can be used</h2>
+<p>A variable's scope is the part of the program where its name can be used. Two scopes matter here. <strong>Global scope</strong> is the file, outside of any function, and a variable assigned there is reachable anywhere in that file. <strong>Local scope</strong> is the inside of a function, and a variable or parameter assigned there exists only while that function is running.</p>
+<p>Here is a file named <code>shop.py</code> with one of each:</p>
+<div class="mlrk-code"><pre># shop.py
+shop_name = "Roast &amp; Co."
+
+def order_total(price):
+    rate = 0.85
+    print(shop_name + " loyalty price:")
+    return price * rate
+
+print(order_total(4.00))
+print(rate)</pre></div>
+<p>Running <code>shop.py</code> prints two lines and then crashes:</p>
+<div class="mlrk-code"><pre>Roast &amp; Co. loyalty price:
+3.4
+Traceback (most recent call last):
+  File "shop.py", line 10, in &lt;module&gt;
+    print(rate)
+NameError: name 'rate' is not defined</pre></div>
+<p>The first two lines work because Python runs the file top to bottom and the broken line is last. Inside <code>order_total</code>, the line <code>print(shop_name + " loyalty price:")</code> uses a global name, which every line of the file is allowed to do. The last line tries the opposite. <code>rate</code> is assigned inside <code>order_total</code>, so <code>rate</code> is local and stops existing the moment <code>order_total</code> finishes. A <code>NameError</code> is what Python raises when a line uses a name that does not exist at the moment that line runs.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 880 345" role="img" aria-labelledby="fnScopeTitle fnScopeDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="fnScopeTitle">The global scope of shop.py with the local scope of order_total nested inside it</title>
+  <desc id="fnScopeDesc">A large outer box labelled global scope, the whole file, holds the name shop_name. A smaller box sits inside it, labelled local scope, inside order_total, and holds the parameter price and the variable rate. Text beside the inner box states that lines inside order_total can use shop_name, and that lines outside it cannot use price or rate.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="8" y="22" font-size="19" font-weight="700" fill="#261F1D">One file, two scopes</text>
+    <rect x="8" y="34" width="864" height="250" rx="12" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <text x="26" y="64" font-size="18" font-weight="700" fill="#261F1D">Global scope: the whole file</text>
+    <text x="26" y="96" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">shop_name = "Roast &amp; Co."</text>
+
+    <rect x="26" y="116" width="510" height="144" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <text x="44" y="148" font-size="18" font-weight="700" fill="#204D3C">Local scope: inside order_total</text>
+    <text x="44" y="186" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">price</text>
+    <text x="44" y="216" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">rate = 0.85</text>
+    <text x="44" y="244" font-size="16" fill="#204D3C">gone once order_total finishes</text>
+
+    <text x="566" y="152" font-size="17" fill="#261F1D">Lines inside order_total</text>
+    <text x="566" y="176" font-size="17" fill="#261F1D">can use shop_name.</text>
+    <text x="566" y="214" font-size="17" fill="#261F1D">Lines outside it cannot</text>
+    <text x="566" y="238" font-size="17" fill="#261F1D">use price or rate.</text>
+
+    <text x="8" y="312" font-size="17" fill="#261F1D">An inner scope can use the outer scope's names.</text>
+    <text x="8" y="336" font-size="17" fill="#261F1D">The outer scope cannot use the inner scope's names.</text>
+  </g>
+</svg>
+
+<div class="mlrk-card">
+<p><strong>Someone adds one more line at the very bottom of <code>shop.py</code>.</strong> <strong>Check every name that new line is allowed to use without raising a <code>NameError</code>.</strong></p>
+<label class="mlrk-selectall-option"><input type="checkbox" class="fn-scope-box" value="shop"> <span><code>shop_name</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="fn-scope-box" value="price"> <span><code>price</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="fn-scope-box" value="rate"> <span><code>rate</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="fn-scope-box" value="func"> <span><code>order_total</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="fn-scope-box" value="print"> <span><code>print</code></span></label>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="fn-scope-check">Check my answers</button></div>
+<div id="fn-scope-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Ask one question per name: was it assigned in the file outside every function, or inside <code>order_total</code>? One of the five was never assigned in <code>shop.py</code> at all, and Python still provides it.</p>
+</details>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
-<p>Roast &amp; Co.'s bug happened because the same formula lived in three places at once, and updating it meant remembering to change all three. A function fixes that by definition: the logic exists exactly once, and every call — <code>order_total(3.50)</code>, <code>order_total(4.25)</code>, <code>order_total(4.75)</code> — reads from that same single copy. <code>return</code> is what makes the function's result usable afterward; <code>print()</code> only ever displays it in the moment.</p>
-<label for="fn-reflect"><strong>In 2–3 sentences:</strong> think of a time you copy-pasted a chunk of code, a formula, or even a spreadsheet row, and changed a couple of numbers each time. Now that you've seen how a function replaces that pattern, where's one place you could use a function instead?</label>
+<h2>8. Summary and reflection</h2>
+<p>A function gives one piece of logic one home. Define it once with <code>def</code>, give it parameters for the values that change, and call it as often as you need, which is what Don't Repeat Yourself (DRY) asks for. <code>return</code> hands a result back to the caller and ends the function, and a function without <code>return</code> hands back <code>None</code>. Names assigned inside a function are local to it, so a line outside the function that uses one raises a <code>NameError</code>.</p>
+<label for="fn-reflect"><strong>The last line of <code>shop.py</code> is <code>print(rate)</code>, and it raises <code>NameError: name 'rate' is not defined</code>.</strong> In 2-3 sentences, say why <code>rate</code> is not reachable from that line, and describe one change to <code>order_total</code> that would let the rest of the file use the value <code>rate</code> holds.</label>
 <textarea id="fn-reflect" class="mlrk-response" data-save></textarea>
 </section>
 
 <section class="mlrk-section">
-<h2>7. Go further (optional)</h2>
+<h2>9. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
-  <li><a href="https://codingbat.com/python" target="_blank" rel="noopener">CodingBat Python</a> — short, auto-graded practice problems where you write the body of a function and get instant pass/fail feedback; the Warmup-1 section is a good place to start.</li>
-  <li><a href="https://www.youtube.com/watch?v=89cGQjB5R4M" target="_blank" rel="noopener">Functions in Python are easy</a> (Bro Code, ~11 min) — a second, differently-paced walkthrough of <code>def</code>, parameters, arguments, and <code>return</code>, if section 3-4 above didn't fully click yet.</li>
+  <li><a href="https://pythontutor.com/visualize.html" target="_blank" rel="noopener">Python Tutor</a> — paste a script in and step through it one line at a time. It draws a box for the global frame and a new box for each function call, so you can watch a local variable appear and then disappear when the function ends.</li>
+  <li><a href="https://codingbat.com/python/Warmup-1" target="_blank" rel="noopener">CodingBat Python, Warmup-1</a> — short auto-graded problems where you write the body of a function and find out immediately whether it returns the right value.</li>
 </ul>
 </section>
 
@@ -244,61 +380,61 @@ print(result)</pre></div>
   const TITLE = "The Discount Bug — Why Python Functions Exist";
   K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
 
-  K.flipCards(document, "act-flipcards");
+  K.flipCards("#fn-flipcards", "act-flipcards");
 
-  K.quiz({
-    id: "act-predict1",
-    buttonSelector: "#fn-predict1 .mlrk-choice",
-    feedbackSelector: "#fn-predict1fb",
-    correct: "8.5",
-    feedback: {
-      "8.5": "Right — price * 0.85 = 10 * 0.85 = 8.5.",
-      "10.85": "That reads as price + 0.85, not price times 0.85 — check the operator inside the function body.",
-      "1.5": "That's the amount the discount removes (10 * 0.15), not what the customer actually pays.",
-      "9.15": "Re-trace the exact line inside the function body: return price * 0.85."
-    }
+  K.orderSteps("#fn-trace-order", {
+    id: "act-control-flow-trace",
+    correctOrder: ["open","taking","three","eight"],
+    feedbackSelector: "#fn-trace-fb",
+    checkSelector: "#fn-trace-check"
   });
 
   K.quiz({
-    id: "act-predict2",
-    buttonSelector: "#fn-predict2 .mlrk-choice",
-    feedbackSelector: "#fn-predict2fb",
-    correct: "17",
+    id: "act-arg-count",
+    buttonSelector: "#fn-typeerr-choices .mlrk-choice",
+    feedbackSelector: "#fn-typeerr-fb",
+    correct: "type",
+    answerLabel: "a TypeError about a missing required positional argument",
     feedback: {
-      "17": "Right — price * 0.85 = 20 * 0.85 = 17.",
-      "20.85": "That reads as price + 0.85, not price times 0.85 — check the operator inside the function body.",
-      "3": "That's the amount the discount removes (20 * 0.15), not what the customer actually pays.",
-      "18.5": "Re-trace the exact line inside the function body: return price * 0.85."
+      type: "Python compares the number of arguments against the number of parameters before it runs the body. <code>menu_line</code> has two parameters and got one argument, so Python raises <code>TypeError: menu_line() missing 1 required positional argument: 'price'</code> and not one line of the body runs.",
+      print: "Nothing is printed, because the body never runs. Python compares the argument count against the parameter count first, and one argument for two parameters raises <code>TypeError: menu_line() missing 1 required positional argument: 'price'</code>.",
+      name: "A <code>NameError</code> is raised when a line uses a name that does not exist at the moment that line runs. Here no line inside <code>menu_line</code> runs at all. Python stops at the call, because two parameters and one argument is a <code>TypeError</code>.",
+      none: "Python fills in a missing argument only for a parameter that has a default value. <code>price</code> has no default, which makes it required, so leaving it out raises <code>TypeError: menu_line() missing 1 required positional argument: 'price'</code>."
     }
   });
 
   function normalizeExpr(s){ return s.trim().toLowerCase().replace(/\s+/g,""); }
-  const cupfeeBtn = document.getElementById("fn-cupfee-check");
-  const cupfeeInput = document.getElementById("fn-cupfee-input");
-  const cupfeeFb = document.getElementById("fn-cupfeefb");
-  K.Scoring.register("act-cupfee-fillcode", 1, "quiz");
-  let cupfeeAttempts = 0, cupfeeDone = false;
-  cupfeeBtn.addEventListener("click", function(){
-    if(cupfeeDone) return;
-    cupfeeAttempts++;
-    const val = normalizeExpr(cupfeeInput.value);
-    const ok = /^return\(?(price\+0?\.75|0?\.75\+price)\)?$/.test(val);
+  const defBtn = document.getElementById("fn-def-check");
+  const defInput = document.getElementById("fn-def-input");
+  const defFb = document.getElementById("fn-def-fb");
+  K.Scoring.register("act-refactor-def", 1, "quiz");
+  let defAttempts = 0, defDone = false;
+  defBtn.addEventListener("click", function(){
+    if(defDone) return;
+    defAttempts++;
+    const val = normalizeExpr(defInput.value);
+    const ok = /^defpoints_for\(spend\):$/.test(val);
+    const missingColon = /^defpoints_for\(spend\)$/.test(val);
     if(ok){
-      K.Scoring.award("act-cupfee-fillcode", cupfeeAttempts===1?1:0.5);
-      cupfeeFb.className = "mlrk-feedback mlrk-show mlrk-good";
-      cupfeeFb.innerHTML = "<strong>Correct.</strong> <code>return price + 0.75</code> hands the new total back out of the function.";
-      cupfeeDone = true;
-    } else if(cupfeeAttempts >= 2){
-      K.Scoring.award("act-cupfee-fillcode", 0);
-      cupfeeFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
-      cupfeeFb.innerHTML = "<strong>The answer is:</strong> <code>return price + 0.75</code>";
-      cupfeeDone = true;
+      K.Scoring.award("act-refactor-def", defAttempts===1?1:0.5);
+      defFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      defFb.innerHTML = "<strong>Correct.</strong> <code>def points_for(spend):</code> names the function the three calls already use and gives it one parameter, <code>spend</code>, for the one value that changed between the three blocks.";
+      defDone = true;
+    } else if(defAttempts >= 2){
+      K.Scoring.award("act-refactor-def", 0);
+      defFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      defFb.innerHTML = "<strong>The answer is:</strong> <code>def points_for(spend):</code> — the keyword <code>def</code>, the name the three calls use, one parameter named the way the body names it, and a colon to end the line.";
+      defDone = true;
+    } else if(missingColon){
+      defFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      defFb.innerHTML = "<strong>One character short.</strong> A <code>def</code> line ends with a colon, which is what tells Python that the indented lines which follow are the function's body. Without it Python raises a <code>SyntaxError</code>." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
     } else {
-      cupfeeFb.className = "mlrk-feedback mlrk-show mlrk-bad";
-      cupfeeFb.innerHTML = "<strong>Not quite.</strong> Start with the keyword that hands a value back, then add the fee to the parameter." +
+      defFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      defFb.innerHTML = "<strong>Check the four parts.</strong> The line starts with <code>def</code>, then the name the three calls use (<code>points_for</code>), then one parameter in parentheses named the way the body names it (<code>spend</code>), then a colon." +
         '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
     }
-    cupfeeFb.setAttribute("tabindex","-1"); cupfeeFb.focus();
+    defFb.setAttribute("tabindex","-1"); defFb.focus();
   });
 
   K.selectAll({
@@ -307,21 +443,44 @@ print(result)</pre></div>
     submitSelector: "#fn-greet-check",
     feedbackSelector: "#fn-greetfb",
     options: [
-      {value:"a", label:'Calling greet("Amir") prints "Hello, Amir" to the console.', correct:true,
-        explain:"print() runs no matter what — that line executes as soon as greet is called."},
-      {value:"b", label:'result ends up storing the string "Hello, Amir" so it can be reused later.', correct:false,
-        hint:"greet only calls print() — nothing in its body hands a value back with return.",
-        explain:"greet has no return statement, so it hands back nothing at all (Python fills in None automatically)."},
-      {value:"c", label:"print(result) outputs None, because greet never uses return.", correct:true,
-        explain:"With no return statement, result was set to None the moment greet finished running."},
-      {value:"d", label:"To make result actually equal \"Hello, Amir\", greet would need a return statement.", correct:true,
-        explain:'Swapping print("Hello, " + name) for return "Hello, " + name would let result actually capture that string.'}
+      {value:"a", label:'Calling greet("Amir") prints Hello, Amir.', correct:true,
+        hint:"The body of greet is a print() call, and calling a function runs its body.",
+        explain:"Calling greet runs its body, and that body is a print() call, so the greeting reaches the terminal."},
+      {value:"b", label:'result holds the string "Hello, Amir" afterwards.', correct:false,
+        hint:"Look for a return statement in greet. print() sends a value to the terminal rather than back to the caller.",
+        explain:"greet has no return statement, so it hands back None, and None is what result holds."},
+      {value:"c", label:"print(result) outputs None.", correct:true,
+        explain:"A function with no return statement produces None, so result was set to None the moment greet finished."},
+      {value:"d", label:"Giving greet a return statement would let result hold the greeting.", correct:true,
+        explain:'Writing return "Hello, " + name in place of the print() call would hand the string back to the caller, and result would hold it.'}
     ]
   });
 
-  K.video({id:"act-video", elementId:"fn-video", videoId:"ZnBQfF5JFDM"});
+  K.selectAll({
+    id: "act-scope-reach",
+    boxSelector: ".fn-scope-box",
+    submitSelector: "#fn-scope-check",
+    feedbackSelector: "#fn-scope-fb",
+    options: [
+      {value:"shop", label:"shop_name", correct:true,
+        hint:"shop_name is assigned on a line of shop.py that sits outside every function.",
+        explain:"Reachable. shop_name is assigned in the global scope, which is the file itself, so any line in the file can use it."},
+      {value:"price", label:"price", correct:false,
+        hint:"price is written inside the parentheses of the def line, which makes it a parameter.",
+        explain:"Not reachable. price is a parameter of order_total, so it is local. It exists only while order_total is running, and the new line runs after that call has finished."},
+      {value:"rate", label:"rate", correct:false,
+        hint:"rate is assigned on an indented line inside order_total.",
+        explain:"Not reachable. rate is assigned inside order_total, so it is local to that function and stops existing when the function ends. That is the NameError shop.py already raises."},
+      {value:"func", label:"order_total", correct:true,
+        hint:"The def statement assigns a name too, and that def sits at the top level of the file.",
+        explain:"Reachable. The def statement assigns the name order_total in the global scope, the same place shop_name is assigned, so any later line can call it."},
+      {value:"print", label:"print", correct:true,
+        hint:"This name is never assigned anywhere in shop.py, and the file still uses it three times.",
+        explain:"Reachable. print is a built-in name that Python provides in every file, which is why built-in functions can be called without being defined first."}
+    ]
+  });
 
-  K.freeResponse({id:"act-reflect", selector:"#fn-reflect", minWords:10});
+  K.freeResponse({id:"act-reflect", selector:"#fn-reflect", minWords:12});
 
   K.Scoring.onChange(function(){ K.Scoring.renderChip("#fn-scorechip"); });
   K.Scoring.renderChip("#fn-scorechip");

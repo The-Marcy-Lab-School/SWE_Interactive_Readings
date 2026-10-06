@@ -202,7 +202,11 @@
         fb.className="mlrk-feedback mlrk-show mlrk-good";
         fb.innerHTML="<strong>That's the right order.</strong>";
       } else if(checkAttempts>=2){
-        const labels=opts.correctOrder.map(step=>items.find(i=>i.dataset.step===step).textContent.trim());
+        // Read the step's label WITHOUT the .mlrk-order-num span, which holds
+        // the position the student clicked ("2."). Taking the whole
+        // textContent rendered the reveal as "1. 2. Opening Roast & Co."
+        const stepLabel=item=>{const c=item.cloneNode(true);const n=$(".mlrk-order-num",c);if(n)n.remove();return c.textContent.trim();};
+        const labels=opts.correctOrder.map(step=>stepLabel(items.find(i=>i.dataset.step===step)));
         fb.className="mlrk-feedback mlrk-show mlrk-reveal";
         fb.innerHTML="<strong>Here's the order it actually happens in.</strong>"+
           "<ol>"+labels.map(l=>"<li>"+l+"</li>").join("")+"</ol>"+

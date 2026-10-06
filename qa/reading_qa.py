@@ -277,54 +277,88 @@ def check_meta_sidecar(path):
     return []
 
 
-def check_mod1_key_terms(path, text):
-    """Mod 1 readings map 1:1 onto the GitBook's lessons 1.1-1.13, and each one
-    owes its lesson's full key-term list. The manifest at curriculum/
-    mod1-lessons.json is generated from the GitBook, so this check is really
-    "has the GitBook moved out from under this reading?"
+def _vocab_card_terms(html):
+    """The term on the front of each vocabulary flip card."""
+    raw = re.findall(
+        r'<button[^>]*class="[^"]*mlrk-term[^"]*"[^>]*>\s*<span[^>]*mlrk-front[^>]*>\s*<strong>(.*?)</strong>',
+        html, re.S)
+    return [" ".join(re.sub("<[^>]+>", "", r).split()) for r in raw]
 
-    Only Mod1 folders whose name matches a manifest slug are checked, so Mod0,
-    Mod2, and any scratch folder are unaffected.
+
+def _tokens(s):
+    """Significant word tokens, lowercased. Punctuation and () are dropped so
+    `print()` matches "print", and joining words are dropped so one card
+    titled "Scope (global and local)" can cover "Global scope"."""
+    words = re.findall(r"[a-z0-9_]+", s.lower())
+    stop = {"a", "an", "the", "and", "or", "of", "for", "to", "is", "are"}
+    # Singular/plural are the same token: the manifest says "Lists" where a
+    # card may reasonably say "list".
+    return {w[:-1] if len(w) > 3 and w.endswith("s") else w
+            for w in words if w not in stop}
+
+
+def check_mod1_key_terms(path, html, text):
+    """Every term the lesson owns has a vocabulary card, and no card teaches a
+    term it does not own.
+
+    Checked against the CARD SET, not the page text. An earlier version
+    searched the whole reading, which passed `State` and `Statements` in a
+    reading that defined neither, because the letters appeared inside
+    unrelated prose ("every statement below that's actually true").
+
+    A card covers a term when the card's tokens are a superset of the term's,
+    so one card titled "Scope (global and local)" covers Scope, Global scope
+    and Local scope, and "Truthy and falsy" covers truthy. That nesting is the
+    GitBook's own.
     """
-    folder = Path(path).parent.name
-    manifest_path = Path(__file__).parent.parent / "curriculum" / "mod1-lessons.json"
-    if not manifest_path.exists():
-        return []
-    try:
-        lessons = json.loads(manifest_path.read_text(encoding="utf-8"))["lessons"]
-    except (json.JSONDecodeError, KeyError) as e:
-        return [("WARN", f"curriculum/mod1-lessons.json unreadable, key-term check skipped: {e}")]
-
-    lesson = next((L for L in lessons if L["slug"] == folder), None)
+    lesson = _mod1_lesson_for(path)
     if lesson is None:
         if Path(path).parent.parent.name == "Mod1":
-            known = ", ".join(L["slug"] for L in lessons)
-            return [("ERROR", f"Mod1 folder '{folder}' matches no lesson in "
-                              f"curriculum/mod1-lessons.json. Expected one of: {known}")]
+            manifest_path = Path(__file__).parent.parent / "curriculum" / "mod1-lessons.json"
+            if manifest_path.exists():
+                known = ", ".join(
+                    L["slug"] for L in json.loads(manifest_path.read_text(encoding="utf-8"))["lessons"])
+                return [("ERROR", f"Mod1 folder '{Path(path).parent.name}' matches no lesson in "
+                                  f"curriculum/mod1-lessons.json. Expected one of: {known}")]
         return []
 
-    # Compare on a loosened form: the reading is allowed to write "f-strings"
-    # for the manifest's "f-string", or drop the () from "print()".
-    def norm(s):
-        return re.sub(r"[^a-z0-9]", "", s.lower())
+    cards = _vocab_card_terms(html)
+    card_tokens = [_tokens(c) for c in cards]
+    findings = []
 
-    haystack = norm(text)
-    missing = []
+    # A term the GitBook nests under a broader one (the six operator families
+    # under Operators) does not need its own card - six cards for one lesson's
+    # children crowds out the parents. It must still be defined somewhere the
+    # student can find it, so those are checked against the page text instead.
+    missing_cards, missing_text = [], []
     for t in lesson["key_terms"]:
-        term = t["term"]
-        n = norm(term)
-        # A term over ~45 chars is a run-on prose bullet in the GitBook rather
-        # than a real vocabulary word (lesson 1.10 has these); don't demand it
-        # appear verbatim.
-        if len(n) > 45:
+        want = _tokens(t["term"])
+        if not want:
             continue
-        if n and n not in haystack and norm(term.rstrip("s")) not in haystack:
-            missing.append(term)
-    if missing:
-        return [("ERROR",
-                 f"lesson {lesson['lesson']} ({lesson['title']}) key term(s) never defined "
-                 f"in the reading: {', '.join(missing)}")]
-    return []
+        if t.get("parent"):
+            if not (want <= _tokens(text)):
+                missing_text.append(t["term"])
+        elif not any(want <= ct for ct in card_tokens):
+            missing_cards.append(t["term"])
+    if missing_cards:
+        findings.append(("ERROR",
+            f"lesson {lesson['lesson']} ({lesson['title']}) key term(s) with no vocabulary card: "
+            f"{', '.join(missing_cards)}"))
+    if missing_text:
+        findings.append(("ERROR",
+            f"lesson {lesson['lesson']} ({lesson['title']}) key term(s) never defined anywhere "
+            f"(nested under a broader term, so a card is optional but a definition is not): "
+            f"{', '.join(missing_text)}"))
+
+    owned_token_sets = [_tokens(t["term"]) for t in lesson["key_terms"]]
+    extra = [c for c, ct in zip(cards, card_tokens)
+             if ct and not any(ot and ot <= ct for ot in owned_token_sets)]
+    if extra:
+        findings.append(("ERROR",
+            f"lesson {lesson['lesson']} ({lesson['title']}) has vocabulary card(s) for term(s) the "
+            f"lesson does not own: {', '.join(extra)}. Teach it in prose if the reading needs it, "
+            f"or move it to the lesson that owns it."))
+    return findings
 
 
 def _mod1_lesson_for(path):
@@ -342,47 +376,6 @@ def _mod1_lesson_for(path):
 
 def _norm_term(s):
     return re.sub(r"[^a-z0-9]", "", s.lower())
-
-
-def check_mod1_extra_key_terms(path, html):
-    """Vocabulary creep: a flip card teaching a term the lesson does not own.
-
-    Every extra card is a term the student is told to learn that no later
-    reading, assignment, or assessment will reinforce, and that the GitBook
-    never defines — so it reads as required vocabulary but is not. Terms can
-    still be *used* in prose; this only governs the vocabulary card set.
-    """
-    lesson = _mod1_lesson_for(path)
-    if lesson is None:
-        return []
-    owned = {_norm_term(t["term"]) for t in lesson["key_terms"]}
-    # Singular/plural tolerance, both directions.
-    for t in list(owned):
-        owned.add(t.rstrip("s"))
-        owned.add(t + "s")
-
-    cards = re.findall(
-        r'<button[^>]*class="[^"]*mlrk-term[^"]*"[^>]*>\s*<span[^>]*mlrk-front[^>]*>\s*<strong>(.*?)</strong>',
-        html, re.S)
-    extra = []
-    for raw in cards:
-        term = " ".join(re.sub("<[^>]+>", "", raw).split())
-        n = _norm_term(term)
-        if not n:
-            continue
-        # A single card may legitimately cover two owned terms that the GitBook
-        # defines in one breath ("Truthy and falsy"), so a card passes when it
-        # names an owned term, not only when it equals one.
-        covers_owned = (n in owned or n.rstrip("s") in owned
-                        or any(o and o in n for o in owned))
-        if not covers_owned:
-            extra.append(term)
-    if extra:
-        return [("ERROR",
-                 f"lesson {lesson['lesson']} ({lesson['title']}) has vocabulary card(s) for "
-                 f"term(s) the lesson does not own: {', '.join(extra)}. Teach it in prose if the "
-                 f"reading needs it, or move it to the lesson that owns it.")]
-    return []
 
 
 # Ben's writing guide, the mechanically-detectable parts. Rules 1 and 3
@@ -609,8 +602,7 @@ def run(path, skip_links=False):
     findings += check_time_estimate(html, word_count)
     findings += check_copyright(text)
     findings += check_meta_sidecar(path)
-    findings += check_mod1_key_terms(path, text)
-    findings += check_mod1_extra_key_terms(path, html)
+    findings += check_mod1_key_terms(path, html, text)
     fb = feedback_text(html)
     prose = text + "\n" + fb
     findings += check_writing_guide(prose, html)
