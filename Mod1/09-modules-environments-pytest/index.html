@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The File That Ran Itself — Modules, Virtual Environments, and pytest</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:860px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+/* Two labelled code blocks side by side, so a contrast never asks the reader
+   to hold one version in their head while looking at the other. */
+.me-compare{display:grid;grid-template-columns:1fr;gap:1.4rem;margin:1.1rem 0;align-items:start}
+@media(min-width:900px){.me-compare{grid-template-columns:1fr 1fr;gap:1.6rem}}
+.me-compare-label{margin:0 0 .5rem;line-height:1.4}
+.me-compare>div{min-width:0}
+/* pytest prints fixed-width banner lines that are meant to line up. Wrapping
+   them breaks the alignment that makes the report readable, so this one block
+   scrolls sideways inside itself instead. */
+.me-wide{white-space:pre;overflow-x:auto;min-height:0}
+.me-out{min-height:0}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The File That Ran Itself</h1>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~20 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. A grocery bill that came up a dollar short</h2>
+<p>Chip In is a small Python program four roommates wrote to split a shared grocery bill. Hand it a total and a number of people, and it says what each person owes.</p>
+<p>A $97 grocery run split four ways is $24.25 each. Chip In said $24. Four payments of $24 come to $96, so a dollar went missing on every grocery run, and nobody noticed for a month. Then one roommate wrote a second program that borrowed a function from Chip In, and the second program printed the old grocery bill the instant it started, unasked.</p>
+<p>Neither problem is a typo you can find by staring at the file. Fixing them takes four things: splitting a program into separate files, knowing exactly what Python does when one file borrows from another, giving a project its own private place to install tools, and writing tests that check your functions so you do not have to.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card. These are the terms the rest of the reading uses.</p>
+<div class="mlrk-grid" id="me-flipcards">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>module</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>module</strong><br>A module is a file containing code, which can then be imported and used in other parts of a larger program. Every function and variable defined at the top level of a file can be imported by another file. Import a whole module with <code>import module_name</code>, or specific names with <code>from module_name import name</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>runs</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>runs</strong><br>Importing a file runs it, top to bottom. The variable <code>__name__</code> tells a file whether it is being run directly (<code>"__main__"</code>) or imported by another file. The <code>if __name__ == "__main__":</code> guard is how a file says "only run this part when I am the program being run".</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>standard library</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>standard library</strong><br>A library is a collection of code written for other programs to use rather than to be run on its own. The standard library is Python's own library: the modules that come with Python, such as <code>random</code>, <code>math</code>, <code>time</code>, and <code>json</code>. They need <code>import</code> but no installation.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>package and the Python Package Index (PyPI)</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>package and the Python Package Index (PyPI)</strong><br>A package is a folder of modules that someone has published so that other people can install it and import it. <code>pytest</code> is a package. Third-party packages are published on the Python Package Index, PyPI for short, and installed with <code>pip</code>, Python's package installer. Many packages are libraries too.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>virtual environment</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>virtual environment</strong><br>A virtual environment is a folder that holds one project's private set of packages, together with a link to the Python installed on your computer. Create one with <code>python3 -m venv .venv</code> and turn it on with <code>source .venv/bin/activate</code>. Installing a package inside an activated virtual environment installs it only there.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>requirements.txt</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>requirements.txt</strong><br><code>requirements.txt</code> is a file listing the packages a project needs. <code>pip freeze &gt; requirements.txt</code> writes it; <code>pip install -r requirements.txt</code> reads it and installs everything in it.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>.gitignore</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>.gitignore</strong><br>A <code>.gitignore</code> file lists the files and folders in a project that Git should not track. The <code>.venv/</code> and <code>__pycache__/</code> folders go in it. The <code>.venv</code> folder is never committed; it is rebuilt from <code>requirements.txt</code> instead.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>JSON</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>JSON</strong><br>JSON (JavaScript Object Notation) is a text format for storing lists and dictionaries in a file. The standard library's <code>json</code> module writes them with <code>json.dump()</code> and reads them back with <code>json.load()</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Developer dependencies</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Developer dependencies</strong><br>A package your project needs is a dependency. Developer dependencies, like <code>pytest</code>, are packages used by the developers of a project but not needed by the people who run it.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>unit test</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>unit test</strong><br>A unit test is a small program that calls one function with a known input and checks that the output is what you expected. A collection of them is a test suite.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>test file</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>test file</strong><br>A test file is a file whose name starts with <code>test_</code> that imports functions from your source code and tests them. Keeping tests in their own files, in a <code>tests/</code> folder beside the source code, is separation of concerns applied to testing.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>pytest</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>pytest</strong><br><code>pytest</code> is the third-party package that finds and runs test files. It is installed into the project's virtual environment and run with <code>python3 -m pytest</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>test function</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>test function</strong><br>A test function is any function in a test file whose name starts with <code>test_</code>. It is named after the function it tests, and the docstring on its first line describes what the test checks.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>assert</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>assert</strong><br>The <code>assert</code> statement checks that an expression is truthy. If it is not, it raises an <code>AssertionError</code> and <code>pytest</code> reports the test as failed. The expression is an ordinary comparison: <code>==</code> for most values, <code>is</code> for <code>True</code>, <code>False</code>, and <code>None</code>, and <code>pytest.approx()</code> for decimal numbers.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. One file doing three jobs</h2>
+<p>Chip In started as a single file doing the math, the printing, and the input collecting all at once. Separation of concerns is the habit of giving each file one job, and in Python you do it by splitting the program into modules. A module is a file containing code that other files can import and use. A module's name is its filename without the <code>.py</code>.</p>
+<p>Here are the three files Chip In became. Each one has a single job.</p>
+<div class="me-compare">
+<div>
+<p class="me-compare-label"><strong><code>bill.py</code></strong><br>the math</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out">def split_evenly(total, people):
+    return total // people</pre></div>
+</div>
+<div>
+<p class="me-compare-label"><strong><code>display.py</code></strong><br>the printing</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out">def display(message):
+    print(message)</pre></div>
+</div>
+</div>
+<p class="me-compare-label"><strong><code>main.py</code></strong><br>collects the numbers and runs the other two</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out">import bill
+from display import display
+
+def main():
+    total = 97
+    people = 4
+    share = bill.split_evenly(total, people)
+    display(f"Each of the {people} roommates owes ${share}.")
+
+main()</pre></div>
+<p>Every name written at the top level of a file, meaning every function and every variable that is not indented inside something else, can be imported by another file. <code>main.py</code> uses both ways of importing. <code>import bill</code> brings in the whole <code>bill</code> module, and its names are reached with a dot, as in <code>bill.split_evenly(total, people)</code>. <code>from display import display</code> brings in one specific name, which is then called on its own. Several names fit in one statement: <code>from bill import split_evenly, add_tax</code>.</p>
+
+<h3>The import to avoid</h3>
+<p>There is a third form. <code>from bill import *</code> imports every name in <code>bill.py</code> at once, so <code>split_evenly(97, 4)</code> works with nothing in front of it. It is the shortest to type and the one experienced Python developers avoid.</p>
+<div class="mlrk-card" id="me-star">
+<p><strong><code>main.py</code> is changed to use <code>from bill import *</code> instead of <code>import bill</code>. Check every statement that is true of that change.</strong></p>
+<div id="me-star-boxes">
+<label class="mlrk-selectall-option"><input type="checkbox" class="me-star-box" value="a"> <span>A reader of <code>main.py</code> can no longer tell which file <code>split_evenly</code> came from.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="me-star-box" value="b"> <span>It brings in every top-level name in <code>bill.py</code>, including names you did not know were there.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="me-star-box" value="c"> <span>A top-level variable in <code>bill.py</code> can replace a Python built-in of the same name inside <code>main.py</code>.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="me-star-box" value="d"> <span>Chip In starts up faster, because Python only reads <code>bill.py</code> once instead of twice.</span></label>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="me-star-submit">Check my answers</button></div>
+<div id="me-star-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>The word <code>*</code> means "everything". Ask what arrives that you never asked for, and what happens if one of those arriving names is a word Python already uses.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Importing a file runs it</h2>
+<p>Here is <code>bill.py</code> again, with the line its author used while writing <code>split_evenly</code> and never deleted. Checking a function by printing the answer and reading it is how most people start out.</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out"># bill.py
+def split_evenly(total, people):
+    return total // people
+
+print(split_evenly(97, 4))</pre></div>
+<div class="mlrk-card">
+<p><strong>You run <code>python3 main.py</code>, and the first line of <code>main.py</code> is <code>import bill</code>.</strong> <strong>What prints, and in what order?</strong></p>
+<div id="me-order-choices">
+<button type="button" class="mlrk-choice" data-a="mainonly">Only <code>Each of the 4 roommates owes $24.</code></button>
+<button type="button" class="mlrk-choice" data-a="billfirst"><code>24</code>, then <code>Each of the 4 roommates owes $24.</code></button>
+<button type="button" class="mlrk-choice" data-a="mainfirst"><code>Each of the 4 roommates owes $24.</code>, then <code>24</code></button>
+<button type="button" class="mlrk-choice" data-a="billonly">Only <code>24</code></button>
+</div>
+<div id="me-order-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<p>Here is what <code>python3 main.py</code> actually printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out">24
+Each of the 4 roommates owes $24.</pre></div>
+<p>Importing a file runs it, top to bottom, exactly as if you had typed <code>python3 bill.py</code>. When Python reaches <code>import bill</code>, it goes and runs all of <code>bill.py</code>: the <code>def</code> statement creates the function, and the <code>print</code> statement prints. Only then does Python come back to <code>main.py</code> and carry on. That is the second program printing the old grocery bill at startup, and it is not a bug in <code>main.py</code> at all.</p>
+<p>Defining a function harms nothing, so a module of <code>def</code> statements is fine to import. The trouble starts when a file is both a program you run on its own and a module other files import.</p>
+
+<h3>What <code>__name__</code> holds</h3>
+<p>Every module has a variable called <code>__name__</code> that Python fills in automatically. Put <code>print(f"my __name__ is {__name__}")</code> at the bottom of <code>bill.py</code> and at the bottom of <code>main.py</code>, then run <code>python3 main.py</code>:</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out">my __name__ is bill
+Each of the 4 roommates owes $24.
+my __name__ is __main__</pre></div>
+<p>An imported file's <code>__name__</code> holds its module name, which is <code>bill</code> here. The file you actually ran with <code>python3</code> has <code>__name__</code> set to the string <code>"__main__"</code>. One variable, two possible values, and a file can read it to tell which situation it is in.</p>
+
+<h3>The <code>__main__</code> guard</h3>
+<p>That gives every Python program its standard ending. Wrap the part that should only happen on a direct run in <code>if __name__ == "__main__":</code>.</p>
+<div class="me-compare">
+<div>
+<p class="me-compare-label"><strong><code>bill.py</code> with the guard</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out">def split_evenly(total, people):
+    return total // people
+
+if __name__ == "__main__":
+    print(split_evenly(97, 4))</pre></div>
+</div>
+<div>
+<p class="me-compare-label"><strong><code>main.py</code> with the guard</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out">import bill
+from display import display
+
+def main():
+    # ...
+
+if __name__ == "__main__":
+    main()</pre></div>
+</div>
+</div>
+<p>Read the guard as "if this file is the one being run, do this". <code>python3 bill.py</code> sets <code>__name__</code> to <code>"__main__"</code>, the condition is true, and the quick check prints. <code>python3 main.py</code> imports <code>bill</code>, which sets <code>bill</code>'s <code>__name__</code> to <code>"bill"</code>, the condition is false, and nothing happens but the <code>def</code>. Put this guard at the bottom of every program you write. The two underscores on each side of <code>name</code> and <code>main</code> are part of the spelling, and Python uses that pattern for names it manages itself.</p>
+<p>The first time Python imports <code>bill.py</code>, a folder called <code>__pycache__</code> appears next to it holding <code>bill.cpython-313.pyc</code>, a pre-processed copy that makes the next import faster. Python rebuilds it on its own, you never edit it, and it never belongs in Git.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Somewhere to put pytest</h2>
+<p>Some of the code you import, you never wrote. <code>random</code>, <code>math</code>, <code>time</code>, and <code>json</code> come with Python itself. That collection is the standard library, and the habit worth building is to ask "does Python already have this?" before writing it yourself. <code>pytest</code> is not one of them. <code>pytest</code> is a package: a folder of modules somebody published so that other people can install it and import it. Third-party packages live on the Python Package Index, PyPI for short, at <a href="https://pypi.org/" target="_blank" rel="noopener">pypi.org</a>, and <code>pip</code> is the installer that fetches them.</p>
+<p>Installing <code>pytest</code> into the one Python on your computer is the thing to avoid. Different projects need different versions of the same package, so one shared pile of packages means an upgrade for one project quietly breaks another. A virtual environment is the fix: a folder inside your project holding that project's own packages, plus a link to the Python already installed on your computer. Whatever you install while it is switched on lands there and nowhere else.</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out">python3 -m venv .venv
+source .venv/bin/activate</pre></div>
+<p><code>python3 -m venv .venv</code> means "run the <code>venv</code> module as a program", and <code>.venv</code> is the name of the folder to create. The leading dot hides it from <code>ls</code> so it does not clutter your view of the project. <code>source .venv/bin/activate</code> switches it on, and your Terminal prompt grows a <code>(.venv)</code> at the front, which is how you know. <code>deactivate</code> switches it off, and you activate again in every new Terminal window you open for this project.</p>
+<p><code>pip install pytest</code> installs five packages, not one. <code>pytest</code> itself needs <code>iniconfig</code>, <code>packaging</code>, <code>pluggy</code>, and <code>pygments</code> to work, so <code>pip</code> fetches those as well. Packages that a package needs are its sub-dependencies, and <code>pip</code> follows the whole chain. <code>pytest</code> is also a developer dependency: the people building Chip In need it, and the roommates who only run Chip In never do.</p>
+<p><code>pip freeze</code> prints every installed package with its exact version. Send that list into a file with <code>pip freeze &gt; requirements.txt</code> and you have the recipe for rebuilding the environment anywhere.</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out">iniconfig==2.3.1
+packaging==26.3
+pluggy==1.6.0
+Pygments==2.21.0
+pytest==9.1.1</pre></div>
+<p>The <code>==</code> records the exact version, so everyone who installs from this file gets the packages you tested with. <code>requirements.txt</code> is what you commit to Git. <code>.venv</code> is what you do not: it holds about 30 megabytes across roughly 2,000 files, and the programs inside it record the full path of the folder they were built in, so on a teammate's computer those paths lead nowhere. A <code>.gitignore</code> file lists what Git should leave alone, and both folders belong in it.</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out"># .gitignore
+.venv/
+__pycache__/</pre></div>
+<p>Commit the recipe, not the meal. Cloning a Python project and getting it running is always these four commands, and the last one reads <code>requirements.txt</code> back.</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-out">cd chip-in
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt</pre></div>
+</section>
+
+<section class="mlrk-section">
+<h2>6. A test that finds the missing dollar</h2>
+<p>The only check on <code>split_evenly</code> so far was that <code>print</code> at the bottom of <code>bill.py</code>, and <code>24</code> looked close enough to whoever read it. Printing a result and reading it also leaves you with an awkward question once you are done: do you delete that <code>print</code> line, comment it out, or let it clutter <code>bill.py</code>? A unit test answers that. A unit test is a small program that calls one function with a known input and checks the output against what you expected, and it lives in a file of its own.</p>
+<p>A test file is a file whose name starts with <code>test_</code> and imports the functions it tests. Put test files in a <code>tests/</code> folder beside the source code, and the source code stays about the product while the tests stay about the testing. Here is the whole Chip In project.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 880 400" role="img" aria-labelledby="treeTitle treeDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="treeTitle">The Chip In project folder, file by file</title>
+  <desc id="treeDesc">A folder named chip-in contains seven entries. .gitignore lists what Git should leave alone. The .venv folder holds this project's own packages and is never committed. requirements.txt is the list that rebuilds .venv. bill.py holds the math, display.py holds the printing, and main.py collects the numbers and runs the other two. A tests folder sits last, and the one file inside it, test_bill.py, holds the tests for bill.py.</desc>
+  <rect x="8" y="8" width="864" height="384" rx="14" fill="#FFF6E4" stroke="#83671C" stroke-width="2.5"/>
+  <g font-family="Menlo, Consolas, monospace" font-size="20" fill="#261F1D">
+    <text x="30" y="48">chip-in/</text>
+    <text x="30" y="86">├── .gitignore</text>
+    <text x="30" y="124">├── .venv/</text>
+    <text x="30" y="162">├── requirements.txt</text>
+    <text x="30" y="200">├── bill.py</text>
+    <text x="30" y="238">├── display.py</text>
+    <text x="30" y="276">├── main.py</text>
+    <text x="30" y="314">└── tests/</text>
+    <text x="74" y="352">└── test_bill.py</text>
+  </g>
+  <g font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#261F1D">
+    <text x="400" y="86">what Git should leave alone</text>
+    <text x="400" y="124">this project's own packages, never committed</text>
+    <text x="400" y="162">the list that rebuilds .venv</text>
+    <text x="400" y="200">the math</text>
+    <text x="400" y="238">the printing</text>
+    <text x="400" y="276">collects the numbers, runs the other two</text>
+    <text x="400" y="352">the tests for bill.py</text>
+  </g>
+</svg>
+
+<div class="mlrk-code"><pre class="mlrk-screen me-out"># tests/test_bill.py
+from bill import split_evenly
+
+
+def test_split_evenly():
+    """split_evenly - splits a bill into equal shares"""
+    assert split_evenly(40, 4) == 10
+    assert split_evenly(97, 4) == 24.25</pre></div>
+<p>A test function is any function in a test file whose name starts with <code>test_</code>, named after the function it tests. <code>pytest</code> finds tests by those two name rules and nothing else, so there is nothing to configure. The string on the first line is a docstring, and in a test it says what the test checks.</p>
+<p><code>assert</code> is the whole mechanism. <code>assert expression</code> checks that the expression is truthy; if it is, nothing happens and the test carries on. If it is falsy, <code>assert</code> raises an <code>AssertionError</code>, the test stops, and <code>pytest</code> reports a failure. <code>split_evenly(97, 4) == 24.25</code> is an ordinary comparison with the same <code>==</code> you already write. One test function can hold as many <code>assert</code> statements as you like, and it passes only if every one of them passes.</p>
+<p>Run every test in the project with <code>python3 -m pytest</code>, from the project's root folder. The <code>python3 -m</code> part is what puts your project folder on the list of places Python looks for modules, so <code>from bill import split_evenly</code> finds <code>bill.py</code>. Here is the report:</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-wide">tests/test_bill.py F                                                     [100%]
+
+=================================== FAILURES ===================================
+______________________________ test_split_evenly _______________________________
+
+    def test_split_evenly():
+        """split_evenly - splits a bill into equal shares"""
+        assert split_evenly(40, 4) == 10
+&gt;       assert split_evenly(97, 4) == 24.25
+E       assert 24 == 24.25
+E        +  where 24 = split_evenly(97, 4)
+
+tests/test_bill.py:7: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_bill.py::test_split_evenly - assert 24 == 24.25
+============================== 1 failed in 0.02s ===============================</pre></div>
+<p>Three pieces of that report do the work. The <code>F</code> after the filename and the name under <code>FAILURES</code> say which test failed. The <code>&gt;</code> marks the exact <code>assert</code> line that raised the error, so the first <code>assert</code> passed and the second did not. The two <code>E</code> lines give you the comparison that came out false and, underneath it, the call that produced the left-hand number.</p>
+
+<div class="mlrk-card">
+<p><strong>Read the report, then answer.</strong> <strong>What does it tell you about <code>split_evenly</code>?</strong></p>
+<div id="me-fail-choices">
+<button type="button" class="mlrk-choice" data-a="backwards">It returned <code>24.25</code>, and the test expected <code>24</code>.</button>
+<button type="button" class="mlrk-choice" data-a="right">It returned <code>24</code>, and the test expected <code>24.25</code>.</button>
+<button type="button" class="mlrk-choice" data-a="crash">It crashed before it could return anything.</button>
+<button type="button" class="mlrk-choice" data-a="firstassert">The failing line is <code>assert split_evenly(40, 4) == 10</code>.</button>
+</div>
+<div id="me-fail-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>The line <code>where 24 = split_evenly(97, 4)</code> is pytest showing its work. Read it as a plain sentence: the call on the right produced the number on the left.</p>
+</details>
+
+<p>There is the missing dollar. <code>//</code> divides and throws the remainder away, so <code>97 // 4</code> is <code>24</code> and the quarter disappears. Change that one character to <code>/</code> in <code>bill.py</code> and run the tests again:</p>
+<div class="mlrk-code"><pre class="mlrk-screen me-wide">tests/test_bill.py .                                                     [100%]
+
+============================== 1 passed in 0.01s ===============================</pre></div>
+<p>Each dot after a filename is one passing test. <code>python3 main.py</code> now says <code>Each of the 4 roommates owes $24.25.</code>, and the test stays in the project, ready to say so again every time anyone touches <code>bill.py</code>.</p>
+
+<h3>Set up Chip In yourself</h3>
+<p>This Terminal runs the real commands against a copy of the Chip In folder. Run them in order.</p>
+<ol class="mlrk-small mlrk-steplist">
+  <li><code>ls</code> — see what is in the project before you start</li>
+  <li><code>python3 -m venv .venv</code> — build the virtual environment</li>
+  <li><code>source .venv/bin/activate</code> — switch it on</li>
+  <li><code>pip install pytest</code> — install pytest into it</li>
+  <li><code>pip freeze &gt; requirements.txt</code> — record what got installed</li>
+  <li><code>python3 -m pytest</code> — run the tests</li>
+</ol>
+<div class="mlrk-terminal" id="me-terminal">
+  <div class="mlrk-terminal-log" aria-live="polite"></div>
+  <div class="mlrk-terminal-row"><span class="mlrk-terminal-prompt"></span><input class="mlrk-terminal-input" type="text" aria-label="Terminal input" autocomplete="off" spellcheck="false"></div>
+</div>
+<details class="mlrk-hint"><summary>What else can I try in there?</summary>
+<p><code>ls -a</code> to see the dot-folders that plain <code>ls</code> hides, <code>cat requirements.txt</code> after step 5, <code>deactivate</code> followed by <code>python3 -m pytest</code> to see what a switched-off environment does, and <code>pip install pytest</code> before step 3 to see what happens when you install with nothing switched on.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary and reflection</h2>
+<p>Give each file one job, and import what you need by name so a reader can tell where every function came from. Importing a file runs it, so put the part that should only happen on a direct run inside <code>if __name__ == "__main__":</code>. Install packages into a virtual environment you create per project, record them with <code>pip freeze &gt; requirements.txt</code>, and keep <code>.venv</code> out of Git. Write the checks you were going to print as <code>assert</code> statements in a <code>test_</code> file, and <code>python3 -m pytest</code> will tell you which one failed and what the function actually returned.</p>
+<label for="me-reflect"><strong>A teammate clones Chip In, runs <code>python3 -m pytest</code> straight away, and gets <code>No module named pytest</code>.</strong> In 2-3 sentences, say what is missing on that teammate's computer, name the committed file that has the answer in it, and list the commands they should run, in order.</label>
+<textarea id="me-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>8. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://exercism.org/tracks/python" target="_blank" rel="noopener">Exercism's Python track</a> — free practice exercises you download and solve on your own machine. Every exercise ships with a <code>test_</code> file you run with <code>python3 -m pytest</code>, so it is the fastest way to get used to reading a failure report.</li>
+  <li><a href="https://www.youtube.com/watch?v=YbpKMIUjvK8" target="_blank" rel="noopener">ArjanCodes, "How To Write Unit Tests in Python: Pytest Tutorial" (about 35 minutes)</a> — a longer walkthrough of the same <code>assert</code> and test-file ideas, then well past them into fixtures and mocking.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<div id="me-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="me-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="me-download">Download as .txt</button>
+</div>
+<p id="me-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "modules-environments-pytest-reading";
+  const TITLE = "The File That Ran Itself — Modules, Virtual Environments, and pytest";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards("#me-flipcards", "act-flipcards");
+
+  K.selectAll({
+    id: "act-import-star",
+    boxSelector: ".me-star-box",
+    submitSelector: "#me-star-submit",
+    feedbackSelector: "#me-star-fb",
+    maxAttempts: 2,
+    options: [
+      {value:"a", label:"A reader can no longer tell which file split_evenly came from", correct:true,
+        hint:"Compare the two spellings of the call: <code>bill.split_evenly(...)</code> and <code>split_evenly(...)</code>. Which one names a file?",
+        explain:"<code>bill.split_evenly(total, people)</code> names the file to open when you want to know what the function does. After <code>from bill import *</code> the call reads <code>split_evenly(total, people)</code> and the file it came from is nowhere on the line."},
+      {value:"b", label:"It brings in every top-level name, including ones you did not know were there", correct:true,
+        hint:"The <code>*</code> stands for every name in the module, not the names you happen to use.",
+        explain:"<code>*</code> means every top-level name in <code>bill.py</code>. Listing the names yourself, as in <code>from bill import split_evenly</code>, means nothing arrives that you did not ask for."},
+      {value:"c", label:"A top-level variable in bill.py can replace a Python built-in of the same name", correct:true,
+        hint:"Python has built-in functions like <code>sum</code> and <code>len</code>. What happens if a module defines a variable with one of those names?",
+        explain:"Suppose someone adds <code>sum = 0</code> to the top of <code>bill.py</code> as a running total. After <code>from bill import *</code>, that <code>0</code> takes over the name <code>sum</code> inside <code>main.py</code>, and the next <code>sum([10, 20, 30])</code> call raises <code>TypeError: 'int' object is not callable</code>."},
+      {value:"d", label:"Chip In starts up faster", correct:false,
+        hint:"Think about how much of <code>bill.py</code> Python has to run before it can hand over any name at all.",
+        explain:"Python runs <code>bill.py</code> once either way, because it has to run the whole file before any name in it exists. The three import forms differ in which names end up in <code>main.py</code>, not in how much work Python does."}
+    ]
+  });
+
+  K.quiz({
+    id: "act-import-order",
+    buttonSelector: "#me-order-choices .mlrk-choice",
+    feedbackSelector: "#me-order-fb",
+    correct: "billfirst",
+    answerLabel: "<code>24</code>, then <code>Each of the 4 roommates owes $24.</code>",
+    feedback: {
+      mainonly: "The <code>print</code> at the bottom of <code>bill.py</code> does run. Importing a file runs it, top to bottom, so <code>import bill</code> runs every line of <code>bill.py</code> including that <code>print</code>, and <code>24</code> appears before anything from <code>main.py</code>.",
+      billfirst: "Importing a file runs it, top to bottom. <code>import bill</code> is the first line of <code>main.py</code>, so Python runs all of <code>bill.py</code> first: the <code>def</code> creates the function and the <code>print</code> prints <code>24</code>. Only then does Python return to <code>main.py</code> and reach <code>main()</code>.",
+      mainfirst: "Both lines do print, and the order is the other way round. <code>import bill</code> sits above <code>main()</code> in <code>main.py</code>, and Python runs the imported file at the moment it reaches the <code>import</code> statement, so <code>24</code> lands first.",
+      billonly: "<code>main()</code> is still called at the bottom of <code>main.py</code>, so its line prints too. Running <code>bill.py</code> during the import does not replace the rest of <code>main.py</code>; it happens before it."
+    }
+  });
+
+  K.quiz({
+    id: "act-read-failure",
+    buttonSelector: "#me-fail-choices .mlrk-choice",
+    feedbackSelector: "#me-fail-fb",
+    correct: "right",
+    answerLabel: "It returned <code>24</code>, and the test expected <code>24.25</code>",
+    feedback: {
+      backwards: "The two numbers are the right pair in the wrong roles. <code>where 24 = split_evenly(97, 4)</code> says the call produced <code>24</code>, and <code>24.25</code> is the value the test wrote down as correct. $97 shared four ways really is $24.25 each, so the bug sits in <code>split_evenly</code> and the test is doing its job.",
+      right: "<code>where 24 = split_evenly(97, 4)</code> is pytest showing what the call actually produced, and <code>24.25</code> is what the <code>assert</code> said it should be. That pair is enough to go find the bug: <code>//</code> in <code>split_evenly</code> throws the remainder away.",
+      crash: "A crash inside the function would show that error's own name, such as <code>ZeroDivisionError</code>, instead of a comparison. <code>AssertionError</code> means the function returned a value and the value did not match, and the <code>E</code> lines print the value it returned.",
+      firstassert: "The <code>&gt;</code> marker picks out the failing line, and it sits on <code>assert split_evenly(97, 4) == 24.25</code>. The <code>split_evenly(40, 4)</code> line carries no marker because it passed: 40 divides by 4 with nothing left over, so that one returns <code>10</code> even with the bug in place."
+    }
+  });
+
+  const PYTEST_FAIL = [
+    "tests/test_bill.py F                                                     [100%]",
+    "",
+    "=================================== FAILURES ===================================",
+    "______________________________ test_split_evenly _______________________________",
+    "",
+    "    def test_split_evenly():",
+    '        """split_evenly - splits a bill into equal shares"""',
+    "        assert split_evenly(40, 4) == 10",
+    ">       assert split_evenly(97, 4) == 24.25",
+    "E       assert 24 == 24.25",
+    "E        +  where 24 = split_evenly(97, 4)",
+    "",
+    "tests/test_bill.py:7: AssertionError",
+    "=========================== short test summary info ============================",
+    "FAILED tests/test_bill.py::test_split_evenly - assert 24 == 24.25",
+    "============================== 1 failed in 0.02s ==============================="
+  ].join("\n");
+
+  const FREEZE = "iniconfig==2.3.1\npackaging==26.3\npluggy==1.6.0\nPygments==2.21.0\npytest==9.1.1";
+  const ROOT = "/home/student/chip-in";
+
+  K.terminal("#me-terminal", {
+    id: "act-terminal",
+    startPath: ROOT,
+    minCommands: 4,
+    filesystem: {
+      "/home/student/chip-in": {type:"dir", children:["bill.py","display.py","main.py","tests"], hidden:[".gitignore"]},
+      "/home/student/chip-in/.gitignore": {type:"file", contents:".venv/\n__pycache__/"},
+      "/home/student/chip-in/bill.py": {type:"file", contents:"def split_evenly(total, people):\n    return total // people\n\nif __name__ == \"__main__\":\n    print(split_evenly(97, 4))"},
+      "/home/student/chip-in/display.py": {type:"file", contents:"def display(message):\n    print(message)"},
+      "/home/student/chip-in/main.py": {type:"file", contents:"import bill\nfrom display import display\n\ndef main():\n    total = 97\n    people = 4\n    share = bill.split_evenly(total, people)\n    display(f\"Each of the {people} roommates owes ${share}.\")\n\nif __name__ == \"__main__\":\n    main()"},
+      "/home/student/chip-in/tests": {type:"dir", children:["test_bill.py"]},
+      "/home/student/chip-in/tests/test_bill.py": {type:"file", contents:"from bill import split_evenly\n\n\ndef test_split_evenly():\n    \"\"\"split_evenly - splits a bill into equal shares\"\"\"\n    assert split_evenly(40, 4) == 10\n    assert split_evenly(97, 4) == 24.25"}
+    },
+    commands: {
+      ls(args, state){
+        const dir = state.fs[state.cwd];
+        if(!dir || dir.type !== "dir") return state.cwd + ": no such directory";
+        const names = (dir.children || []).slice();
+        if(args[0] === "-a") names.unshift.apply(names, dir.hidden || []);
+        return names.join("\n");
+      },
+      python3(args, state){
+        if(args[0] !== "-m") return "python3: can't open file '" + (args[0] || "") + "': [Errno 2] No such file or directory";
+        if(args[1] === "venv"){
+          const name = args[2] || ".venv";
+          const hidden = state.fs[ROOT].hidden;
+          if(hidden.indexOf(name) === -1) hidden.push(name);
+          state.fs[ROOT + "/" + name] = {type:"dir", children:["bin","lib","pyvenv.cfg"]};
+          state.venvBuilt = true;
+          return "";
+        }
+        if(args[1] === "pytest"){
+          if(!state.venvOn) return "/usr/local/bin/python3: No module named pytest";
+          if(!state.pytestInstalled) return "/home/student/chip-in/.venv/bin/python3: No module named pytest";
+          return PYTEST_FAIL;
+        }
+        return "/usr/local/bin/python3: No module named " + (args[1] || "");
+      },
+      source(args, state){
+        if(!state.venvBuilt || (args[0] || "") !== ".venv/bin/activate")
+          return "source: no such file or directory: " + (args[0] || "");
+        state.venvOn = true;
+        return "[the real prompt now starts with (.venv)]";
+      },
+      deactivate(args, state){
+        if(!state.venvOn) return "deactivate: command not found";
+        state.venvOn = false;
+        return "[the (.venv) is gone from the real prompt]";
+      },
+      which(args, state){
+        if((args[0] || "") !== "python3") return "which: " + (args[0] || "") + ": not found";
+        return state.venvOn ? ROOT + "/.venv/bin/python3" : "/usr/local/bin/python3";
+      },
+      pip(args, state){
+        if(!state.venvOn) return "No virtual environment is switched on, so this would install into the computer's own Python.\nSwitch one on first: source .venv/bin/activate";
+        if(args[0] === "install" && args[1] === "pytest"){
+          state.pytestInstalled = true;
+          return "Collecting pytest\nCollecting iniconfig>=1 (from pytest)\nCollecting packaging>=20 (from pytest)\nCollecting pluggy<2,>=1.5 (from pytest)\nCollecting pygments>=2.7.2 (from pytest)\nInstalling collected packages: pygments, pluggy, packaging, iniconfig, pytest\nSuccessfully installed iniconfig-2.3.1 packaging-26.3 pluggy-1.6.0 pygments-2.21.0 pytest-9.1.1";
+        }
+        if(args[0] === "freeze"){
+          if(!state.pytestInstalled) return "";
+          if(args[1] === ">" && args[2] === "requirements.txt"){
+            if(state.fs[ROOT].children.indexOf("requirements.txt") === -1) state.fs[ROOT].children.push("requirements.txt");
+            state.fs[ROOT + "/requirements.txt"] = {type:"file", contents: FREEZE};
+            return "";
+          }
+          return FREEZE;
+        }
+        if(args[0] === "list"){
+          return state.pytestInstalled
+            ? "Package   Version\n--------- -------\niniconfig 2.3.1\npackaging 26.3\npip       25.0.1\npluggy    1.6.0\nPygments  2.21.0\npytest    9.1.1"
+            : "Package Version\n------- -------\npip     25.0.1";
+        }
+        return "pip: unknown command in this simulator. Try: pip install pytest, pip freeze, pip list";
+      }
+    }
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#me-reflect", minWords:15});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#me-scorechip"); });
+  K.Scoring.renderChip("#me-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#me-download"});
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#me-copy", onDone:function(ok){
+    document.getElementById("me-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>

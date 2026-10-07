@@ -222,11 +222,26 @@ def check_time_estimate(text, word_count):
         return findings
     lo = int(m.group(1))
     hi = int(m.group(2)) if m.group(2) else lo
+    # 15 minutes was a hard ERROR until 2026-10-07, which had it backwards: it
+    # made under-reporting the only way to pass. A reading built honestly
+    # against a lesson the curriculum itself sizes large (1.9 carries 16 key
+    # terms across 11 chapter sections) landed at ~20 and was forced to display
+    # 15. Angelica's call: one reading per GitBook lesson, and the stated time
+    # tells the truth however long it is. Over 15 now warns, so it stays
+    # visible without rewarding a false number.
     if hi > 15:
-        findings.append(("ERROR", f"stated time ~{hi} min exceeds this format's 15-minute hard ceiling (including video) — trim an activity or the video, don't just under-report"))
+        findings.append(("WARN", f"stated time ~{hi} min is over the format's usual 15-minute target. "
+                                 f"Fine when the lesson genuinely carries it — confirm the number is the "
+                                 f"honest count and not a padded one."))
     reading_minutes = word_count / 200
     if reading_minutes > lo * 2.5:
         findings.append(("WARN", f"stated time ~{lo} min looks low next to ~{word_count} words (~{reading_minutes:.0f} min reading alone, before activities/video)"))
+    # The real failure mode is the opposite of a long reading: prose alone
+    # already exceeding the stated time means the number cannot be true.
+    if reading_minutes > hi:
+        findings.append(("ERROR", f"stated time ~{hi} min is below the reading time of the prose alone "
+                                  f"(~{word_count} words, ~{reading_minutes:.0f} min) — before a single "
+                                  f"activity. State the honest count."))
     return findings
 
 

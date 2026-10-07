@@ -211,7 +211,7 @@ Build the top-of-page time pill from real counts:
 - The video's actual verified duration.
 - ~2-3 minutes baseline for reading the scenario/explanation prose itself.
 
-Add it up. If it's over 15, cut something — don't shrink the displayed number to hide an honest overage. A typical reading here should land around 3-5 quiz/activity items total (not the 15-20+ item readings the DA fellowship builds) — this format is intentionally lean.
+Add it up and **state what you get, however long it is** (Angelica, 2026-10-07). 10-15 minutes is the target, not a cap. A 15-minute hard ERROR in `qa/reading_qa.py` had it backwards: it made under-reporting the only way to pass, and a reading built honestly against lesson 1.9 (16 key terms across 11 chapter sections) was forced to display 15 for a ~20-minute page. One reading per GitBook lesson stands, and the time pill tells the truth. Over 15 now warns rather than fails; prose whose own reading time exceeds the stated number is still an ERROR, because that number cannot be true. Trim when a reading is padded. Do not trim an in-session objective to hit a number. A typical reading here should land around 3-5 quiz/activity items total (not the 15-20+ item readings the DA fellowship builds) — this format is intentionally lean.
 
 ## Pipeline
 1. **Scope the topic** against this repo's README/existing readings so two readings don't cover the same mechanism.
