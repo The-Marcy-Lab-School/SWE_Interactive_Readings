@@ -1,7 +1,7 @@
 {
-  "title": "The Exception Nobody Caught — try/except in Python",
-  "skill": "exception handling",
+  "title": "The Traceback Nobody Read to the Bottom",
+  "skill": "errors and tracebacks",
   "topic_area": "Python Fundamentals",
-  "time_minutes": 14,
+  "time_minutes": 20,
   "lesson": "1.11"
 }
