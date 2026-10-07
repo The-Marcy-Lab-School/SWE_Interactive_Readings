@@ -4,13 +4,19 @@
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:720px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
-.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:22rem;font-family:var(--mlrk-font-code)}
-.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
-.dict-checklist{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0}
-.dict-checklist label{display:flex;gap:.55rem;align-items:flex-start;cursor:pointer}
-.dict-checklist input{margin-top:.3rem}
+.mlrk-illustration{width:100%;max-width:900px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
+/* Two labelled blocks side by side, so a contrast never asks the reader to
+   hold one version in their head while looking at the other. Stacks below
+   900px, where two columns would wrap the longest printed line. Its own
+   class, not .mlrk-grid, so the reading-level check's vocabulary-section
+   strip cannot swallow a teaching section. */
+.dt-compare{display:grid;grid-template-columns:1fr;gap:1.4rem;margin:1.1rem 0;align-items:start}
+@media(min-width:900px){.dt-compare{grid-template-columns:1fr 1fr;gap:1.6rem}}
+.dt-compare-label{margin:0 0 .5rem;line-height:1.4}
+.dt-compare>div{min-width:0}
+.dt-out{min-height:0}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:26rem;max-width:100%;font-family:var(--mlrk-font-code)}
 </style>
 </head><body>
 
@@ -18,7 +24,7 @@
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>The City That Wasn't in the Dictionary</h1>
 <div class="mlrk-meta">
-  <span class="mlrk-pill">~14 minutes</span>
+  <span class="mlrk-pill">~20 minutes</span>
   <span class="mlrk-pill">Interactive</span>
   <span class="mlrk-pill">No setup needed to read</span>
 </div>
@@ -29,187 +35,448 @@
 <main class="mlrk-main"><div class="mlrk-wrap">
 
 <section class="mlrk-section">
-<h2>1. The lookup that crashes</h2>
-<p>Weather apps get their numbers from a weather API (Application Programming Interface) — a service you can ask over the internet for data, and it answers back. Here's roughly what OpenWeatherMap (a real weather-data API many apps build on) actually sends when asked for Brooklyn's weather. It's real JSON (JavaScript Object Notation), the standard text format almost every API uses to send structured data back:</p>
-<div class="mlrk-code"><pre>{
+<h2>1. The lookup that crashed</h2>
+<p>Weather apps get their numbers from a weather API (Application Programming Interface), which is a service you ask over the internet for data. Here is part of what OpenWeatherMap, a real weather-data service many apps build on, sends back when asked about Brooklyn. It arrives as JSON (JavaScript Object Notation), the text format most APIs answer in:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">{
   "name": "Brooklyn",
   "main": {
     "temp": 71.6,
-    "feels_like": 70.9,
     "humidity": 58
   },
   "weather": [
     {"description": "scattered clouds"}
   ]
 }</pre></div>
-<p>Once Python parses that response, it's already a dictionary — a <strong>dict</strong>, Python's built-in way to store data as labeled <strong>key/value</strong> pairs instead of a numbered list. Curly braces hold the pairs, each key is a name in quotes, and each value is whatever data lives under that name. Pulling out one field is just <code>response["name"]</code>, which returns <code>"Brooklyn"</code>, or <code>response["main"]["temp"]</code>, which returns <code>71.6</code>. This works every time here because the API always includes these exact keys.</p>
-<p>To avoid calling the API again every time someone re-checks a city, the tool keeps its own smaller dict of temperatures it has already fetched:</p>
-<div class="mlrk-code"><pre>cached_temps = {
+<p>Once Python reads that response, it is a <strong>dictionary</strong>. A dictionary stores data as <strong>key</strong> and <strong>value</strong> pairs instead of numbered positions. Curly braces hold the pairs. Each key is a name, and each value is the data stored under that name. <code>response["name"]</code> gives back <code>"Brooklyn"</code>, and <code>response["main"]["temp"]</code> gives back <code>71.6</code>.</p>
+<p>A small tool built on that API keeps its own dictionary of temperatures it has already fetched, so it never asks for the same city twice in one session:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">cached_temps = {
     "Brooklyn": 71.6,
     "Queens": 68.2,
-    "Bronx": 69.5
+    "Bronx": 69.5,
 }</pre></div>
 
-<svg class="mlrk-illustration" viewBox="0 0 720 470" role="img" aria-labelledby="dictDiagTitle dictDiagDesc" xmlns="http://www.w3.org/2000/svg">
-  <title id="dictDiagTitle">cached_temps as three key/value pairs, plus one key that isn't there</title>
-  <desc id="dictDiagDesc">cached_temps holds three keys, each connected by a line to its own value: Brooklyn to 71.6, Queens to 68.2, and Bronx to 69.5. Below them, a fourth attempted key, Manhattan, sits in a dashed red box with no line reaching any value, because that key was never added to the dict. Text beneath explains that this missing connection is exactly where Python raises a KeyError.</desc>
+<svg class="mlrk-illustration" viewBox="0 0 760 470" role="img" aria-labelledby="dictDiagTitle dictDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="dictDiagTitle">cached_temps as three key and value pairs, plus one key that is not there</title>
+  <desc id="dictDiagDesc">cached_temps holds three keys, each connected by a line to its own value: Brooklyn to 71.6, Queens to 68.2, and Bronx to 69.5. Underneath them, a fourth key, Manhattan, sits in a dashed red box with no line reaching any value, because that key was never added to the dictionary. Text at the bottom explains that this missing connection is where Python raises a KeyError.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <text x="360" y="26" text-anchor="middle" font-size="18" font-weight="700" fill="#261F1D">cached_temps holds three keys, each mapped to one value</text>
-    <text x="145" y="54" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">Keys (already cached)</text>
-    <text x="560" y="54" text-anchor="middle" font-size="16" font-weight="700" fill="#261F1D">Values</text>
+    <text x="380" y="28" text-anchor="middle" font-size="19" font-weight="700" fill="#261F1D">cached_temps holds three keys, each mapped to one value</text>
+    <text x="150" y="58" text-anchor="middle" font-size="17" font-weight="700" fill="#261F1D">Keys (already cached)</text>
+    <text x="590" y="58" text-anchor="middle" font-size="17" font-weight="700" fill="#261F1D">Values</text>
 
-    <rect x="40" y="68" width="210" height="52" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
-    <text x="145" y="101" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">"Brooklyn"</text>
-    <rect x="440" y="68" width="240" height="52" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
-    <text x="560" y="101" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">71.6</text>
-    <line x1="250" y1="94" x2="440" y2="94" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="40" y="72" width="220" height="54" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="150" y="106" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">"Brooklyn"</text>
+    <rect x="470" y="72" width="240" height="54" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="590" y="106" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">71.6</text>
+    <line x1="260" y1="99" x2="470" y2="99" stroke="#B3BBB0" stroke-width="2"/>
 
-    <rect x="40" y="132" width="210" height="52" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
-    <text x="145" y="165" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">"Queens"</text>
-    <rect x="440" y="132" width="240" height="52" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
-    <text x="560" y="165" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">68.2</text>
-    <line x1="250" y1="158" x2="440" y2="158" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="40" y="138" width="220" height="54" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="150" y="172" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">"Queens"</text>
+    <rect x="470" y="138" width="240" height="54" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="590" y="172" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">68.2</text>
+    <line x1="260" y1="165" x2="470" y2="165" stroke="#B3BBB0" stroke-width="2"/>
 
-    <rect x="40" y="196" width="210" height="52" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
-    <text x="145" y="229" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">"Bronx"</text>
-    <rect x="440" y="196" width="240" height="52" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
-    <text x="560" y="229" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" fill="#261F1D">69.5</text>
-    <line x1="250" y1="222" x2="440" y2="222" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="40" y="204" width="220" height="54" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="150" y="238" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">"Bronx"</text>
+    <rect x="470" y="204" width="240" height="54" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="590" y="238" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">69.5</text>
+    <line x1="260" y1="231" x2="470" y2="231" stroke="#B3BBB0" stroke-width="2"/>
 
-    <rect x="40" y="290" width="210" height="58" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5" stroke-dasharray="7,5"/>
-    <text x="145" y="325" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" font-weight="700" fill="#B72525">"Manhattan"</text>
-    <line x1="250" y1="319" x2="330" y2="319" stroke="#C92929" stroke-width="2" stroke-dasharray="4,4"/>
-    <line x1="335" y1="309" x2="355" y2="329" stroke="#C92929" stroke-width="2.5"/>
-    <line x1="355" y1="309" x2="335" y2="329" stroke="#C92929" stroke-width="2.5"/>
-    <text x="560" y="325" text-anchor="middle" font-size="16" font-weight="700" fill="#C92929">no matching value</text>
+    <rect x="40" y="298" width="220" height="60" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5" stroke-dasharray="7,5"/>
+    <text x="150" y="335" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" font-weight="700" fill="#B72525">"Manhattan"</text>
+    <line x1="260" y1="328" x2="340" y2="328" stroke="#C92929" stroke-width="2" stroke-dasharray="4,4"/>
+    <line x1="347" y1="316" x2="371" y2="340" stroke="#C92929" stroke-width="3"/>
+    <line x1="371" y1="316" x2="347" y2="340" stroke="#C92929" stroke-width="3"/>
+    <text x="590" y="335" text-anchor="middle" font-size="17" font-weight="700" fill="#C92929">no matching value</text>
 
-    <text x="360" y="388" text-anchor="middle" font-size="16" fill="#C92929" font-weight="700">cached_temps["Manhattan"] has no value to find here —</text>
-    <text x="360" y="414" text-anchor="middle" font-size="16" fill="#C92929" font-weight="700">this is exactly where Python raises a KeyError</text>
-    <text x="360" y="440" text-anchor="middle" font-size="16" fill="#C92929" font-weight="700">and stops the program.</text>
+    <text x="380" y="400" text-anchor="middle" font-size="17" fill="#C92929" font-weight="700">cached_temps["Manhattan"] has no value to find here.</text>
+    <text x="380" y="428" text-anchor="middle" font-size="17" fill="#C92929" font-weight="700">This is where Python raises a KeyError</text>
+    <text x="380" y="456" text-anchor="middle" font-size="17" fill="#C92929" font-weight="700">and stops the program.</text>
   </g>
 </svg>
 
-<p>That's the crash, exactly. Someone types "Manhattan," the code runs <code>cached_temps["Manhattan"]</code>, and because <code>"Manhattan"</code> was never added as a key, Python raises an error right there:</p>
-<div class="mlrk-code"><pre>&gt;&gt;&gt; cached_temps["Manhattan"]
-Traceback (most recent call last):
+<p>Someone typed "Manhattan," the tool ran <code>cached_temps["Manhattan"]</code>, and Python stopped there:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">Traceback (most recent call last):
   File "weather_app.py", line 12, in &lt;module&gt;
 KeyError: 'Manhattan'</pre></div>
-<p>Nothing after that line runs — not a friendly "sorry, no data for that city" message, nothing. Square-bracket lookup is fine when you're sure the key is there; the problem is trusting it when you're not.</p>
+<p>Nothing after that line ran. No temperature, and no "sorry, no data for that city" message either. The rest of this reading is the set of dictionary moves that tool needs: reading a value when the key might be missing, adding and removing cities as people search, looping over everything cached so far, and storing a whole list of cities at once.</p>
 </section>
 
 <section class="mlrk-section">
 <h2>2. Technical vocabulary</h2>
-<p>Flip each card before the practice below.</p>
+<p>Flip each card. These six terms are the ones the rest of the reading uses.</p>
 <div class="mlrk-grid">
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>dict</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Dictionary (dict)</strong><br>Python's built-in way to store data as key/value pairs instead of a numbered sequence. Written with curly braces: <code>{"key": value, "key2": value2}</code>.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>key</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Key</strong><br>The name used to look up one specific piece of data inside a dict, like <code>"Brooklyn"</code> in <code>cached_temps</code>. Keys have to be unique within one dict.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>value</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Value</strong><br>The actual data stored under a key, like <code>71.6</code>, the temperature stored under the key <code>"Brooklyn"</code>.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>KeyError</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>KeyError</strong><br>The error Python raises the instant square brackets look up a key that doesn't exist, e.g. <code>cached_temps["Manhattan"]</code>. It stops the program immediately — nothing after that line runs.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>.get()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>.get(key, default)</strong><br>Looks up a key the safe way. If the key exists, it returns the value, same as square brackets would. If the key doesn't exist, it returns the default you provide instead of crashing.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Dictionaries</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Dictionaries</strong><br>Dictionaries store several pieces of data as key-value pairs, which makes them a good fit for one real-world thing such as a user or a city. A <strong>key</strong> is the name a value is stored under and looked up by, and each key appears only once in a dictionary. A <strong>value</strong> is the data stored under a key, and it can be any type, including a list or another dictionary.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>bracket notation</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>bracket notation</strong><br>Dictionary values are read with bracket notation, <code>my_dict["key"]</code>, which raises a <code>KeyError</code> for a missing key. The <code>.get()</code> method asks the same question without the crash: it gives back <code>None</code>, or a default you choose, when the key is not there.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>mutable</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>mutable</strong><br>Dictionaries are mutable. You can add, change, or delete key-value pairs after the dictionary already exists, using assignment, <code>del</code>, or <code>.pop()</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>nested data</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>nested data</strong><br>A dictionary can hold nested data, which means lists and other dictionaries sitting inside it as values. Stacked brackets reach in one layer at a time, so <code>user["favorite_meal"]["name"]</code> reads a key of a dictionary that is itself a value.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>reference</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>reference</strong><br>Like a list, a dictionary is held by reference. A variable holds a reference to the dictionary rather than the dictionary itself, so two names can refer to one dictionary. Copy it with <code>dict(my_dict)</code> before changing it inside a pure function.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>.keys()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>.keys()</strong><br><code>.keys()</code> gives every key, <code>.values()</code> gives every value, and <code>.items()</code> gives each key and its value together. <code>.keys()</code> hands back a <code>dict_keys</code> object, which a <code>for</code> loop can walk and <code>in</code> can search, but brackets cannot index. Wrap it in <code>list()</code> when you need a real list.</span></button>
 </div>
 </section>
 
 <section class="mlrk-section">
-<h2>3. Writing a safe lookup</h2>
-<p>Compare the two ways of reading the exact same dict:</p>
-<div class="mlrk-grid">
-<div class="mlrk-card">
-<p><strong>Square brackets — crashes on a missing key</strong></p>
-<div class="mlrk-code"><pre>cached_temps = {
+<h2>3. Reading a value when the key might be missing</h2>
+<p>Bracket notation is the direct way to read a value, and it is the right choice whenever the key is guaranteed to be there. Every OpenWeatherMap response carries a <code>"name"</code> key, so <code>response["name"]</code> is safe. A city someone just typed is a different story. Here are both lookups on the same dictionary:</p>
+<div class="dt-compare">
+<div>
+<p class="dt-compare-label"><strong>Brackets, on a key that is missing</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">cached_temps = {
     "Brooklyn": 71.6,
-    "Queens": 68.2
+    "Queens": 68.2,
+    "Bronx": 69.5,
 }
-temp = cached_temps["Manhattan"]
-print(temp)</pre></div>
-<p class="mlrk-small">Line 4 raises <code>KeyError: 'Manhattan'</code> the moment it runs. <code>print(temp)</code> never executes at all.</p>
+
+print(cached_temps["Manhattan"])
+print("still running")</pre></div>
+<p class="dt-compare-label">It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">KeyError: 'Manhattan'</pre></div>
 </div>
-<div class="mlrk-card">
-<p><strong>.get() — falls back instead of crashing</strong></p>
-<div class="mlrk-code"><pre>cached_temps = {
+<div>
+<p class="dt-compare-label"><strong><code>.get()</code>, on the same dictionary</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">cached_temps = {
     "Brooklyn": 71.6,
-    "Queens": 68.2
+    "Queens": 68.2,
+    "Bronx": 69.5,
 }
-temp = cached_temps.get("Manhattan", 0)
-print(temp)</pre></div>
-<p class="mlrk-small">Line 4 returns <code>0</code> — the default supplied as the second argument — because <code>"Manhattan"</code> isn't a key. The program keeps going and prints <code>0</code>.</p>
+
+print(cached_temps.get("Manhattan"))
+print(cached_temps.get("Manhattan", 0))
+print(cached_temps.get("Brooklyn"))</pre></div>
+<p class="dt-compare-label">It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">None
+0
+71.6</pre></div>
 </div>
+</div>
+<p>The bracket version never reached <code>print("still running")</code>. A <code>KeyError</code> ends the program on the spot. The <code>.get()</code> version ran all three lines. Called with one argument, <code>.get()</code> gives back <code>None</code> for a key it cannot find. Called with two, it gives back the second argument instead, which is why the middle line printed <code>0</code>. On a key that is there, <code>.get()</code> behaves exactly like brackets and hands over the value.</p>
+<p>There is a third option when you want to decide for yourself. The <code>in</code> operator on a dictionary searches the keys, so <code>"Brooklyn" in cached_temps</code> is <code>True</code> and <code>"Manhattan" in cached_temps</code> is <code>False</code>. Use it when a missing key needs its own branch of code rather than a fallback value.</p>
+
+<div class="mlrk-card">
+<p><strong><code>cached_temps</code> holds the keys <code>"Brooklyn"</code>, <code>"Queens"</code>, and <code>"Bronx"</code>.</strong> <strong>Which statement about <code>"Manhattan"</code> is true?</strong></p>
+<div id="dt-predict1">
+  <button type="button" class="mlrk-choice" data-a="crash-get0"><code>cached_temps["Manhattan"]</code> raises a <code>KeyError</code>, and <code>cached_temps.get("Manhattan", 0)</code> gives back <code>0</code>.</button>
+  <button type="button" class="mlrk-choice" data-a="both-none"><code>cached_temps["Manhattan"]</code> gives back <code>None</code>, and so does <code>cached_temps.get("Manhattan", 0)</code>.</button>
+  <button type="button" class="mlrk-choice" data-a="both-crash">Both <code>cached_temps["Manhattan"]</code> and <code>cached_temps.get("Manhattan", 0)</code> raise a <code>KeyError</code>.</button>
+  <button type="button" class="mlrk-choice" data-a="both-zero">Both <code>cached_temps["Manhattan"]</code> and <code>cached_temps.get("Manhattan", 0)</code> give back <code>0</code>.</button>
+</div>
+<div id="dt-predict1fb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 
-<div class="mlrk-card" style="margin-top:1rem">
-<p><strong>Predict:</strong> given <code>cached_temps = {"Brooklyn": 71.6, "Queens": 68.2, "Bronx": 69.5}</code>, which statement is true?</p>
-<div id="dict-predict1">
-  <button type="button" class="mlrk-choice" data-a="crash-get0">cached_temps["Manhattan"] crashes with a KeyError; cached_temps.get("Manhattan", 0) returns 0 instead.</button>
-  <button type="button" class="mlrk-choice" data-a="both-none">cached_temps["Manhattan"] returns None; cached_temps.get("Manhattan", 0) also returns None.</button>
-  <button type="button" class="mlrk-choice" data-a="both-crash">Both cached_temps["Manhattan"] and cached_temps.get("Manhattan", 0) crash with a KeyError.</button>
-  <button type="button" class="mlrk-choice" data-a="both-zero">Both cached_temps["Manhattan"] and cached_temps.get("Manhattan", 0) return 0.</button>
-</div>
-<div id="dict-predict1fb" class="mlrk-feedback" tabindex="-1"></div>
-</div>
-
-<p style="margin-top:1.4rem">Now write one yourself. The tool needs a real lookup function — one place every part of the app can call instead of reaching into <code>cached_temps</code> directly. Complete <code>get_temp</code> so it returns the cached temperature for a city, or <code>0</code> if that city hasn't been cached yet:</p>
+<p style="margin-top:1.4rem">The tool needs one lookup function that the whole app can call, so no other part of the code reaches into <code>cached_temps</code> directly. <strong>Finish <code>get_temp</code> so it hands back the cached temperature for <code>city</code>, or <code>0</code> when that city was never cached.</strong></p>
 <div class="mlrk-card">
-<p><strong>Fill in the blank</strong> so the function returns the cached temperature, or <code>0</code> as a default:</p>
-<div class="mlrk-code"><pre>def get_temp(city):
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">def get_temp(city):
     ____________</pre></div>
-<div class="mlrk-fillblank"><input type="text" id="dict-gettemp-input" autocomplete="off" placeholder='e.g. return cached_temps.get(city, 0)'> <button type="button" class="mlrk-btn" id="dict-gettemp-check">Check</button></div>
-<div id="dict-gettempfb" class="mlrk-feedback" tabindex="-1"></div>
+<div class="mlrk-fillblank"><input type="text" id="dt-gettemp-input" autocomplete="off" placeholder="e.g. return cached_temps.get(city, 0)"> <button type="button" class="mlrk-btn" id="dt-gettemp-check">Check</button></div>
+<div id="dt-gettempfb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>The method that looks up a key the safe way takes two things inside its parentheses: the key you're looking for (here, the <code>city</code> parameter), and the fallback value to use if that key isn't there. Don't forget <code>return</code> — the value still needs to be handed back out of the function.</p>
+<p>The safe-lookup method takes two things inside its parentheses: the key to look for, which is the <code>city</code> parameter, and the fallback to use when that key is missing. Start the line with <code>return</code> so the value leaves the function.</p>
 </details>
 </section>
 
 <section class="mlrk-section">
-<h2>4. Watch: dict.get() with a default, in under five minutes</h2>
-<div class="mlrk-video-wrap"><div id="dict-video"></div></div>
-<a class="mlrk-video-link" href="https://www.youtube.com/watch?v=09Y-UX7xgZI" target="_blank" rel="noopener">Watch on YouTube</a>
-<p>Watch for the exact pattern from section 3 above: reaching into a dict with square brackets when a key might be missing turns into a crash, while <code>.get()</code> with a default turns the same situation into a single line of ordinary code.</p>
+<h2>4. Adding, changing, and removing pairs</h2>
+<p>A cache that can never grow is not a cache. Every time someone searches a new city, the tool has to put that city into <code>cached_temps</code>, and every so often it has to throw a stale one out. Dictionaries are <strong>mutable</strong>, which means Python can change the pairs inside a dictionary that already exists. Four moves cover all of it:</p>
+<ul>
+  <li><code>cached_temps["Manhattan"] = 70.1</code> adds the pair when <code>"Manhattan"</code> is a new key.</li>
+  <li><code>cached_temps["Queens"] = 68.9</code> replaces the value when <code>"Queens"</code> is already a key. The same line does both jobs, and which one happens depends only on whether the key is already in the dictionary.</li>
+  <li><code>del cached_temps["Bronx"]</code> removes the pair. <code>del</code> is a statement rather than a method, so it has no dot and no parentheses.</li>
+  <li><code>cached_temps.pop("Brooklyn")</code> removes the pair and hands back the value it removed, which is useful when you want to use that value one last time.</li>
+</ul>
+<p>The key inside the brackets is an expression, so it does not have to be typed out as a literal string. A variable works just as well, and that is what makes a search box possible: the tool never knows the city name while the code is being written.</p>
+<div class="dt-compare">
+<div>
+<p class="dt-compare-label"><strong>A key typed as a literal</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">cached_temps["Manhattan"] = 70.1</pre></div>
+</div>
+<div>
+<p class="dt-compare-label"><strong>A key held in a variable</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">city = input("Which city? ")
+cached_temps[city] = 70.1</pre></div>
+</div>
+</div>
+<p>Both lines add one pair. In the variable version, Python works out what <code>city</code> holds first, then uses that string as the key. Typing <code>Manhattan</code> at the prompt gives the two lines the same result.</p>
+<p>Here are all four moves in a row, starting from the three cached cities:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">cached_temps = {"Brooklyn": 71.6, "Queens": 68.2, "Bronx": 69.5}
+
+city = "Manhattan"
+cached_temps[city] = 70.1
+cached_temps["Queens"] = 68.9
+del cached_temps["Bronx"]
+dropped = cached_temps.pop("Brooklyn")</pre></div>
+<p><strong>Predict what <code>cached_temps</code> holds after each line before you click.</strong> Each click runs the next line and adds the result to the panel.</p>
+<div class="mlrk-card"><div id="dt-mutate-trace"></div></div>
 </section>
 
 <section class="mlrk-section">
-<h2>5. One more check: reading the dict correctly</h2>
+<h2>5. Two names, one dictionary</h2>
+<p>The tool outgrew a plain number per city. Each saved city is now its own dictionary, with a list of active weather alerts inside it. A dictionary holding lists and other dictionaries is called <strong>nested data</strong>:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">brooklyn = {
+    "name": "Brooklyn",
+    "temp": 71.6,
+    "alerts": ["heat advisory"],
+}</pre></div>
+<p>A variable does not hold a dictionary. It holds a <strong>reference</strong> to one, exactly as it does with a list. Assigning that variable to a second name gives one dictionary two names, and a change made through either name shows through both:</p>
+<div class="dt-compare">
+<div>
+<p class="dt-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">saved = brooklyn
+saved["temp"] = 80.4
+
+print(brooklyn["temp"])
+print(brooklyn is saved)</pre></div>
+</div>
+<div>
+<p class="dt-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">80.4
+True</pre></div>
+</div>
+</div>
+<p><code>saved = brooklyn</code> builds no second dictionary. It gives the one dictionary another name, and <code>brooklyn is saved</code> reports <code>True</code> because both names refer to the same object. To get a real second dictionary, copy it. <code>dict(brooklyn)</code>, <code>brooklyn.copy()</code>, and <code>{**brooklyn}</code> all do the same job, and you will see all three in other people's code.</p>
+
+<h3>The copy that was not a copy</h3>
+<p>The tool has a function that is supposed to be pure: hand it a city and an alert, and it hands back a new city dictionary carrying that alert, leaving the original alone. It copies first, which looks like exactly the right move:</p>
+<div class="dt-compare">
+<div>
+<p class="dt-compare-label"><strong><code>with_alert</code>, copying the dictionary</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">def with_alert(city, alert):
+    clone = dict(city)
+    clone["alerts"].append(alert)
+    return clone
+
+updated = with_alert(brooklyn, "flood watch")
+
+print(brooklyn["alerts"])
+print(updated["alerts"])</pre></div>
+</div>
+<div>
+<p class="dt-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">['heat advisory', 'flood watch']
+['heat advisory', 'flood watch']</pre></div>
+</div>
+</div>
+<p>The original picked up the flood watch too. Here is the rule that explains it. <code>dict()</code>, <code>.copy()</code>, and <code>{**city}</code> each build a new outer dictionary and then store the <em>same</em> values in it. A string or a number is immutable, so sharing one is harmless. A list is mutable, and the copy stores a reference to the very same list the original holds. <code>clone["alerts"]</code> and <code>brooklyn["alerts"]</code> are two routes to one list, so <code>.append()</code> through either route adds to it once and both routes see it.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 900 390" role="img" aria-labelledby="copyDiagTitle copyDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="copyDiagTitle">dict(brooklyn) builds a second outer dictionary that still shares one inner list</title>
+  <desc id="copyDiagDesc">The name brooklyn has an arrow to its own dictionary box holding name, temp, and alerts. The name clone has an arrow to a separate dictionary box holding the same three keys. The alerts key in each of the two dictionary boxes has an arrow running to one single red list box holding heat advisory. The caption reads: two dictionaries, one shared list, so appending through either name changes both.</desc>
+  <defs>
+    <marker id="dtArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#261F1D"/>
+    </marker>
+  </defs>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="450" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#261F1D">clone = dict(brooklyn)</text>
+
+    <rect x="16" y="78" width="120" height="52" rx="10" fill="#FFFCF7" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="76" y="111" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">brooklyn</text>
+    <rect x="16" y="246" width="120" height="52" rx="10" fill="#FFFCF7" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="76" y="279" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">clone</text>
+
+    <rect x="186" y="60" width="300" height="118" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="206" y="90" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">"name": "Brooklyn"</text>
+    <text x="206" y="120" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">"temp": 71.6</text>
+    <text x="206" y="150" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">"alerts":</text>
+
+    <rect x="186" y="228" width="300" height="118" rx="12" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="206" y="258" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">"name": "Brooklyn"</text>
+    <text x="206" y="288" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">"temp": 71.6</text>
+    <text x="206" y="318" font-family="Menlo, Consolas, monospace" font-size="17" fill="#261F1D">"alerts":</text>
+
+    <rect x="620" y="174" width="264" height="58" rx="12" fill="#F7DFDF" stroke="#C92929" stroke-width="3"/>
+    <text x="752" y="211" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" font-weight="700" fill="#B72525">['heat advisory']</text>
+
+    <line x1="142" y1="104" x2="178" y2="104" stroke="#261F1D" stroke-width="2.5" marker-end="url(#dtArrow)"/>
+    <line x1="142" y1="272" x2="178" y2="272" stroke="#261F1D" stroke-width="2.5" marker-end="url(#dtArrow)"/>
+    <line x1="492" y1="145" x2="612" y2="193" stroke="#C92929" stroke-width="3" marker-end="url(#dtArrow)"/>
+    <line x1="492" y1="313" x2="612" y2="221" stroke="#C92929" stroke-width="3" marker-end="url(#dtArrow)"/>
+
+    <text x="450" y="378" text-anchor="middle" font-size="17" fill="#261F1D">Two dictionaries, one shared list. Appending through either name changes both.</text>
+  </g>
+</svg>
+
+<p>The fix is to copy the inner list as well, before anything appends to it. Both versions of <code>with_alert</code> are here so the one changed line is easy to find:</p>
+<div class="dt-compare">
+<div>
+<p class="dt-compare-label"><strong>Impure</strong><br>copies the dictionary only</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">def with_alert(city, alert):
+    clone = dict(city)
+    clone["alerts"].append(alert)
+    return clone</pre></div>
+</div>
+<div>
+<p class="dt-compare-label"><strong>Pure</strong><br>copies the nested list too</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">def with_alert(city, alert):
+    clone = dict(city)
+    clone["alerts"] = list(city["alerts"])
+    clone["alerts"].append(alert)
+    return clone</pre></div>
+</div>
+</div>
+<p>With the extra line, the pure version printed <code>['heat advisory']</code> for <code>brooklyn</code> and <code>['heat advisory', 'flood watch']</code> for <code>updated</code>. This trap is worth remembering because of how quietly it fails. A function that copies first looks pure, passes a quick read, and still edits data somewhere else in the program.</p>
+
 <div class="mlrk-card">
-<p>Given this code:</p>
-<div class="mlrk-code"><pre>cached_temps = {"Brooklyn": 71.6, "Queens": 68.2}
-print(cached_temps.get("Bronx"))
-print(cached_temps.get("Bronx", 0))
-print(cached_temps["Brooklyn"])</pre></div>
-<p>Select every statement below that's actually true about what happens when this code runs:</p>
-<div class="dict-checklist">
-<label class="mlrk-selectall-option"><input type="checkbox" class="dict-read-box" value="a"> <span><code>cached_temps.get("Bronx")</code> prints <code>None</code>, because no default was given and "Bronx" isn't a key.</span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="dict-read-box" value="b"> <span><code>cached_temps.get("Bronx", 0)</code> prints <code>0</code>, the default supplied since "Bronx" isn't a key.</span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="dict-read-box" value="c"> <span><code>cached_temps["Brooklyn"]</code> prints <code>71.6</code>, because "Brooklyn" is an existing key.</span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="dict-read-box" value="d"> <span><code>cached_temps.get("Bronx")</code> raises a KeyError, exactly like <code>cached_temps["Bronx"]</code> would.</span></label>
+<p><strong>A teammate copies a city dictionary and changes a value that is a plain number.</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">brooklyn = {"name": "Brooklyn", "temp": 71.6, "alerts": ["heat advisory"]}
+clone = dict(brooklyn)
+clone["temp"] = 90.0
+
+print(brooklyn["temp"])</pre></div>
+<p><strong>What does <code>print(brooklyn["temp"])</code> show?</strong></p>
+<div id="dt-copy-choices">
+  <button type="button" class="mlrk-choice" data-a="orig"><code>71.6</code></button>
+  <button type="button" class="mlrk-choice" data-a="new"><code>90.0</code></button>
+  <button type="button" class="mlrk-choice" data-a="none"><code>None</code></button>
+  <button type="button" class="mlrk-choice" data-a="error">Nothing. It raises a <code>KeyError</code>.</button>
 </div>
-<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="dict-read-check">Check my answers</button></div>
-<div id="dict-readfb" class="mlrk-feedback" tabindex="-1"></div>
+<div id="dt-copyfb2" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p><code>dict(brooklyn)</code> builds a real second outer dictionary. Assigning to <code>clone["temp"]</code> changes a pair in that outer dictionary. Ask yourself whether the shared-list problem applies to a line that never touches <code>"alerts"</code>.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Looping over a dictionary</h2>
+<p>The tool shows a panel listing every city it has cached, which means walking the whole dictionary rather than asking for one key. A <code>for</code> loop over a dictionary visits the <strong>keys</strong>, one per pass:</p>
+<div class="dt-compare">
+<div>
+<p class="dt-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">cached_temps = {"Brooklyn": 71.6,
+                "Queens": 68.2,
+                "Bronx": 69.5}
+
+for city in cached_temps:
+    print(city)</pre></div>
+</div>
+<div>
+<p class="dt-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">Brooklyn
+Queens
+Bronx</pre></div>
+</div>
+</div>
+<p>Three methods give you exactly the part you want. <code>.keys()</code> gives every key, <code>.values()</code> gives every value, and <code>.items()</code> gives each key and its value together. <code>.items()</code> is the one you will reach for most, because the <code>for</code> line can unpack the pair into two names at once:</p>
+<div class="dt-compare">
+<div>
+<p class="dt-compare-label"><strong>Values only</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">for temp in cached_temps.values():
+    print(temp)</pre></div>
+<p class="dt-compare-label">It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">71.6
+68.2
+69.5</pre></div>
+</div>
+<div>
+<p class="dt-compare-label"><strong>Both halves, unpacked</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">for city, temp in cached_temps.items():
+    print(f"{city} is {temp} degrees")</pre></div>
+<p class="dt-compare-label">It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">Brooklyn is 71.6 degrees
+Queens is 68.2 degrees
+Bronx is 69.5 degrees</pre></div>
+</div>
+</div>
+<p>Each pass of <code>.items()</code> produces one key and one value, and <code>for city, temp</code> puts them into two separate names. That is the same unpacking <code>enumerate()</code> uses for a list.</p>
+<p>One thing surprises people about <code>.keys()</code>. It does not give back a list:</p>
+<div class="dt-compare">
+<div>
+<p class="dt-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">print(cached_temps.keys())
+print(len(cached_temps))
+print(list(cached_temps.keys())[0])</pre></div>
+</div>
+<div>
+<p class="dt-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">dict_keys(['Brooklyn', 'Queens', 'Bronx'])
+3
+Brooklyn</pre></div>
+</div>
+</div>
+<p><code>.keys()</code> gives back a <code>dict_keys</code> object. A <code>for</code> loop can walk it and <code>in</code> can search it, and that covers almost everything anyone does with keys. Brackets cannot index it, so <code>cached_temps.keys()[0]</code> raises a <code>TypeError</code>. Wrapping it in <code>list()</code> builds a real list, which is what makes the third line work. <code>len()</code> on the dictionary itself counts the pairs, so no method call is needed there at all.</p>
+
+<div class="mlrk-card">
+<p><strong><code>cached_temps</code> holds three pairs: Brooklyn 71.6, Queens 68.2, and Bronx 69.5.</strong> <strong>Check every statement that is true.</strong></p>
+<div style="margin-top:.6rem">
+<label class="mlrk-selectall-option"><input type="checkbox" class="dt-loop-box" value="a"> <span><code>for city in cached_temps:</code> gives <code>city</code> one key on each pass.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="dt-loop-box" value="b"> <span><code>cached_temps.keys()[0]</code> gives back <code>"Brooklyn"</code>.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="dt-loop-box" value="c"> <span><code>for city, temp in cached_temps.items():</code> fills both names on every pass.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="dt-loop-box" value="d"> <span><code>len(cached_temps)</code> gives back <code>3</code>.</span></label>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="dt-loop-submit">Check my answers</button></div>
+<div id="dt-loopfb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
-<p>A dict stores data as key/value pairs, which is exactly the shape of most real-world "look something up by name" data — a JSON API response included. <code>dict["key"]</code> is a fine way to read one when you're certain the key exists, but the instant it doesn't, Python raises a <code>KeyError</code> and the program stops cold. <code>dict.get("key", default)</code> asks the same question more carefully: give me this value if you have it, and this fallback if you don't — no crash either way.</p>
-<label for="dict-reflect"><strong>In 2–3 sentences:</strong> think of a real place in an app (a weather tool, a contacts list, a grade lookup, anything) where the data being searched for might not exist yet. Where would <code>.get()</code> with a default be the safer choice than square brackets?</label>
-<textarea id="dict-reflect" class="mlrk-response" data-save></textarea>
+<h2>7. Many cities, one list</h2>
+<p>A city is more than a temperature now, and the tool has to hold several of them at once. The shape that does this is a list where every element is a dictionary with the same keys. It is how a program holds many of the same kind of thing:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">saved_cities = [
+    {"name": "Brooklyn", "temp": 71.6, "starred": True},
+    {"name": "Queens", "temp": 68.2, "starred": False},
+    {"name": "Bronx", "temp": 69.5, "starred": False},
+]</pre></div>
+<p>The list keeps the cities in order, and each dictionary keeps one city's fields labelled. Looping over the list hands you one whole dictionary per pass, and bracket notation reads a key off it:</p>
+<div class="dt-compare">
+<div>
+<p class="dt-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">for city in saved_cities:
+    print(f"{city['name']}: {city['temp']}")
+
+print(saved_cities[1]["name"])</pre></div>
+</div>
+<div>
+<p class="dt-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">Brooklyn: 71.6
+Queens: 68.2
+Bronx: 69.5
+Queens</pre></div>
+</div>
+</div>
+<p><code>saved_cities[1]["name"]</code> reads as "element 1 of the list, then the <code>"name"</code> key of that dictionary". The index picks which thing, and the key picks which field of it. Note the single quotes inside the f-string: the f-string itself is wrapped in double quotes, so the key inside it uses the other kind.</p>
+<p>Growing the list uses the same list method as any other list, with a whole dictionary as the value:</p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">saved_cities.append({"name": "Manhattan", "temp": 70.1, "starred": False})</pre></div>
+<p>After that line <code>saved_cities</code> holds four dictionaries, and the <code>for</code> loop prints four lines without a single change.</p>
+
+<div class="mlrk-card">
+<p><strong>A new city dictionary is already built and stored in <code>new_city</code>. Write the one line that adds it to the end of <code>saved_cities</code>.</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen dt-out">new_city = {"name": "Staten Island", "temp": 67.3, "starred": False}
+
+____________
+
+print(len(saved_cities))   # 4</pre></div>
+<div class="mlrk-fillblank"><input type="text" id="dt-append-input" autocomplete="off" placeholder="type the missing line"> <button type="button" class="mlrk-btn" id="dt-append-check">Check</button></div>
+<div id="dt-appendfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p><code>saved_cities</code> is an ordinary list, so the ordinary list method for adding to the end is the right one. The value you pass it happens to be a dictionary, and the method does not care what type the value is.</p>
+</details>
 </section>
 
 <section class="mlrk-section">
-<h2>7. Go further (optional)</h2>
+<h2>8. Summary and reflection</h2>
+<p>A dictionary stores data as key-value pairs, which is the shape of most "look something up by name" data, a JSON response included. Brackets read a value and are the right choice when the key is guaranteed to exist. <code>.get()</code> is the choice when it might not, because it gives back <code>None</code> or a default you pick instead of raising a <code>KeyError</code>. Dictionaries are mutable, so assignment adds or replaces a pair, and <code>del</code> or <code>.pop()</code> removes one, with the key written as a literal or held in a variable. A <code>for</code> loop visits the keys, <code>.items()</code> hands over each key and value together, and <code>.keys()</code> gives a <code>dict_keys</code> object rather than a list. A variable holds a reference to a dictionary, and <code>dict()</code> copies the outer dictionary while leaving every nested list or dictionary shared. A list of dictionaries is how a program holds many of the same kind of thing.</p>
+<label for="dt-reflect"><strong>A teammate writes <code>def star(city): clone = dict(city); clone["alerts"].append("starred"); return clone</code> and calls it on a saved city.</strong> In 2-3 sentences, say what happens to the caller's city dictionary, why it happens, and the one line you would add to make <code>star</code> pure.</label>
+<textarea id="dt-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>9. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
-  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>cached_temps</code> code from this reading and step through it line by line to watch each key/value pair get created, and see exactly where a missing key would raise a <code>KeyError</code>.</li>
-  <li><a href="https://www.youtube.com/watch?v=MZZSMaEAC2g" target="_blank" rel="noopener">Python dictionaries are easy</a> (Bro Code, ~8 min) — a second, differently-paced walkthrough of dicts, keys, values, and <code>.get()</code>, if section 1-3 above didn't fully click yet.</li>
+  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in <code>brooklyn = {"name": "Brooklyn", "alerts": ["heat advisory"]}</code>, then <code>clone = dict(brooklyn)</code>, then <code>clone["alerts"].append("flood watch")</code> and step through it. It draws both dictionaries and the single list they share, live.</li>
+  <li><a href="https://www.youtube.com/watch?v=MZZSMaEAC2g" target="_blank" rel="noopener">Python dictionaries are easy</a> (Bro Code, about 8 minutes) — a second, differently paced walkthrough of keys, values, <code>.get()</code>, and looping, if any part of this reading has not clicked yet.</li>
 </ul>
 </section>
 
 <section class="mlrk-section">
-<div id="dict-scorechip" class="mlrk-score-chip"></div>
+<div id="dt-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
 <div class="mlrk-actions">
-<button type="button" class="mlrk-btn mlrk-btn-primary" id="dict-copy">Copy Plain Text Answers</button>
-<button type="button" class="mlrk-btn" id="dict-download">Download as .txt</button>
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="dt-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="dt-download">Download as .txt</button>
 </div>
-<p id="dict-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+<p id="dt-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
 
@@ -229,21 +496,23 @@ print(cached_temps["Brooklyn"])</pre></div>
 
   K.quiz({
     id: "act-predict1",
-    buttonSelector: "#dict-predict1 .mlrk-choice",
-    feedbackSelector: "#dict-predict1fb",
+    buttonSelector: "#dt-predict1 .mlrk-choice",
+    feedbackSelector: "#dt-predict1fb",
     correct: "crash-get0",
+    answerLabel: "<code>cached_temps[\"Manhattan\"]</code> raises a <code>KeyError</code>, and <code>cached_temps.get(\"Manhattan\", 0)</code> gives back <code>0</code>",
     feedback: {
-      "crash-get0": "Right — square brackets crash on a missing key with a KeyError; .get() catches that same missing key and hands back the default, 0, instead.",
-      "both-none": "Square brackets don't quietly return None on a missing key — they raise a KeyError and stop the program. Only .get() (with no default given) falls back to None.",
-      "both-crash": ".get() is specifically built to never raise a KeyError on its own — that's the entire reason it exists. Only the square-bracket version crashes here.",
-      "both-zero": "Square brackets don't fall back to anything — a missing key there raises a KeyError immediately, so line 4 never finishes running."
+      "crash-get0": "Brackets have no fallback, so a missing key raises a <code>KeyError</code> and the program stops. <code>.get()</code> finds the same key missing and hands back its second argument, <code>0</code>.",
+      "both-none": "<code>None</code> is what <code>.get()</code> gives back when no default is passed. Brackets give back nothing at all for a missing key: they raise a <code>KeyError</code> and end the program on that line.",
+      "both-crash": "<code>.get()</code> exists so that a missing key has an answer instead of an error, so it never raises a <code>KeyError</code> of its own. The bracket lookup is the one that crashes here.",
+      "both-zero": "<code>0</code> is the default handed to <code>.get()</code>, and only <code>.get()</code> uses it. Brackets have no default to fall back on, so that lookup raises a <code>KeyError</code> instead."
     }
   });
 
   function normalizeExpr(s){ return s.trim().toLowerCase().replace(/\s+/g,""); }
-  const gettempBtn = document.getElementById("dict-gettemp-check");
-  const gettempInput = document.getElementById("dict-gettemp-input");
-  const gettempFb = document.getElementById("dict-gettempfb");
+
+  const gettempBtn = document.getElementById("dt-gettemp-check");
+  const gettempInput = document.getElementById("dt-gettemp-input");
+  const gettempFb = document.getElementById("dt-gettempfb");
   K.Scoring.register("act-gettemp-fillcode", 1, "quiz");
   let gettempAttempts = 0, gettempDone = false;
   gettempBtn.addEventListener("click", function(){
@@ -254,50 +523,108 @@ print(cached_temps["Brooklyn"])</pre></div>
     if(ok){
       K.Scoring.award("act-gettemp-fillcode", gettempAttempts===1?1:0.5);
       gettempFb.className = "mlrk-feedback mlrk-show mlrk-good";
-      gettempFb.innerHTML = "<strong>Correct.</strong> <code>return cached_temps.get(city, 0)</code> hands back the cached temperature, or 0 if that city was never added as a key.";
+      gettempFb.innerHTML = "<strong>Correct.</strong> <code>return cached_temps.get(city, 0)</code> hands back the cached temperature, and hands back <code>0</code> when that city is not a key yet.";
       gettempDone = true;
     } else if(gettempAttempts >= 2){
       K.Scoring.award("act-gettemp-fillcode", 0);
       gettempFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
-      gettempFb.innerHTML = "<strong>The answer is:</strong> <code>return cached_temps.get(city, 0)</code>";
+      gettempFb.innerHTML = "<strong>Here's the answer.</strong> <code>return cached_temps.get(city, 0)</code>. The first argument is the key to look for, and the second is the value to hand back when that key is missing.";
       gettempDone = true;
     } else {
       gettempFb.className = "mlrk-feedback mlrk-show mlrk-bad";
-      gettempFb.innerHTML = "<strong>Not quite.</strong> Start with the keyword that hands a value back, then call the safe-lookup method on cached_temps with the city and a default." +
+      gettempFb.innerHTML = "<strong>That line would not hand a value back to the caller, or it would crash on a city that was never cached.</strong> Start with <code>return</code>, then call the safe-lookup method on <code>cached_temps</code> with two arguments: the <code>city</code> parameter and the fallback <code>0</code>." +
         '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
     }
     gettempFb.setAttribute("tabindex","-1"); gettempFb.focus();
   });
 
-  K.video({id:"act-video", elementId:"dict-video", videoId:"09Y-UX7xgZI"});
-
-  K.selectAll({
-    id: "act-read-selectall",
-    boxSelector: ".dict-read-box",
-    submitSelector: "#dict-read-check",
-    feedbackSelector: "#dict-readfb",
-    options: [
-      {value:"a", label:'cached_temps.get("Bronx") prints None, because no default was given and "Bronx" isn\'t a key.', correct:true,
-        explain:"Right — with no default argument, .get() falls back to None automatically when the key is missing."},
-      {value:"b", label:'cached_temps.get("Bronx", 0) prints 0, the default supplied since "Bronx" isn\'t a key.', correct:true,
-        explain:"Right — the second argument to .get() is exactly what gets returned when the key doesn't exist."},
-      {value:"c", label:'cached_temps["Brooklyn"] prints 71.6, because "Brooklyn" is an existing key.', correct:true,
-        explain:"Right — square brackets work fine on a key that's actually there; they only raise a KeyError when it's missing."},
-      {value:"d", label:'cached_temps.get("Bronx") raises a KeyError, exactly like cached_temps["Bronx"] would.', correct:false,
-        hint:".get() is specifically built to never raise a KeyError on its own — that's the whole reason it exists.",
-        explain:"False — that's the entire point of .get(): it swaps the crash for a safe fallback value (None here, since no default was given)."}
+  K.traceStepper("#dt-mutate-trace", {
+    steps: [
+      {cell:'cached_temps[city] = 70.1',
+       line:'after cached_temps[city] = 70.1   (city holds "Manhattan")\n  {\'Brooklyn\': 71.6, \'Queens\': 68.2, \'Bronx\': 69.5, \'Manhattan\': 70.1}'},
+      {cell:'cached_temps["Queens"] = 68.9',
+       line:'after cached_temps["Queens"] = 68.9   (an existing key, so the value is replaced)\n  {\'Brooklyn\': 71.6, \'Queens\': 68.9, \'Bronx\': 69.5, \'Manhattan\': 70.1}'},
+      {cell:'del cached_temps["Bronx"]',
+       line:'after del cached_temps["Bronx"]\n  {\'Brooklyn\': 71.6, \'Queens\': 68.9, \'Manhattan\': 70.1}'},
+      {cell:'dropped = cached_temps.pop("Brooklyn")',
+       line:'after dropped = cached_temps.pop("Brooklyn")   (dropped now holds 71.6)\n  {\'Queens\': 68.9, \'Manhattan\': 70.1}'}
     ]
   });
 
-  K.freeResponse({id:"act-reflect", selector:"#dict-reflect", minWords:10});
+  K.quiz({
+    id: "act-copy-predict",
+    buttonSelector: "#dt-copy-choices .mlrk-choice",
+    feedbackSelector: "#dt-copyfb2",
+    correct: "orig",
+    answerLabel: "<code>71.6</code>",
+    feedback: {
+      orig: "<code>dict(brooklyn)</code> builds a real second outer dictionary, so <code>clone[\"temp\"] = 90.0</code> replaces a pair in <code>clone</code> only. The shared-list problem reaches nested lists and dictionaries, and <code>71.6</code> is a plain number sitting directly in the outer dictionary.",
+      new: "That would be the answer if <code>clone</code> and <code>brooklyn</code> named one dictionary, which is what <code>clone = brooklyn</code> does. <code>dict(brooklyn)</code> builds a separate outer dictionary instead, so assigning to <code>clone[\"temp\"]</code> leaves <code>brooklyn[\"temp\"]</code> at <code>71.6</code>.",
+      none: "<code>None</code> appears when <code>.get()</code> cannot find a key. <code>\"temp\"</code> is a key of <code>brooklyn</code>, and brackets on a key that exists hand back its value, which is <code>71.6</code>.",
+      error: "A <code>KeyError</code> needs a missing key, and <code>\"temp\"</code> is right there in <code>brooklyn</code>. The lookup succeeds and prints the value <code>brooklyn</code> still holds, <code>71.6</code>."
+    }
+  });
 
-  K.Scoring.onChange(function(){ K.Scoring.renderChip("#dict-scorechip"); });
-  K.Scoring.renderChip("#dict-scorechip");
+  K.selectAll({
+    id: "act-loop-selectall",
+    boxSelector: ".dt-loop-box",
+    submitSelector: "#dt-loop-submit",
+    feedbackSelector: "#dt-loopfb",
+    options: [
+      {value:"a", label:"for city in cached_temps: gives city one key on each pass.", correct:true,
+        explain:"A for loop over a dictionary visits the keys, so city holds \"Brooklyn\", then \"Queens\", then \"Bronx\". Reaching the value takes a second step, cached_temps[city]."},
+      {value:"b", label:'cached_temps.keys()[0] gives back "Brooklyn".', correct:false,
+        hint:"Look again at what printing cached_temps.keys() put on the screen, and what type that is.",
+        explain:"False. .keys() gives back a dict_keys object, which brackets cannot index, so that line raises a TypeError. list(cached_temps.keys())[0] is the version that gives back \"Brooklyn\"."},
+      {value:"c", label:"for city, temp in cached_temps.items(): fills both names on every pass.", correct:true,
+        explain:"Each pass of .items() produces one key and one value together, and the two names in the for line unpack them."},
+      {value:"d", label:"len(cached_temps) gives back 3.", correct:true,
+        explain:"len() on the dictionary itself counts the key-value pairs, and there are three of them."}
+    ]
+  });
 
-  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#dict-download"});
+  const appendBtn = document.getElementById("dt-append-check");
+  const appendInput = document.getElementById("dt-append-input");
+  const appendFb = document.getElementById("dt-appendfb");
+  K.Scoring.register("act-append-fillcode", 1, "quiz");
+  let appendAttempts = 0, appendDone = false;
+  appendBtn.addEventListener("click", function(){
+    if(appendDone) return;
+    appendAttempts++;
+    const val = normalizeExpr(appendInput.value);
+    const ok = /^saved_cities\.append\(new_city\)$/.test(val);
+    const usedInsert = /^saved_cities\.insert\(/.test(val);
+    if(ok){
+      K.Scoring.award("act-append-fillcode", appendAttempts===1?1:0.5);
+      appendFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      appendFb.innerHTML = "<strong>Correct.</strong> <code>saved_cities.append(new_city)</code> puts the whole dictionary at the end of the list, and <code>len(saved_cities)</code> then reports <code>4</code>.";
+      appendDone = true;
+    } else if(appendAttempts >= 2){
+      K.Scoring.award("act-append-fillcode", 0);
+      appendFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      appendFb.innerHTML = "<strong>Here's the answer.</strong> <code>saved_cities.append(new_city)</code>. A list of dictionaries grows with the same <code>append</code> any list uses, and the value handed to it is one whole dictionary.";
+      appendDone = true;
+    } else if(usedInsert){
+      appendFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      appendFb.innerHTML = "<strong><code>insert</code> puts a value at a position you choose, and this line needs it at the end.</strong> The list method that always adds to the end takes one argument, the value being added." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+      } else {
+      appendFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      appendFb.innerHTML = "<strong>That line does not add <code>new_city</code> to the end of the list.</strong> <code>saved_cities</code> is an ordinary list, so use the ordinary list method for adding to the end, and pass it <code>new_city</code> by name rather than retyping the dictionary." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    appendFb.setAttribute("tabindex","-1"); appendFb.focus();
+  });
 
-  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#dict-copy", onDone:function(ok){
-    document.getElementById("dict-copyfb").textContent = ok
+  K.freeResponse({id:"act-reflect", selector:"#dt-reflect", minWords:12});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#dt-scorechip"); });
+  K.Scoring.renderChip("#dt-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#dt-download"});
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#dt-copy", onDone:function(ok){
+    document.getElementById("dt-copyfb").textContent = ok
       ? "Copied! Paste it anywhere you're keeping your notes."
       : "Couldn't copy automatically — select the page text and copy manually.";
   }});

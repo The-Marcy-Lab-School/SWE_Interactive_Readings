@@ -351,7 +351,11 @@ def check_mod1_key_terms(path, html, text):
         want = _tokens(t["term"])
         if not want:
             continue
-        if t.get("parent"):
+        # Some chapters bold a whole phrase or a multi-step method as one
+        # "term" - lesson 1.10's key terms are prose bullets, and one bolds
+        # six method steps in a single run. A card per step would be absurd,
+        # so a long term is satisfied by being defined anywhere on the page.
+        if len(t["term"]) > 45 or t.get("parent"):
             if not (want <= _tokens(text)):
                 missing_text.append(t["term"])
         elif not any(want <= ct for ct in card_tokens):
