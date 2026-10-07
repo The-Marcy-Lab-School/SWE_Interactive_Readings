@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Receipt That Said 33 Cookies</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:860px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+/* A snippet and the lines it actually prints, side by side, so a reader never
+   has to hold one of them in their head while looking at the other. Stacks
+   below 900px, where two columns would wrap the longest print() line. */
+.io-compare{display:grid;grid-template-columns:1fr;gap:1.4rem;margin:1.1rem 0;align-items:start}
+@media(min-width:900px){.io-compare{grid-template-columns:1fr 1fr;gap:1.6rem}}
+/* A snippet whose longest line is too wide for a half-width column keeps the
+   full column instead, code first and its output underneath, so no Python
+   line ever wraps mid-statement. */
+.io-compare.io-wide{grid-template-columns:1fr}
+@media(min-width:900px){.io-compare.io-wide{grid-template-columns:1fr}}
+.io-compare-label{margin:0 0 .5rem;line-height:1.4}
+.io-compare>div{min-width:0}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The Receipt That Said 33 Cookies</h1>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~14 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. A receipt that said 33 cookies</h2>
+<p>A school runs a bake sale every Friday. Cookies come in 2-packs at $1.10 a pack, and the volunteer working the table rings up each order on a laptop with a short Python script called <code>register.py</code>. The first version had the number of packs typed straight into the file:</p>
+<div class="io-compare io-wide">
+<div>
+<p class="io-compare-label"><strong>The first <code>register.py</code></strong><br>the order is typed into the code</p>
+<div class="mlrk-code"><pre class="mlrk-screen">PACK_PRICE = 1.10
+
+def main():
+    packs = 3
+    print("Cookies:", packs * 2)
+    print("Total: $", PACK_PRICE * packs)
+
+main()</pre></div>
+</div>
+<div>
+<p class="io-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">Cookies: 6
+Total: $ 3.3000000000000003</pre></div>
+</div>
+</div>
+<p>The count is right and the receipt is not. A receipt should read <code>$3.30</code>. <code>print()</code> put a space between the dollar sign and the number because a space is what it puts between values unless you tell it otherwise. It printed all 17 digits because <code>1.10 * 3</code> is not stored as exactly 3.3 inside a computer.</p>
+<p>The <code>packs = 3</code> line was the bigger problem. A program is hard-coded when you have to edit its code to get a different result. Every single order meant stopping, opening <code>register.py</code>, changing that number, and saving the file, while people waited in line.</p>
+<p>So someone changed one line. <code>packs = 3</code> became <code>packs = input("How many 2-packs? ")</code>, and nothing else in the file changed. Here is the next order, where the volunteer typed 3:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">How many 2-packs? 3
+Cookies: 33
+Traceback (most recent call last):
+  File "register.py", line 6, in main
+    print("Total: $", PACK_PRICE * packs)
+TypeError: can't multiply sequence by non-int of type 'float'</pre></div>
+<p>Six cookies turned into 33, and then the register stopped working in front of a customer. <code>input()</code> hands back whatever was typed as a string, every time, so <code>packs</code> held the text <code>"3"</code> rather than the number 3. Multiplying a string by 2 repeats it, which is how <code>"3"</code> became <code>"33"</code>. Multiplying a string by a decimal means nothing in Python, so the next line stopped the program.</p>
+<p>Fixing that register takes three things: how Python stores and slices text, how <code>print()</code> and f-strings shape what goes out, and how <code>input()</code> and the conversion functions bring what a person typed back in as a number.</p>
+</section>
+
+<section class="mlrk-section" id="io-vocab">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card. These eleven terms are the ones the rest of the reading uses.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Strings</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Strings</strong><br>Strings are sequences of characters enclosed in quotes, single or double. Strings are immutable, meaning their characters cannot be changed directly.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>bracket notation</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>bracket notation</strong><br>Bracket notation accesses one character of a string by its index: <code>name[0]</code>. Indexes start at <code>0</code>, and a negative index counts back from the end, so <code>name[-1]</code> is the last character.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong><code>len(str)</code></strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong><code>len(str)</code></strong><br>You can check the length of a string with <code>len(str)</code>, which counts every character including spaces. You can use it on lists and dictionaries too.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>method</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>method</strong><br>A method is a function that is attached to a value. Methods are invoked using dot notation: <code>value.method()</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>String methods</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>String methods</strong><br>String methods like <code>startswith</code>, <code>endswith</code>, <code>find</code>, <code>upper</code>, <code>replace</code>, <code>strip</code>, and <code>split</code> let you search, analyze, and manipulate string data. Most of them hand back a new string, but <code>split</code> hands back a list and <code>isdigit</code> hands back a boolean.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong><code>in</code> operator</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong><code>in</code> operator</strong><br>The <code>in</code> operator checks whether one string contains another, and produces <code>True</code> or <code>False</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong><code>print()</code></strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong><code>print()</code></strong><br><code>print()</code> takes any number of values. It puts <code>sep</code> between them, a space unless you say otherwise, and <code>end</code> after them, a new line unless you say otherwise.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>f-strings</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>f-strings</strong><br>f-strings interpolate the value of any expression written inside <code>{}</code> into a string. Write an <code>f</code> before the opening quote. A format specifier after a colon, like <code>{price:.2f}</code>, controls how the value is displayed.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong><code>input()</code></strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong><code>input()</code></strong><br>The <code>input()</code> function gets input from the user. It always returns a string, so converting it to another type is your job.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Type conversion</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Type conversion</strong><br>Type conversion with <code>str()</code>, <code>int()</code>, <code>float()</code>, and <code>bool()</code> turns a value of one type into another.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>hard-coded</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>hard-coded</strong><br>A program is hard-coded if the program code must be modified in order to produce a new result.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Strings, one character at a time</h2>
+<p>The bake sale keeps a sign-in sheet as well. A second script, <code>signin.py</code>, takes a volunteer's name and writes a short tag next to each shift:</p>
+<div class="io-compare">
+<div>
+<p class="io-compare-label"><strong><code>signin.py</code></strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">name = "Jordan"
+
+print("Initial:", name[0])
+print("Tag:", name[0:3].upper())
+print("Letters:", len(name))
+print("Last letter:", name[-1])</pre></div>
+</div>
+<div>
+<p class="io-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">Initial: J
+Tag: JOR
+Letters: 6
+Last letter: n</pre></div>
+</div>
+</div>
+<p>A string is a sequence of characters between single or double quotes. Every character sits at a numbered position called an index, and the counting starts at <code>0</code>. Bracket notation reads the character at an index, so <code>name[0]</code> is the first character. Python also counts backwards from the end: <code>-1</code> is the last character and <code>-2</code> is the one before it. <code>len(name)</code> counts the characters, spaces included.</p>
+<p>Two numbers inside the brackets take a slice, which is a piece of the string. A slice runs from the start index up to but not including the end index, so <code>name[0:3]</code> gives three characters rather than four. The diagram below lays out both sets of index numbers for <code>"Jordan"</code>, plus the slice and the one position that does not exist.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 860 330" role="img" aria-labelledby="idxTitle idxDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="idxTitle">Every character of the string Jordan, with its positive index, its negative index, and the slice bounds</title>
+  <desc id="idxDesc">The six characters J, o, r, d, a, n sit in a row of boxes. Above each box is its positive index, counting 0 through 5 from the left. Below each box is its negative index, counting negative 6 through negative 1, so the last character is both index 5 and index negative 1. The first three boxes, holding J, o and r, are shaded to show the slice name bracket 0 colon 3, which stops at index 3 and does not include it. A seventh box drawn with a dashed red outline sits past the end of the string at index 6, holding a question mark, because no character exists there and asking for it raises an IndexError.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="20" y="28" font-size="19" font-weight="700" fill="#261F1D">name = "Jordan"</text>
+
+    <text x="112" y="68" text-anchor="middle" font-size="18" fill="#261F1D">0</text>
+    <text x="217" y="68" text-anchor="middle" font-size="18" fill="#261F1D">1</text>
+    <text x="322" y="68" text-anchor="middle" font-size="18" fill="#261F1D">2</text>
+    <text x="427" y="68" text-anchor="middle" font-size="18" fill="#261F1D">3</text>
+    <text x="532" y="68" text-anchor="middle" font-size="18" fill="#261F1D">4</text>
+    <text x="637" y="68" text-anchor="middle" font-size="18" fill="#261F1D">5</text>
+    <text x="742" y="68" text-anchor="middle" font-size="18" font-weight="700" fill="#B72525">6</text>
+
+    <rect x="60" y="82" width="105" height="78" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <rect x="165" y="82" width="105" height="78" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <rect x="270" y="82" width="105" height="78" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <rect x="375" y="82" width="105" height="78" rx="10" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="480" y="82" width="105" height="78" rx="10" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="585" y="82" width="105" height="78" rx="10" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2"/>
+    <rect x="690" y="82" width="105" height="78" rx="10" fill="#F7DFDF" stroke="#C92929" stroke-width="2.5" stroke-dasharray="8 6"/>
+
+    <text x="112" y="137" text-anchor="middle" font-size="34" font-weight="700" fill="#261F1D">J</text>
+    <text x="217" y="137" text-anchor="middle" font-size="34" font-weight="700" fill="#261F1D">o</text>
+    <text x="322" y="137" text-anchor="middle" font-size="34" font-weight="700" fill="#261F1D">r</text>
+    <text x="427" y="137" text-anchor="middle" font-size="34" font-weight="700" fill="#261F1D">d</text>
+    <text x="532" y="137" text-anchor="middle" font-size="34" font-weight="700" fill="#261F1D">a</text>
+    <text x="637" y="137" text-anchor="middle" font-size="34" font-weight="700" fill="#261F1D">n</text>
+    <text x="742" y="137" text-anchor="middle" font-size="34" font-weight="700" fill="#B72525">?</text>
+
+    <text x="112" y="190" text-anchor="middle" font-size="18" fill="#261F1D">-6</text>
+    <text x="217" y="190" text-anchor="middle" font-size="18" fill="#261F1D">-5</text>
+    <text x="322" y="190" text-anchor="middle" font-size="18" fill="#261F1D">-4</text>
+    <text x="427" y="190" text-anchor="middle" font-size="18" fill="#261F1D">-3</text>
+    <text x="532" y="190" text-anchor="middle" font-size="18" fill="#261F1D">-2</text>
+    <text x="637" y="190" text-anchor="middle" font-size="18" fill="#261F1D">-1</text>
+
+    <path d="M60 214 L60 226 L375 226 L375 214" fill="none" stroke="#264326" stroke-width="2.5"/>
+    <text x="20" y="262" font-size="18" fill="#261F1D">name[0:3] is "Jor". The slice stops at index 3, so index 3 is not included.</text>
+    <text x="20" y="296" font-size="18" fill="#261F1D">name[6] is a position the string does not have, so Python raises</text>
+    <text x="20" y="320" font-size="18" fill="#261F1D">IndexError: string index out of range, and the program stops.</text>
+  </g>
+</svg>
+
+<p>Later, <code>signin.py</code> was changed to ask for the name instead of holding one: <code>name = input("Volunteer name: ")</code>. A volunteer in a hurry pressed Enter without typing anything, so <code>name</code> held <code>""</code>, a string with no characters in it.</p>
+<div class="mlrk-card">
+<p><strong><code>name</code> holds <code>""</code>.</strong> <strong>What does <code>print("Initial:", name[0])</code> do?</strong></p>
+<div id="io-idx-choices">
+<button type="button" class="mlrk-choice" data-a="blank">Prints <code>Initial:</code> with nothing after it</button>
+<button type="button" class="mlrk-choice" data-a="error">Raises an <code>IndexError</code> and stops the program</button>
+<button type="button" class="mlrk-choice" data-a="none">Prints <code>Initial: None</code></button>
+</div>
+<div id="io-idx-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Count the characters in <code>""</code>, then ask which index numbers exist for a string that long. Index <code>0</code> works on <code>"Jordan"</code> because <code>"Jordan"</code> has a character sitting there.</p>
+</details>
+
+<h3>Methods, and the <code>in</code> operator</h3>
+<p>A method is a function attached to a value, and you call it with dot notation: <code>value.method()</code>. String methods either answer a question about a string or build a new string from it. A string cannot be changed in place, so a method like <code>upper()</code> hands back a new string and leaves the original alone.</p>
+<div class="io-compare">
+<div>
+<p class="io-compare-label"><strong>Four checks on one order note</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">order = "2 packs, no brownies"
+
+print(order.upper())
+print(order.startswith("2"))
+print("brownie" in order)
+print(order.find("packs"))</pre></div>
+</div>
+<div>
+<p class="io-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">2 PACKS, NO BROWNIES
+True
+True
+2</pre></div>
+</div>
+</div>
+<p><code>in</code> is an operator rather than a method, so it is written between the two strings: <code>"brownie" in order</code> asks whether the second string contains the first. <code>find</code> gives the index where a piece of text starts, which is <code>2</code> here because <code>"packs"</code> begins at the third character of <code>order</code>.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Shaping what comes out</h2>
+<p><code>print()</code> takes any number of values, separated by commas, and puts them all on one line:</p>
+<div class="io-compare">
+<div>
+<p class="io-compare-label"><strong>Four values, one <code>print()</code></strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">print("Cookies:", 6, "Total:", 3.3)</pre></div>
+</div>
+<div>
+<p class="io-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">Cookies: 6 Total: 3.3</pre></div>
+</div>
+</div>
+<p>Two keyword arguments control the spacing. <code>sep</code> is what goes between the values, and its default is a single space. <code>end</code> is what goes after the last value, and its default is <code>"\n"</code>, the new line character. That default is the reason every <code>print()</code> starts on a fresh line.</p>
+<div class="io-compare">
+<div>
+<p class="io-compare-label"><strong>Setting <code>sep</code> and <code>end</code></strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">print("a", "b", "c", sep="-")
+print("loading", end="")
+print("...", end="")
+print("done")</pre></div>
+</div>
+<div>
+<p class="io-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">a-b-c
+loading...done</pre></div>
+</div>
+</div>
+<p>That default space is what put a gap between the dollar sign and the number on the bake sale receipt. <code>print("Total: $", PACK_PRICE * packs)</code> hands <code>print()</code> two separate values, so <code>print()</code> separated them.</p>
+
+<h3>f-strings put the values inside the text</h3>
+<p>Write an <code>f</code> before the opening quote and any expression inside curly braces gets worked out and dropped into the string. That way the words and the values sit in the order they will be printed, and no commas decide the spacing for you:</p>
+<div class="io-compare">
+<div>
+<p class="io-compare-label"><strong>The same receipt as an f-string</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">packs = 3
+total = packs * 1.10
+
+print(f"{packs} packs, ${total}")</pre></div>
+</div>
+<div>
+<p class="io-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">3 packs, $3.3000000000000003</pre></div>
+</div>
+</div>
+<p>The gap is gone and the 17 digits are still there. Computers store decimal numbers in a way that is very slightly inexact, so <code>1.10 * 3</code> comes out as <code>3.3000000000000003</code>, and <code>print()</code> shows every digit it was given.</p>
+<p>A format specifier says how a value should be displayed. Put a colon after the expression, then the format. <code>.2f</code> means "a decimal number with exactly two digits after the decimal point":</p>
+<div class="io-compare io-wide">
+<div>
+<p class="io-compare-label"><strong>The same f-string with a format specifier</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">print(f"{packs} packs, ${total:.2f}")</pre></div>
+</div>
+<div>
+<p class="io-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">3 packs, $3.30</pre></div>
+</div>
+</div>
+<p><code>.2f</code> changes only how the number is displayed. The value stored in <code>total</code> is untouched, so later arithmetic still uses the full number.</p>
+
+<div class="mlrk-card">
+<p><strong>Here are two <code>print()</code> calls from a receipt line.</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">packs = 3
+price = 1.10
+
+print("Packs", packs, sep=": ", end=" | ")
+print(f"Total: ${packs * price:.2f}")</pre></div>
+<p><strong>What do those two calls print?</strong></p>
+<div id="io-print-choices">
+<button type="button" class="mlrk-choice" data-a="one"><code>Packs: 3 | Total: $3.30</code>, all on one line</button>
+<button type="button" class="mlrk-choice" data-a="two"><code>Packs: 3 |</code> on one line, then <code>Total: $3.30</code> on the next</button>
+<button type="button" class="mlrk-choice" data-a="nosep"><code>Packs 3 | Total: $3.3000000000000003</code>, all on one line</button>
+<button type="button" class="mlrk-choice" data-a="space"><code>Packs: 3 Total: $3.30</code>, all on one line</button>
+</div>
+<div id="io-print-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Answer three questions in order. What does the first <code>print()</code> put between its two values? What does it put after them, now that <code>end</code> has been set to something other than a new line? And what does <code>:.2f</code> do to <code>3.3000000000000003</code>?</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Bringing what a person types in</h2>
+<p><code>input(prompt)</code> prints the prompt, waits for someone to type a line and press Enter, and hands back what was typed. The space at the end of the prompt text keeps the answer from running into the question.</p>
+<div class="mlrk-code"><pre class="mlrk-screen">name = input("Volunteer name: ")
+print(f"Thanks, {name}!")</pre></div>
+<p>Whatever comes back is a string. Typing 3 gives you <code>"3"</code>, not the number 3, and nothing converts it on your behalf. That one rule is the whole reason the bake sale register printed 33 cookies.</p>
+<p>People also type messily. They add spaces at the ends, and they use capitals where you expected small letters. <code>strip()</code> removes the spaces from both ends of a string and <code>lower()</code> makes every letter small. Each one hands back a new string, so you can call the second on the result of the first:</p>
+<div class="io-compare">
+<div>
+<p class="io-compare-label"><strong>Cleaning up a messy answer</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">answer = "  Y "
+
+print(answer.strip().lower() == "y")
+print(answer.lower() == "y")</pre></div>
+</div>
+<div>
+<p class="io-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">True
+False</pre></div>
+</div>
+</div>
+<p>Calling one method on the result of another is called method chaining, and it works because <code>strip()</code> hands back a string, which has a <code>lower()</code> method of its own. The second comparison is <code>False</code> because <code>lower()</code> changes letters and leaves the spaces alone, so <code>"  y "</code> is not equal to <code>"y"</code>.</p>
+
+<h3>Run all three registers</h3>
+<p>This simulated Terminal has the three versions of the bake sale register in it. Try these, in order:</p>
+<ol class="mlrk-small mlrk-steplist">
+  <li><code>ls</code> — see the three files</li>
+  <li><code>python3 register_v1.py</code> — the hard-coded version, which asks nothing</li>
+  <li><code>python3 register_v2.py</code> — the version with the one changed line. Type <code>3</code> when it asks, then press Enter</li>
+  <li><code>python3 register_v3.py</code> — the finished version. Type <code>3</code>, then <code>Y</code></li>
+  <li><code>python3 register_v3.py</code> again, this time typing <code>three</code> instead of a number</li>
+</ol>
+<p class="mlrk-small">While a program is waiting for an answer, this simulator shows what you type on its own line, below the question. A real Terminal shows it on the same line, right after the question.</p>
+<div class="mlrk-terminal" id="io-terminal">
+  <div class="mlrk-terminal-log" aria-live="polite"></div>
+  <div class="mlrk-terminal-row"><span class="mlrk-terminal-prompt"></span><input class="mlrk-terminal-input" type="text" aria-label="Terminal input" autocomplete="off" spellcheck="false"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Turning what was typed into the right type</h2>
+<p>Arithmetic and comparisons only make sense between values of the right type, and everything out of <code>input()</code> is a string. Type conversion is the fix: <code>int()</code>, <code>float()</code>, <code>str()</code>, and <code>bool()</code> each turn a value into one of Python's types.</p>
+<div class="io-compare">
+<div>
+<p class="io-compare-label"><strong>Three conversions</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">print(int("42") + 1)
+print(float("0.50") * 2)
+print(str(42) + "!")</pre></div>
+</div>
+<div>
+<p class="io-compare-label"><strong>What it printed</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">43
+1.0
+42!</pre></div>
+</div>
+</div>
+<p>Anything can be turned into a string, and <code>int()</code> is pickier. <code>int("hello")</code> raises a <code>ValueError</code> and stops the program, because <code>"hello"</code> is not a number written out in digits. A volunteer who types <code>three</code> instead of <code>3</code> would take the register down.</p>
+<p>The <code>isdigit()</code> method is the guard against that. It hands back <code>True</code> when a string is made only of digits, so you can check first and print a message instead of crashing:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">packs_typed = input("How many 2-packs? ").strip()
+
+if not packs_typed.isdigit():
+    print(f"'{packs_typed}' is not a whole number. Nothing was rung up.")
+    return
+
+packs = int(packs_typed)</pre></div>
+<p><code>isdigit()</code> hands back <code>False</code> for <code>"3.5"</code> as well, because a decimal point is not a digit. For an amount typed with a decimal point you want <code>float()</code>, and <code>isdigit()</code> is the wrong check for it.</p>
+
+<h3>A Y or N answer, turned into a boolean</h3>
+<p>The register's last question has two acceptable answers, and the rest of the program needs a boolean rather than text. One comparison does the whole job:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">wants_receipt = input("Print a receipt? (Y/N) ").strip().lower() == "y"</pre></div>
+<p><code>strip()</code> drops stray spaces, <code>lower()</code> turns a typed <code>Y</code> into <code>y</code>, and <code>== "y"</code> produces <code>True</code> or <code>False</code>. From that line on, <code>wants_receipt</code> holds a boolean, so <code>if wants_receipt:</code> works the way any other condition does.</p>
+
+<div class="mlrk-card">
+<p><strong>Check every answer a volunteer could type that sets <code>wants_receipt</code> to <code>True</code>.</strong> More than one is possible.</p>
+<label class="mlrk-selectall-option"><input type="checkbox" class="io-yn-box" value="capY"> <span><code>Y</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="io-yn-box" value="lowy"> <span><code>y</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="io-yn-box" value="spacey"> <span><code>y</code> with a space typed on each side of it</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="io-yn-box" value="yes"> <span><code>yes</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="io-yn-box" value="capN"> <span><code>N</code></span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="io-yn-box" value="yep"> <span><code>Yep</code></span></label>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="io-yn-submit">Check my answers</button></div>
+<div id="io-yn-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Work each answer through the chain one step at a time: <code>strip()</code> first, then <code>lower()</code>, then compare what is left against the single character <code>"y"</code>. Two of the six end up as strings longer than one character.</p>
+</details>
+
+<h3>From hard-coded to asking</h3>
+<p>Here is the finished <code>register.py</code>. Nothing about it is hard-coded any more: the same file handles every order of the day, because it asks instead of being edited.</p>
+<div class="io-compare io-wide">
+<div>
+<p class="io-compare-label"><strong>The finished <code>register.py</code></strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">PACK_PRICE = 1.10
+
+def main():
+    packs_typed = input("How many 2-packs? ").strip()
+
+    if not packs_typed.isdigit():
+        print(f"'{packs_typed}' is not a whole number. Nothing was rung up.")
+        return
+
+    packs = int(packs_typed)
+    total = packs * PACK_PRICE
+    wants_receipt = input("Print a receipt? (Y/N) ").strip().lower() == "y"
+
+    print(f"Cookies: {packs * 2}")
+    print(f"Total: ${total:.2f}")
+    if wants_receipt:
+        print("Receipt printed.")
+
+main()</pre></div>
+</div>
+<div>
+<p class="io-compare-label"><strong>One order, typing <code>3</code> then <code>Y</code></strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">How many 2-packs? 3
+Print a receipt? (Y/N) Y
+Cookies: 6
+Total: $3.30
+Receipt printed.</pre></div>
+</div>
+</div>
+
+<p><strong>Try it.</strong> Five lines from the finished <code>main()</code> are out of order. Click them in the one order that makes the register work. The guard is written on a single line here so that every step stays one line long.</p>
+<div class="mlrk-card">
+<ul class="mlrk-orderlist" id="io-build-order">
+  <li class="mlrk-orderitem" data-step="total"><span class="mlrk-order-num"></span> <code>total = packs * PACK_PRICE</code></li>
+  <li class="mlrk-orderitem" data-step="convert"><span class="mlrk-order-num"></span> <code>packs = int(packs_typed)</code></li>
+  <li class="mlrk-orderitem" data-step="ask"><span class="mlrk-order-num"></span> <code>packs_typed = input("How many 2-packs? ").strip()</code></li>
+  <li class="mlrk-orderitem" data-step="show"><span class="mlrk-order-num"></span> <code>print(f"Total: ${total:.2f}")</code></li>
+  <li class="mlrk-orderitem" data-step="guard"><span class="mlrk-order-num"></span> <code>if not packs_typed.isdigit(): return</code></li>
+</ul>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="io-build-check">Check my order</button></div>
+<div id="io-build-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>A line can only use a variable that an earlier line created. Find which line creates <code>packs_typed</code>, which one creates <code>packs</code>, and which one creates <code>total</code>, and the order falls out. The guard has one more rule of its own: it has to run before the conversion it is protecting.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary and reflection</h2>
+<p>A string is a sequence of characters, each at a numbered position starting at <code>0</code>, and a negative index counts back from the end. A slice stops just before its end index, and an index the string does not have raises an <code>IndexError</code>. <code>print()</code> puts <code>sep</code> between its values and <code>end</code> after them, and an f-string with <code>:.2f</code> displays a decimal with exactly two digits after the point. <code>input()</code> always hands back a string, so <code>strip()</code> and <code>lower()</code> clean it up and <code>int()</code> or <code>float()</code> turn it into a number, with <code>isdigit()</code> checking first.</p>
+<label for="io-reflect"><strong>The bake sale starts taking custom orders, so a volunteer now types a dollar amount such as <code>2.75</code> instead of a number of packs.</strong> In 2-3 sentences, say what <code>isdigit()</code> would answer for <code>"2.75"</code> and why, what conversion function the program needs now, and what would happen if the program used <code>int()</code> on that answer anyway.</label>
+<textarea id="io-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>8. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://codingbat.com/python/String-1" target="_blank" rel="noopener">CodingBat, String-1 (Python)</a> — short auto-graded problems that are almost all indexing, slicing, and <code>len()</code>, so an off-by-one slice tells you immediately instead of weeks later.</li>
+  <li><a href="https://www.youtube.com/watch?v=o0mvgsPQ8Jg" target="_blank" rel="noopener">Pretty Printed, "Quick Intro to F-Strings in Python for String Formatting" (4 min 28 s)</a> — types f-strings out live, including format specifiers, which is a useful second pass if the <code>:.2f</code> section moved too fast.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<div id="io-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="io-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="io-download">Download as .txt</button>
+</div>
+<p id="io-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "inputs-and-outputs-reading";
+  const TITLE = "The Receipt That Said 33 Cookies";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards("#io-vocab .mlrk-grid", "act-flipcards");
+
+  K.quiz({
+    id: "act-index-error",
+    buttonSelector: "#io-idx-choices .mlrk-choice",
+    feedbackSelector: "#io-idx-fb",
+    correct: "error",
+    answerLabel: "Raises an <code>IndexError</code> and stops the program",
+    feedback: {
+      blank: "<code>print()</code> never gets the chance to run. Python works out <code>name[0]</code> first, and <code>\"\"</code> has no characters, so there is no character at index <code>0</code> to hand over. Python raises <code>IndexError: string index out of range</code> and the whole program stops.",
+      error: "An index has to point at a character the string really has. <code>\"\"</code> has none, so index <code>0</code> points at nothing and Python raises <code>IndexError: string index out of range</code>. The sign-in sheet records nothing for that shift, because the program stopped before it printed anything.",
+      none: "<code>None</code> is what a function hands back when it has nothing to return, and bracket notation is not a function call. Reading past the end of a string raises <code>IndexError: string index out of range</code> instead, which stops the program rather than producing a value."
+    }
+  });
+
+  K.quiz({
+    id: "act-print-format",
+    buttonSelector: "#io-print-choices .mlrk-choice",
+    feedbackSelector: "#io-print-fb",
+    correct: "one",
+    answerLabel: "<code>Packs: 3 | Total: $3.30</code>, all on one line",
+    feedback: {
+      one: "<code>sep=\": \"</code> puts a colon and a space between <code>\"Packs\"</code> and <code>3</code>. <code>end=\" | \"</code> replaces the usual new line, so the second <code>print()</code> carries on along the same line. <code>:.2f</code> then displays <code>3.3000000000000003</code> as <code>3.30</code>.",
+      two: "A second line would need the first <code>print()</code> to end with a new line, and <code>end=\" | \"</code> replaced that new line with a space, a vertical bar, and another space. Both calls therefore write to the same line, giving <code>Packs: 3 | Total: $3.30</code>.",
+      nosep: "Both halves miss a keyword. <code>sep=\": \"</code> is set, so a colon and a space go between <code>\"Packs\"</code> and <code>3</code> rather than a plain space. And <code>:.2f</code> displays the total with exactly two digits after the decimal point, which turns <code>3.3000000000000003</code> into <code>3.30</code>.",
+      space: "The <code>:.2f</code> part is right. The missing piece is <code>end=\" | \"</code>, which is what the first <code>print()</code> writes after its last value in place of a new line, so a space, a vertical bar, and a space sit between the two halves."
+    }
+  });
+
+  /* The shared terminal reads one command per Enter press. A Python program
+     that calls input() needs the opposite: once it starts, the next line typed
+     belongs to the program, not to the shell. Each entry in PROGRAMS is a
+     function of the answers given so far, returning either the next prompt or
+     the program's final output, and `running` holds the script currently
+     waiting for a line. The command table is a Proxy so that while a script is
+     waiting, whatever first word the student types is handed to that script
+     instead of being looked up as a shell command. */
+  const running = {name: null, answers: []};
+
+  const PROGRAMS = {
+    "register_v1.py": function(){
+      return {output: "Cookies: 6\nTotal: $ 3.3000000000000003"};
+    },
+    "register_v2.py": function(answers){
+      if(answers.length === 0) return {prompt: "How many 2-packs? "};
+      const typed = answers[0];
+      return {output:
+        "Cookies: " + typed + typed + "\n" +
+        "Traceback (most recent call last):\n" +
+        '  File "register_v2.py", line 6, in main\n' +
+        '    print("Total: $", PACK_PRICE * packs)\n' +
+        "TypeError: can't multiply sequence by non-int of type 'float'"};
+    },
+    "register_v3.py": function(answers){
+      if(answers.length === 0) return {prompt: "How many 2-packs? "};
+      const typed = answers[0].trim();
+      if(!/^[0-9]+$/.test(typed)){
+        return {output: "'" + typed + "' is not a whole number. Nothing was rung up."};
+      }
+      if(answers.length === 1) return {prompt: "Print a receipt? (Y/N) "};
+      const packs = parseInt(typed, 10);
+      let out = "Cookies: " + (packs * 2) + "\nTotal: $" + (packs * 1.10).toFixed(2);
+      if(answers[1].trim().toLowerCase() === "y") out += "\nReceipt printed.";
+      return {output: out};
+    }
+  };
+
+  function advance(){
+    const result = PROGRAMS[running.name](running.answers);
+    if(result.prompt) return result.prompt;
+    running.name = null;
+    running.answers = [];
+    return result.output;
+  }
+
+  function startProgram(file){
+    if(!PROGRAMS[file]){
+      return "python3: can't open file '" + file + "': [Errno 2] No such file or directory";
+    }
+    running.name = file;
+    running.answers = [];
+    return advance();
+  }
+
+  const SHELL_COMMANDS = {
+    python3: function(args){
+      if(!args[0]) return "usage: python3 <file>.py";
+      return startProgram(args[0]);
+    },
+    python: function(args){
+      return "command not found: python\nThis laptop only has python3 installed. Try: python3 " + (args[0] || "<file>.py");
+    }
+  };
+
+  const commandTable = new Proxy(SHELL_COMMANDS, {
+    get: function(target, prop){
+      if(typeof prop !== "string") return undefined;
+      if(Object.prototype.hasOwnProperty.call(target, prop)) return target[prop];
+      if(running.name){
+        return function(args){
+          running.answers.push([prop].concat(args).join(" "));
+          return advance();
+        };
+      }
+      return undefined;
+    }
+  });
+
+  const V1_SOURCE = 'PACK_PRICE = 1.10\n\ndef main():\n    packs = 3\n    print("Cookies:", packs * 2)\n    print("Total: $", PACK_PRICE * packs)\n\nmain()';
+  const V2_SOURCE = 'PACK_PRICE = 1.10\n\ndef main():\n    packs = input("How many 2-packs? ")\n    print("Cookies:", packs * 2)\n    print("Total: $", PACK_PRICE * packs)\n\nmain()';
+  const V3_SOURCE = 'PACK_PRICE = 1.10\n\ndef main():\n    packs_typed = input("How many 2-packs? ").strip()\n\n    if not packs_typed.isdigit():\n        print(f"\'{packs_typed}\' is not a whole number. Nothing was rung up.")\n        return\n\n    packs = int(packs_typed)\n    total = packs * PACK_PRICE\n    wants_receipt = input("Print a receipt? (Y/N) ").strip().lower() == "y"\n\n    print(f"Cookies: {packs * 2}")\n    print(f"Total: ${total:.2f}")\n    if wants_receipt:\n        print("Receipt printed.")\n\nmain()';
+
+  K.terminal("#io-terminal", {
+    id: "act-terminal",
+    startPath: "/home/fellow/bake-sale",
+    minCommands: 4,
+    filesystem: {
+      "/home/fellow/bake-sale": {type:"dir", children:["register_v1.py","register_v2.py","register_v3.py"]},
+      "/home/fellow/bake-sale/register_v1.py": {type:"file", contents: V1_SOURCE},
+      "/home/fellow/bake-sale/register_v2.py": {type:"file", contents: V2_SOURCE},
+      "/home/fellow/bake-sale/register_v3.py": {type:"file", contents: V3_SOURCE}
+    },
+    commands: commandTable
+  });
+
+  K.selectAll({
+    id: "act-yes-no-boolean",
+    boxSelector: ".io-yn-box",
+    submitSelector: "#io-yn-submit",
+    feedbackSelector: "#io-yn-fb",
+    maxAttempts: 2,
+    options: [
+      {value:"capY", label:"<code>Y</code>", correct:true,
+        hint:"Work out what <code>lower()</code> does to a single capital letter.",
+        explain:"True. <code>strip()</code> finds no spaces to remove, <code>lower()</code> turns <code>\"Y\"</code> into <code>\"y\"</code>, and <code>\"y\" == \"y\"</code> is <code>True</code>."},
+      {value:"lowy", label:"<code>y</code>", correct:true,
+        hint:"Nothing in the chain has any work to do here. Compare what is left against <code>\"y\"</code>.",
+        explain:"True. <code>strip()</code> and <code>lower()</code> both leave <code>\"y\"</code> exactly as it is, and the comparison against <code>\"y\"</code> is <code>True</code>."},
+      {value:"spacey", label:"<code>y</code> with a space on each side", correct:true,
+        hint:"<code>strip()</code> runs before the comparison does. What is left after it runs?",
+        explain:"True. <code>strip()</code> removes the spaces from both ends and hands back <code>\"y\"</code>, which is what the comparison then sees. Stray spaces are exactly what <code>strip()</code> exists to absorb."},
+      {value:"yes", label:"<code>yes</code>", correct:false,
+        hint:"Count the characters this one still has after <code>strip()</code> and <code>lower()</code> run.",
+        explain:"False, and this is the one that surprises people. <code>lower()</code> gives <code>\"yes\"</code>, which is three characters, and <code>\"yes\" == \"y\"</code> is <code>False</code>. A volunteer who types the obvious word gets no receipt, so a real register would compare against <code>\"y\"</code> and <code>\"yes\"</code> both."},
+      {value:"capN", label:"<code>N</code>", correct:false,
+        hint:"This is the answer the question offers for \"no\".",
+        explain:"False. <code>lower()</code> gives <code>\"n\"</code>, and <code>\"n\" == \"y\"</code> is <code>False</code>. That <code>False</code> is the point: the comparison turns a typed letter into the boolean the rest of the program needs."},
+      {value:"yep", label:"<code>Yep</code>", correct:false,
+        hint:"<code>lower()</code> changes the letters it is given. It does not shorten anything.",
+        explain:"False. <code>lower()</code> gives <code>\"yep\"</code>, which is three characters, and the comparison asks for exactly <code>\"y\"</code>. A comparison with <code>==</code> matches the whole string, never just the start of it."}
+    ]
+  });
+
+  K.orderSteps("#io-build-order", {
+    id: "act-build-register",
+    correctOrder: ["ask","guard","convert","total","show"],
+    feedbackSelector: "#io-build-fb",
+    checkSelector: "#io-build-check"
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#io-reflect", minWords:12});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#io-scorechip"); });
+  K.Scoring.renderChip("#io-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#io-download"});
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#io-copy", onDone:function(ok){
+    document.getElementById("io-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>
