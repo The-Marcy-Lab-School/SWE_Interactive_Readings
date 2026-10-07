@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Page That Went Up Empty</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:880px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:24rem;font-family:var(--mlrk-font-code)}
+.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+.mlrk-outlabel{display:block;font-size:1em;letter-spacing:.07em;text-transform:uppercase;opacity:.85;margin-bottom:.5rem}
+.mlrk-code + .mlrk-code{margin-top:.8rem}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}.mlrk-fillblank input{width:100%}}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>The Page That Went Up Empty</h1>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~20 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. The Monday post that never went out</h2>
+<p>Maple Street Rescue is a small animal shelter that keeps about a hundred cats, dogs, and rabbits at a time. Every Monday a volunteer runs a short Python script that posts the pets who have been waiting longest to the shelter's website. A pet on that page gets phone calls. A pet left off it waits another week.</p>
+<p>Each pet is a dictionary, and the dictionaries sit in a list called <code>pets</code>:</p>
+<div class="mlrk-code"><pre>pets = [
+    {'name': 'Biscuit', 'species': 'dog',
+     'days_waiting': 96, 'adoptable': True},
+    {'name': 'Pepper', 'species': 'cat',
+     'days_waiting': 12, 'adoptable': True},
+    {'name': 'Juniper', 'species': 'dog',
+     'days_waiting': 210, 'adoptable': False},
+    {'name': 'Mochi', 'species': 'cat',
+     'days_waiting': 45, 'adoptable': True},
+    {'name': 'Tilly', 'species': 'rabbit',
+     'days_waiting': 61, 'adoptable': True},
+]</pre></div>
+<p>One Monday the page went up with no pets on it. Here is the <code>longest_waiting</code> version of the script that produced that empty page:</p>
+<div class="mlrk-code"><pre>def days(pet):
+    return pet['days_waiting']
+
+longest_waiting = pets.sort(key=days, reverse=True)
+
+for pet in longest_waiting:
+    print(pet['name'])</pre></div>
+<p>No names printed. The script stopped instead, on the line with the <code>for</code>:</p>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — the longest_waiting version</div><pre>Traceback (most recent call last):
+  File "post_listings.py", line 19, in &lt;module&gt;
+    for pet in longest_waiting:
+               ^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not iterable</pre></div>
+<p>The <code>.sort()</code> method reorders the list it is called on and hands back nothing at all, so <code>longest_waiting</code> holds <code>None</code>. A <code>for</code> loop needs a list of values to walk through, and <code>None</code> is not one. Biscuit, 96 days in a kennel, stayed off the page for another week.</p>
+<p>One word fixes that line, and you will write it yourself later in this reading. The rest of the script has a bigger problem: five separate hand-written loops, each doing a job Python already ships a tool for.</p>
+<p>Code that spells out every step is called <strong>imperative</strong>. You control each move, and you type each move. Code that describes the result you want and lets an existing tool run the steps is called <strong>declarative</strong>. Python's list comprehensions and built-in list functions are how you write the declarative version.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card before you work through the activities.</p>
+<div class="mlrk-grid">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>List comprehensions</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>List comprehensions</strong><br>A list comprehension builds a new list out of an existing one in a single expression: <code>[expression for item in items]</code>. It describes the list you want instead of spelling out an empty list, a loop, and an <code>.append()</code> call, so there is less code to read and less of it to get wrong.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>transforms and filters</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>transforms and filters</strong><br>The two jobs a comprehension does. <code>[expression for item in items]</code> <em>transforms</em> each element and returns a new list of the new values, which is useful for converting data formats or doing a calculation. <code>[item for item in items if test]</code> <em>filters</em>, returning a new list of only the elements that pass the test. One comprehension can do both at once.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>dictionary comprehension</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>dictionary comprehension</strong><br><code>{key: value for item in items}</code> builds a new dictionary the same way a list comprehension builds a new list. Curly braces instead of square ones, and a <code>key: value</code> pair in front of the <code>for</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>first</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>first</strong><br>Getting the first element that passes a test is a <code>for</code> loop with an early <code>return</code> or <code>break</code>, not a comprehension. The loop leaves at the first success and never looks at the rest. The line after the loop decides what comes back when nothing passes at all.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>sum()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>sum()</strong><br><code>sum()</code>, <code>min()</code>, <code>max()</code>, and <code>len()</code> each combine a whole list into a single value. When none of them fits, the accumulator pattern does: start a variable before the loop, update it once per element, and read it after the loop ends.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>sorted()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>sorted()</strong><br><code>sorted(items)</code> returns a new sorted list and leaves the original alone. <code>items.sort()</code> reorders the list in place and returns <code>None</code>. Both accept <code>key=</code>, a callback that says what to compare, and <code>reverse=True</code> for largest first.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>enumerate()</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>enumerate()</strong><br><code>enumerate(items)</code> hands you a position number and an element together on each pass, so you never need <code>range(len(items))</code>. <code>zip()</code> walks two lists in step and pairs up their elements, <code>any()</code> asks whether at least one value is true, and <code>all()</code> asks whether every value is.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>== and is</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>== and is</strong><br><code>==</code> compares contents: two different lists holding the same values are <code>==</code>. <code>is</code> compares identity, meaning whether two names point at the very same object, and <code>is not</code> is its opposite. A test for a function that returns a new list uses <code>==</code> on the contents and <code>is not</code> to confirm a new list came back rather than the original.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>refactor</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>refactor</strong><br>To refactor is to change how code works without changing what it does. Rewriting a <code>for</code> loop as a list comprehension is a refactor. Passing tests are what make one safe: run the tests, change the code, run the tests again.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Test-driven development (TDD)</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Test-driven development (TDD)</strong><br>A workflow that writes the test first, runs it and watches it fail (red), writes just enough code to pass (green), and then refactors while the tests stay green.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>isinstance(value, type)</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>isinstance(value, type)</strong><br><code>isinstance(value, type)</code> asks whether a value is of a given type and gives back <code>True</code> or <code>False</code>. It accepts a tuple of types too, so <code>isinstance(x, (int, float))</code> asks whether <code>x</code> is either kind of number.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. The same new list, in one line</h2>
+<p>The shelter's script needs a list of just the pets' names. Three lines of the script do that: an empty list, a loop, and an <code>.append()</code> call. Here is that <code>append</code> version and the comprehension that replaces it, side by side:</p>
+<div class="mlrk-code"><div class="mlrk-outlabel">The append version</div><pre>names = []
+for pet in pets:
+    names.append(pet['name'])
+
+print(names)</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">The comprehension version</div><pre>names = [pet['name'] for pet in pets]
+
+print(names)</pre></div>
+<p>Both print the same line:</p>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — both versions</div><pre>['Biscuit', 'Pepper', 'Juniper', 'Mochi', 'Tilly']</pre></div>
+<p>A list comprehension has three parts. The square brackets say a new list is coming back. The <code>for</code> clause says which list to walk through and what to call one element of it. The expression in front of the <code>for</code> says what to collect. Python runs that expression once per element, so the new list has exactly as many elements as the source list.</p>
+
+<h3>Read it from the <code>for</code> outward</h3>
+<p>A comprehension is written in the opposite order from the order it runs. Python cannot work out <code>pet['name']</code> until it has a <code>pet</code>, and the <code>for</code> clause is what supplies one. So find the <code>for</code> first and read outward from there, in three steps.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 880 396" role="img" aria-labelledby="readTitle readDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="readTitle">The three parts of a list comprehension, and the order to read them in</title>
+  <desc id="readDesc">The comprehension names = [pet['name'] for pet in pets] is shown with two parts boxed. The boxed expression pet['name'] is labelled part 2, the expression, and the boxed clause for pet in pets is labelled part 1, the for clause. Underneath, the reading order is given in three steps: step one, for pet in pets, read as for each pet in the pets list; step two, pet['name'], read as take that pet's name; step three, collect each name into a new list in the same order, producing the list of five names Biscuit, Pepper, Juniper, Mochi and Tilly.</desc>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="440" y="32" text-anchor="middle" font-size="21" font-weight="700" fill="#261F1D">Written in one order, read in another</text>
+
+    <rect x="164" y="62" width="180" height="48" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <rect x="356" y="62" width="244" height="48" rx="10" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+    <g font-family="Roboto Mono, Consolas, Monaco, monospace" font-size="24" font-weight="700" fill="#261F1D">
+      <text x="24" y="95">names = [</text>
+      <text x="174" y="95">pet['name']</text>
+      <text x="366" y="95">for pet in pets</text>
+      <text x="612" y="95">]</text>
+    </g>
+    <text x="254" y="140" text-anchor="middle" font-size="18" font-weight="700" fill="#1E659D">part 2: the expression</text>
+    <text x="478" y="140" text-anchor="middle" font-size="18" font-weight="700" fill="#204D3C">part 1: the for clause</text>
+
+    <text x="36" y="192" font-size="19" font-weight="700" fill="#261F1D">Read it in this order:</text>
+
+    <circle cx="48" cy="228" r="17" fill="#A6C2B4" stroke="#264326" stroke-width="2"/>
+    <text x="48" y="235" text-anchor="middle" font-size="18" font-weight="700" fill="#204D3C">1</text>
+    <text x="80" y="235" font-size="19" fill="#261F1D">The for clause: "for each pet in the pets list"</text>
+
+    <circle cx="48" cy="276" r="17" fill="#DEEAF4" stroke="#2274B5" stroke-width="2"/>
+    <text x="48" y="283" text-anchor="middle" font-size="18" font-weight="700" fill="#1E659D">2</text>
+    <text x="80" y="283" font-size="19" fill="#261F1D">The expression: "take that pet's name"</text>
+
+    <circle cx="48" cy="324" r="17" fill="#FFEECA" stroke="#83671C" stroke-width="2"/>
+    <text x="48" y="331" text-anchor="middle" font-size="18" font-weight="700" fill="#675116">3</text>
+    <text x="80" y="331" font-size="19" fill="#261F1D">The brackets: "collect each name in a new list"</text>
+
+    <text x="80" y="372" font-family="Roboto Mono, Consolas, Monaco, monospace" font-size="18" font-weight="700" fill="#261F1D">['Biscuit', 'Pepper', 'Juniper', 'Mochi', 'Tilly']</text>
+  </g>
+</svg>
+
+<p>Said out loud, <code>[pet['name'] for pet in pets]</code> is "for each pet in pets, take that pet's name, and collect the names in a new list." That takes a few seconds and tells you exactly what the line produces.</p>
+
+<div class="mlrk-card">
+<p><strong>This comprehension collects every pet's wait in days.</strong> The expression is written for you and the <code>for</code> clause is missing.</p>
+<div class="mlrk-code"><pre>waits = [pet['days_waiting'] ________________]
+
+print(waits)
+# [96, 12, 210, 45, 61]</pre></div>
+<p><strong>Type the missing <code>for</code> clause.</strong></p>
+<div class="mlrk-fillblank"><input type="text" id="for-input" autocomplete="off" placeholder="Click here to type the for clause"> <button type="button" class="mlrk-btn" id="for-check">Check</button></div>
+<div id="for-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>The expression <code>pet['days_waiting']</code> uses the name <code>pet</code>, so the <code>for</code> clause has to give one element that exact name. The list it walks through is <code>pets</code>.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Keeping only some of them</h2>
+<p>Juniper has waited 210 days, longer than any other pet at Maple Street Rescue, and Juniper's record says <code>'adoptable': False</code> because Juniper is on a medical hold. Posting Juniper brings in calls about a pet nobody can take home, and the volunteer has to turn every caller down. The listing page should show only the pets whose <code>'adoptable'</code> value is <code>True</code>.</p>
+<p>That is a filter: same elements, fewer of them. An <code>if</code> at the end of a comprehension keeps only the elements the test is true for. Here is the <code>append</code> version of the filter and the comprehension version together:</p>
+<div class="mlrk-code"><div class="mlrk-outlabel">The append version</div><pre>adoptable = []
+for pet in pets:
+    if pet['adoptable']:
+        adoptable.append(pet)</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">The comprehension version</div><pre>adoptable = [pet for pet in pets if pet['adoptable']]
+
+for pet in adoptable:
+    print(pet['name'])</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — the comprehension version</div><pre>Biscuit
+Pepper
+Mochi
+Tilly</pre></div>
+<p>Two details carry this one. The expression in front of the <code>for</code> is just <code>pet</code>, so each whole dictionary comes through untouched, which is what the page needs: it prints a name and a wait from the same record. And the <code>if</code> runs once per pet on <code>pet['adoptable']</code>, a value that is already <code>True</code> or <code>False</code>, so no comparison is needed. <code>if pet['adoptable'] == True</code> gives the same four pets, it just asks a question whose answer was already sitting there.</p>
+<p>A transform collects one new value per element, so its result is always as long as the source. A filter keeps only the elements that pass, so its result can be shorter: four pets out of five.</p>
+
+<div class="mlrk-card">
+<p><strong>One comprehension can filter and transform at the same time.</strong> This one runs on the five pets in <code>pets</code>, with Juniper the only pet whose <code>'adoptable'</code> value is <code>False</code>.</p>
+<div class="mlrk-code"><pre>shown = [pet['name'] for pet in pets if pet['adoptable']]
+
+print(shown)</pre></div>
+<p><strong>What does <code>print(shown)</code> put on the screen?</strong></p>
+<div id="q-filter">
+  <button type="button" class="mlrk-choice" data-a="four"><code>['Biscuit', 'Pepper', 'Mochi', 'Tilly']</code></button>
+  <button type="button" class="mlrk-choice" data-a="five"><code>['Biscuit', 'Pepper', 'Juniper', 'Mochi', 'Tilly']</code></button>
+  <button type="button" class="mlrk-choice" data-a="bools"><code>[True, True, False, True, True]</code></button>
+</div>
+<div id="q-filterfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<h3>When you want one match instead of all of them</h3>
+<p>A filtering comprehension hands back every element that passes. Sometimes a program needs the first one and nothing else, and for that a <code>for</code> loop with a <code>return</code> inside it does less work:</p>
+<div class="mlrk-code"><pre>def first_urgent(pets, limit):
+    for pet in pets:
+        if pet['days_waiting'] &gt; limit:
+            return pet
+    return None   # nothing passed the test</pre></div>
+<p>The <code>return</code> inside the loop is what makes <code>first_urgent</code> stop at the <strong>first</strong> match: the loop leaves immediately and never reads the rest of the list. The <code>return None</code> after the loop covers the case where no pet passed. Decide what that line hands back first, because every caller has to handle it.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Boiling a whole list down to one value</h2>
+<p>The shelter's board wants three numbers each month: how many pets are waiting, the longest wait, and the shortest. Python has a built-in function for each of those, and each one takes a list and gives back a single value:</p>
+<div class="mlrk-code"><pre>waits = [pet['days_waiting'] for pet in pets]
+
+print(len(waits))
+print(max(waits))
+print(min(waits))
+print(sum(waits))
+print(sum(waits) / len(waits))</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output</div><pre>5
+210
+12
+424
+84.8</pre></div>
+<p><code>len()</code> counts the elements, <code>max()</code> and <code>min()</code> find the largest and smallest, and <code>sum()</code> adds them all up. Dividing <code>sum()</code> by <code>len()</code> gives the average wait, 84.8 days.</p>
+
+<h3>When no built-in fits</h3>
+<p>The board also asks how many pets of each species the shelter is holding. No built-in function answers that, because the answer is not one number. It is a dictionary, and it has to be built up one pet at a time.</p>
+<p>That shape is the accumulator pattern, the same counting variable you have already written in a <code>for</code> loop: create it before the loop, update it once per element, read it after. Here it starts as an empty dictionary, and <code>.get(species, 0)</code> supplies a count of <code>0</code> the first time a species shows up:</p>
+<div class="mlrk-code"><pre>counts = {}
+for pet in pets:
+    species = pet['species']
+    counts[species] = counts.get(species, 0) + 1
+
+print(counts)</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output</div><pre>{'dog': 2, 'cat': 2, 'rabbit': 1}</pre></div>
+<p>A comprehension cannot do this job. Curly braces and a <code>key: value</code> pair make a <strong>dictionary comprehension</strong>, which builds one entry per element and never looks at the entries it has already made:</p>
+<div class="mlrk-code"><pre>waits_by_name = {pet['name']: pet['days_waiting']
+                 for pet in adoptable}
+
+print(waits_by_name)</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output</div><pre>{'Biscuit': 96, 'Pepper': 12, 'Mochi': 45, 'Tilly': 61}</pre></div>
+<p>Each pet on the page is in there once, which is all that pairing needs. Counting is different: the second dog's count depends on the first dog's count, so each entry has to read what is already in the dictionary. The accumulator loop does that, and a comprehension does not.</p>
+
+<div class="mlrk-card">
+<p><strong>One built-in call means one function name and a list, like <code>sum(waits)</code>.</strong></p>
+<p><strong>Select every job below that one built-in call already does for you.</strong></p>
+<div id="combine-opts">
+  <label class="mlrk-selectall-option"><input type="checkbox" class="combine-box" value="total"> <span>The total number of days all the pets have waited</span></label>
+  <label class="mlrk-selectall-option"><input type="checkbox" class="combine-box" value="count"> <span>How many pets are in the <code>pets</code> list</span></label>
+  <label class="mlrk-selectall-option"><input type="checkbox" class="combine-box" value="shortest"> <span>The shortest wait in days</span></label>
+  <label class="mlrk-selectall-option"><input type="checkbox" class="combine-box" value="species"> <span>How many pets of each species the shelter holds</span></label>
+  <label class="mlrk-selectall-option"><input type="checkbox" class="combine-box" value="names"> <span>A list of every pet's name</span></label>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="combine-submit">Check my answers</button></div>
+<div id="combine-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<h3>Two more built-ins that stand in for a loop</h3>
+<p><code>any()</code> and <code>all()</code> take a list of true-or-false values and give back one answer. <code>any()</code> is <code>True</code> when at least one element is true, and <code>all()</code> is <code>True</code> only when every element is:</p>
+<div class="mlrk-code"><pre>print(any([pet['days_waiting'] &gt; 180 for pet in pets]))
+print(all([pet['adoptable'] for pet in pets]))</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output</div><pre>True
+False</pre></div>
+<p>One pet has waited more than 180 days, so <code>any()</code> is <code>True</code>. Juniper is not adoptable, so <code>all()</code> is <code>False</code>.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>6. sorted() hands back a list, .sort() hands back nothing</h2>
+<p>Python has two ways to put a list in order, and they differ in what you get back. <code>sorted()</code> is a function that returns a new list and leaves the original where it was:</p>
+<div class="mlrk-code"><pre>nums = [4, 2, 3, 5, 1]
+ordered = sorted(nums)
+
+print(ordered)
+print(nums)</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — the sorted version</div><pre>[1, 2, 3, 4, 5]
+[4, 2, 3, 5, 1]</pre></div>
+<p><code>.sort()</code> is a list method that reorders the list in place. The original list changes, and the method returns nothing:</p>
+<div class="mlrk-code"><pre>nums = [4, 2, 3, 5, 1]
+nums.sort()
+
+print(nums)</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — the .sort() version</div><pre>[1, 2, 3, 4, 5]</pre></div>
+
+<div class="mlrk-card">
+<p><strong>A volunteer assigns the result of <code>.sort()</code> to a variable and prints it.</strong></p>
+<div class="mlrk-code"><pre>nums = [4, 2, 3, 5, 1]
+result = nums.sort()
+
+print(result)</pre></div>
+<p><strong>What does <code>print(result)</code> put on the screen?</strong></p>
+<div id="q-sortnone">
+  <button type="button" class="mlrk-choice" data-a="none"><code>None</code></button>
+  <button type="button" class="mlrk-choice" data-a="sorted"><code>[1, 2, 3, 4, 5]</code></button>
+  <button type="button" class="mlrk-choice" data-a="orig"><code>[4, 2, 3, 5, 1]</code></button>
+</div>
+<div id="q-sortnonefb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<p>Writing <code>x = my_list.sort()</code> and then wondering where the list went is one of the most common mistakes in Python, and it is the one that emptied the shelter's listing page. <code>.append()</code> and <code>.reverse()</code> behave the same way. <code>.pop()</code> does not: it changes the list <em>and</em> returns the element it removed:</p>
+<div class="mlrk-code"><pre>letters = ['a', 'b', 'c']
+
+print(letters.pop())
+print(letters)</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output</div><pre>c
+['a', 'b']</pre></div>
+<p>So "methods that change a list return <code>None</code>" is not a rule you can lean on. Look up the method you are calling, or try it once in the interpreter.</p>
+
+<h3>key= picks what to compare, reverse=True flips the order</h3>
+<p>Both <code>sorted()</code> and <code>.sort()</code> take two optional keyword arguments. <code>key=</code> takes a callback, which is called once per element to produce the value to compare, and <code>reverse=True</code> puts the largest first. Dictionaries have no natural order, so <code>sorted(pets)</code> with no <code>key=</code> raises a <code>TypeError</code>. Sorting pets by their wait needs a callback that pulls that one number out.</p>
+<p>Here is the <code>longest_waiting</code> version of the script that printed nothing, and the repaired version that uses <code>sorted()</code> instead:</p>
+<div class="mlrk-code"><div class="mlrk-outlabel">The longest_waiting version — crashed</div><pre>longest_waiting = pets.sort(key=days, reverse=True)
+
+for pet in longest_waiting:
+    print(pet['name'])</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">The repaired version</div><pre>def days(pet):
+    return pet['days_waiting']
+
+adoptable = [pet for pet in pets if pet['adoptable']]
+by_wait = sorted(adoptable, key=days, reverse=True)
+
+for position, pet in enumerate(by_wait, start=1):
+    waited = pet['days_waiting']
+    print(f"{position}. {pet['name']}: {waited} days")</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — the repaired version</div><pre>1. Biscuit: 96 days
+2. Tilly: 61 days
+3. Mochi: 45 days
+4. Pepper: 12 days</pre></div>
+<p><code>sorted()</code> hands back a list, so the <code>for</code> loop has something to walk through. <code>days</code> is passed by its bare name, with no parentheses, so <code>sorted</code> receives the function and calls it once per pet. <code>sorted</code> compares the numbers <code>days</code> returns but moves the whole dictionary, which is why each line still has its own pet's name next to its own number. <code>enumerate()</code> supplies the position numbers, counting from 1.</p>
+
+<div class="mlrk-card">
+<p><strong>Fill in both blanks.</strong> <code>adoptable</code> holds the four adoptable pets, and <code>days</code> returns a pet's <code>'days_waiting'</code>.</p>
+<ol class="mlrk-steplist">
+<li><p>Longest wait first.</p>
+<div class="mlrk-code"><pre>longest_first = sorted(adoptable, key=days, _________)
+
+print([pet['name'] for pet in longest_first])
+# ['Biscuit', 'Tilly', 'Mochi', 'Pepper']</pre></div>
+<div class="mlrk-fillblank"><input type="text" id="rev-input" autocomplete="off" placeholder="Click here to type the argument"></div></li>
+<li><p>Alphabetical by name.</p>
+<div class="mlrk-code"><pre>def pet_name(pet):
+    return pet['name']
+
+by_name = sorted(adoptable, ______________)
+
+print([pet['name'] for pet in by_name])
+# ['Biscuit', 'Mochi', 'Pepper', 'Tilly']</pre></div>
+<div class="mlrk-fillblank"><input type="text" id="key-input" autocomplete="off" placeholder="Click here to type the argument"></div></li>
+</ol>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="key-check">Check both</button></div>
+<div id="key-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Both blanks are keyword arguments, written as a name, an equals sign, and a value. The first one asks for descending order. The second one needs the bare name of the function that pulls out the value to compare, with no parentheses after it.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Changing the loop without changing the listing</h2>
+<p>The volunteer wants to replace the <code>append</code> filter loop with the one-line comprehension. Both versions kept four pets out of five this week, but the real file holds 104 pets, and nobody wants to compare two printed lists of 104 names by eye. The <code>pytest</code> tests you already know how to write settle it instead.</p>
+<p>Here is the function in <code>src/listing.py</code>, still written as a loop:</p>
+<div class="mlrk-code"><pre>def adoptable_pets(pets):
+    available = []
+    for pet in pets:
+        if pet['adoptable']:
+            available.append(pet)
+    return available</pre></div>
+<p><code>adoptable_pets</code> is a pure function: it returns a new list and leaves the list it was handed alone. Testing a function that returns a list means testing two separate things, so <code>tests/test_listing.py</code> has two test functions:</p>
+<div class="mlrk-code"><pre>from src.listing import adoptable_pets
+
+PETS = [
+    {'name': 'Biscuit', 'adoptable': True},
+    {'name': 'Juniper', 'adoptable': False},
+]
+
+
+def test_adoptable_pets_keeps_the_adoptable_ones():
+    """adoptable_pets - keeps only the adoptable pets"""
+    kept = adoptable_pets(PETS)
+
+    assert kept == [{'name': 'Biscuit', 'adoptable': True}]
+
+
+def test_adoptable_pets_returns_a_new_list():
+    """adoptable_pets - returns a new list"""
+    kept = adoptable_pets(PETS)
+
+    assert kept is not PETS
+    assert PETS == [
+        {'name': 'Biscuit', 'adoptable': True},
+        {'name': 'Juniper', 'adoptable': False},
+    ]</pre></div>
+<p>The two comparisons are different on purpose. <code>==</code> compares contents, so one list of dictionaries equals another holding the same dictionaries. <code>is not</code> compares identity, so <code>kept is not PETS</code> passes only when a genuinely different list came back. Run both tests with <code>python3 -m pytest tests/test_listing.py</code>:</p>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — the loop version</div><pre>collected 2 items
+
+tests/test_listing.py ..                             [100%]
+
+==================== 2 passed in 0.01s =====================</pre></div>
+<p>Now swap the loop for the comprehension and run the same two tests again:</p>
+<div class="mlrk-code"><pre>def adoptable_pets(pets):
+    return [pet for pet in pets if pet['adoptable']]</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — the comprehension version</div><pre>collected 2 items
+
+tests/test_listing.py ..                             [100%]
+
+==================== 2 passed in 0.01s =====================</pre></div>
+<p>Five lines became one, and the tests say the behavior is the same: same contents, still a new list. That is a <strong>refactor</strong>, and the passing tests are what made it a two-minute change instead of a gamble.</p>
+
+<h3>Writing the test first</h3>
+<p>Half of the shelter's records now arrive from a spreadsheet export, and that export writes <code>days_waiting</code> as text: <code>'12'</code> instead of <code>12</code>. The monthly total crashes on those rows, because Python will not add a string to a number. The new rule the board agreed on is to add up the numbers and skip anything that is not one.</p>
+<p><strong>Test-driven development (TDD)</strong> writes the test for that rule before writing any code to satisfy it. The test says what the function should do, in a form that can be run:</p>
+<div class="mlrk-code"><pre>def test_total_days_waiting_skips_text():
+    """total_days_waiting - adds numbers, skips text"""
+    rows = [
+        {'name': 'Biscuit', 'days_waiting': 96},
+        {'name': 'Pepper', 'days_waiting': '12'},
+        {'name': 'Mochi', 'days_waiting': 45},
+    ]
+    assert total_days_waiting(rows) == 141</pre></div>
+<p>Run the tests now and the new one fails. A failing test is the point of this step, because it proves the test is actually checking something:</p>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — red</div><pre>collected 3 items
+
+tests/test_listing.py ..F                            [100%]
+
+    def total_days_waiting(pets):
+&gt;       return sum([pet['days_waiting'] for pet in pets])
+E       TypeError: unsupported operand type(s) for +: 'int' and 'str'
+
+=============== 1 failed, 2 passed in 0.02s ================</pre></div>
+<p>The traceback names the exact problem: <code>sum()</code> reached <code>'12'</code> and could not add a string to the running total. Keeping the text out of <code>sum()</code>'s way means knowing which values are numbers, and <code>isinstance(value, type)</code> answers that. It accepts a tuple of types, so one call covers whole numbers and decimals both:</p>
+<div class="mlrk-code"><pre>def total_days_waiting(pets):
+    numbers = [
+        pet['days_waiting'] for pet in pets
+        if isinstance(pet['days_waiting'], (int, float))
+    ]
+    return sum(numbers)</pre></div>
+<div class="mlrk-code"><div class="mlrk-outlabel">Output — green</div><pre>collected 3 items
+
+tests/test_listing.py ...                            [100%]
+
+==================== 3 passed in 0.03s =====================</pre></div>
+<p>A filtering comprehension did the work, with <code>isinstance</code> as its test, and <code>sum()</code> added what came through. Red, then green: the test failed first, then the smallest change that could satisfy it made it pass.</p>
+
+<div class="mlrk-card">
+<p><strong>Put the four steps of that cycle in the order they happened.</strong> Click a step to add it to your sequence, and click it again to take it back out.</p>
+<ul class="mlrk-orderlist" id="tdd-order">
+  <li class="mlrk-orderitem" data-step="pass"><span class="mlrk-order-num"></span> <span>Run <code>pytest</code> again and watch all three tests pass</span></li>
+  <li class="mlrk-orderitem" data-step="write"><span class="mlrk-order-num"></span> <span>Write a test for the new rule, asserting the total is <code>141</code></span></li>
+  <li class="mlrk-orderitem" data-step="code"><span class="mlrk-order-num"></span> <span>Add the <code>isinstance</code> test to the comprehension</span></li>
+  <li class="mlrk-orderitem" data-step="fail"><span class="mlrk-order-num"></span> <span>Run <code>pytest</code> and watch the new test fail with a <code>TypeError</code></span></li>
+</ul>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="tdd-check">Check my order</button></div>
+<div id="tdd-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>8. Summary &amp; reflection</h2>
+<p>A list comprehension builds a new list in one expression, and reading it from the <code>for</code> outward tells you what it produces. Add an <code>if</code> at the end and it keeps only the elements that pass. <code>sum()</code>, <code>min()</code>, <code>max()</code>, and <code>len()</code> turn a whole list into one value, and the accumulator loop covers the jobs they do not. <code>sorted()</code> gives you a new ordered list, while <code>.sort()</code> reorders in place and returns <code>None</code> — the reason Maple Street Rescue's page went up empty.</p>
+<label for="reflect"><strong>In 2-3 sentences:</strong> <code>total_days_waiting</code> now skips any <code>days_waiting</code> that is not a number, so a pet whose wait arrived from the spreadsheet as <code>'12'</code> adds nothing to the board's total. Nobody sees an error. Who at the shelter would be misled by that total, and what would you change so the skipped rows do not stay invisible?</label>
+<textarea id="reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>9. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://codingbat.com/python/List-2" target="_blank" rel="noopener">CodingBat: Python List-2</a> — short auto-graded problems that each take a list and return a new list or a single value, which is exactly the shape a comprehension or a built-in handles; write each one as a loop first, then refactor it.</li>
+  <li><a href="https://pythontutor.com/python-compiler.html" target="_blank" rel="noopener">Python Tutor</a> — paste a comprehension in and step through it one element at a time; it draws the new list filling up as the <code>for</code> clause walks the source, which is the part the one-line form hides.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<div id="scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="copy-btn">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="download-btn">Download as .txt</button>
+</div>
+<p id="copy-fb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "python-comprehensions-builtin-iteration";
+  const TITLE = "The Page That Went Up Empty";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards(document, "act-flipcards");
+
+  function normalize(s){ return s.trim().toLowerCase().replace(/\s+/g,"").replace(/[‘’]/g,"'"); }
+
+  /* ---- section 3: type the missing for clause ---- */
+  const forBtn = document.getElementById("for-check");
+  const forInput = document.getElementById("for-input");
+  const forFb = document.getElementById("for-fb");
+  K.Scoring.register("act-for-clause", 1, "quiz");
+  let forAttempts = 0, forDone = false;
+  forBtn.addEventListener("click", function(){
+    if(forDone) return;
+    forAttempts++;
+    const val = normalize(forInput.value);
+    if(/^forpetinpets$/.test(val)){
+      K.Scoring.award("act-for-clause", forAttempts===1?1:0.5);
+      forFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      forFb.innerHTML = "<strong>Correct.</strong> <code>for pet in pets</code> walks the <code>pets</code> list and calls one element <code>pet</code>, which is the name the expression <code>pet['days_waiting']</code> is waiting for. Read the whole line from the <code>for</code> outward: for each pet in pets, take that pet's days_waiting, and collect the numbers in a new list.";
+      forDone = true;
+    } else if(/^forpetinpets:$/.test(val)){
+      forFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      forFb.innerHTML = "<strong>Drop the colon.</strong> A <code>for</code> statement ends in a colon because an indented block follows it. A comprehension has no block: the expression that would go in that block is written in front of the <code>for</code> instead, so the clause ends at <code>pets</code>." +
+        (forAttempts >= 2 ? " <strong>The answer is <code>for pet in pets</code>.</strong>" : '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>');
+      if(forAttempts >= 2){ K.Scoring.award("act-for-clause", 0); forDone = true; }
+    } else if(/^for[a-z_]+inpets$/.test(val)){
+      forFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      forFb.innerHTML = "<strong>The list is right, the element's name is not.</strong> The expression already written on that line is <code>pet['days_waiting']</code>, so Python needs an element called <code>pet</code>. Any other name leaves <code>pet</code> undefined and raises a <code>NameError</code>." +
+        (forAttempts >= 2 ? " <strong>The answer is <code>for pet in pets</code>.</strong>" : '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>');
+      if(forAttempts >= 2){ K.Scoring.award("act-for-clause", 0); forDone = true; }
+    } else if(forAttempts >= 2){
+      K.Scoring.award("act-for-clause", 0);
+      forFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      forFb.innerHTML = "<strong>Here's the answer:</strong> <code>for pet in pets</code>. The clause names the list to walk through, <code>pets</code>, and the name one element goes by, <code>pet</code>. No colon, because a comprehension has no indented block after it.";
+      forDone = true;
+    } else {
+      forFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      forFb.innerHTML = "<strong>Not yet.</strong> The clause has three parts: the word <code>for</code>, the name one element will go by, the word <code>in</code>, and the list to walk through. The expression on that line already tells you which name it needs." +
+        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
+    }
+    forFb.setAttribute("tabindex","-1"); forFb.focus();
+  });
+
+  /* ---- section 4: filter and transform in one comprehension ---- */
+  K.quiz({
+    id: "act-filter-predict",
+    buttonSelector: "#q-filter .mlrk-choice",
+    feedbackSelector: "#q-filterfb",
+    correct: "four",
+    answerLabel: "['Biscuit', 'Pepper', 'Mochi', 'Tilly']",
+    feedback: {
+      four: "The if runs once per pet and keeps only the four whose 'adoptable' value is True, and the expression pet['name'] turns each kept dictionary into just the name. Juniper's 'adoptable' value is False, so Juniper never reaches the new list at all.",
+      five: "That is what the comprehension would produce with the if removed, since a transform always returns exactly as many elements as the source list. The if is what makes the result shorter: it is tested once per pet, and a pet whose test comes out False is left out of the new list entirely. Juniper's value is False, so four names come back, not five.",
+      bools: "True and False are what the if tests, not what the comprehension collects. The expression in front of the for decides what goes in the new list, and that expression is pet['name']. The if only decides which pets get that far, so the result is four names."
+    }
+  });
+
+  /* ---- section 5: which jobs does one built-in already do? ---- */
+  K.selectAll({
+    id: "act-combine-tools",
+    boxSelector: ".combine-box",
+    submitSelector: "#combine-submit",
+    feedbackSelector: "#combine-fb",
+    options: [
+      {value:"total", label:"The total number of days all the pets have waited", correct:true,
+        hint:"Think about what you would do with a list of five numbers to get one number out.",
+        explain:"<code>sum(waits)</code> adds up a list of numbers and returns one number."},
+      {value:"count", label:"How many pets are in the pets list", correct:true,
+        hint:"Python has a one-word function for the length of any list.",
+        explain:"<code>len(pets)</code> returns 5, counting the elements without a loop."},
+      {value:"shortest", label:"The shortest wait in days", correct:true,
+        hint:"There is a built-in for the largest value in a list, and a matching one for the smallest.",
+        explain:"<code>min(waits)</code> returns 12, the smallest number in the list."},
+      {value:"species", label:"How many pets of each species the shelter holds", correct:false,
+        hint:"Picture the answer. Is it one value, or several counts that each have to be built up?",
+        explain:"The answer is a dictionary of counts, and each count depends on the counts already made, so this needs the accumulator loop with <code>.get(species, 0)</code>."},
+      {value:"names", label:"A list of every pet's name", correct:false,
+        hint:"This one gives back as many values as it started with. Is that combining a list into one value?",
+        explain:"This is a transform, not a combine, so it is a comprehension: <code>[pet['name'] for pet in pets]</code>."}
+    ]
+  });
+
+  /* ---- section 6: the None that .sort() hands back ---- */
+  K.quiz({
+    id: "act-sort-none",
+    buttonSelector: "#q-sortnone .mlrk-choice",
+    feedbackSelector: "#q-sortnonefb",
+    correct: "none",
+    answerLabel: "None",
+    feedback: {
+      none: "The .sort() method reorders nums in place and returns nothing, and a call that returns nothing is worth None. So result holds None while nums itself is now [1, 2, 3, 4, 5]. To get the sorted list as a value, call sorted(nums). To reorder nums itself, call nums.sort() on its own line and assign it to nothing.",
+      sorted: "That is what sorted(nums) returns, and it is also what nums itself holds after this code runs. It is not what .sort() handed back: .sort() does its work in place and returns nothing, so result holds None. Print nums instead of result and you get [1, 2, 3, 4, 5].",
+      orig: "nums does not stay in its original order, because .sort() changes the list it is called on. After these lines nums is [1, 2, 3, 4, 5]. The variable result is the one that holds nothing useful: .sort() returns nothing, so result is None."
+    }
+  });
+
+  /* ---- section 6: key= and reverse=True ---- */
+  const keyBtn = document.getElementById("key-check");
+  const revInput = document.getElementById("rev-input");
+  const keyInput = document.getElementById("key-input");
+  const keyFb = document.getElementById("key-fb");
+  K.Scoring.register("act-key-reverse", 1, "quiz");
+  let keyAttempts = 0, keyDone = false;
+  keyBtn.addEventListener("click", function(){
+    if(keyDone) return;
+    keyAttempts++;
+    const revVal = normalize(revInput.value);
+    const keyVal = normalize(keyInput.value);
+    const revOk = /^reverse=true$/.test(revVal);
+    const keyOk = /^key=pet_name$/.test(keyVal) ||
+                  /^key=lambda[a-z_]+:[a-z_]+\[['"]name['"]\]$/.test(keyVal);
+    if(revOk && keyOk){
+      K.Scoring.award("act-key-reverse", keyAttempts===1?1:0.5);
+      keyFb.className = "mlrk-feedback mlrk-show mlrk-good";
+      keyFb.innerHTML = "<strong>Both correct.</strong> <code>reverse=True</code> flips the order to largest first, so the longest wait leads the list. <code>key=pet_name</code> hands the <code>pet_name</code> function to <code>sorted</code>, which calls it once per pet and compares the names that come back. Both calls still return whole dictionaries, so <code>pet['name']</code> works on every element of the result.";
+      keyDone = true;
+    } else if(keyAttempts >= 2){
+      K.Scoring.award("act-key-reverse", 0);
+      keyFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
+      keyFb.innerHTML = "<strong>Here are the answers:</strong> <code>reverse=True</code> for the first blank, and <code>key=pet_name</code> for the second. <code>reverse=True</code> asks for descending order. <code>key=pet_name</code> names the function <code>sorted</code> should call on each pet, with no parentheses, because <code>sorted</code> is the one doing the calling.";
+      keyDone = true;
+    } else {
+      const which = revOk ? "The second blank is not right yet." : (keyOk ? "The first blank is not right yet." : "Neither blank is right yet.");
+      keyFb.className = "mlrk-feedback mlrk-show mlrk-bad";
+      keyFb.innerHTML = "<strong>" + which + "</strong> Each blank is one keyword argument: a name, an equals sign, and a value. One of them asks for descending order. The other needs a function's bare name, because parentheses would run that function on this line, before <code>sorted</code> has a pet to hand it." +
+        '<div class="mlrk-attempt-note">One more try before the answers are revealed.</div>';
+    }
+    keyFb.setAttribute("tabindex","-1"); keyFb.focus();
+  });
+
+  /* ---- section 7: the order of the red-green cycle ---- */
+  K.orderSteps("#tdd-order", {
+    id: "act-tdd-order",
+    correctOrder: ["write","fail","code","pass"],
+    feedbackSelector: "#tdd-fb",
+    checkSelector: "#tdd-check"
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#reflect", minWords:10});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#scorechip"); });
+  K.Scoring.renderChip("#scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#download-btn"});
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#copy-btn", onDone:function(ok){
+    document.getElementById("copy-fb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>
