@@ -214,7 +214,21 @@ def check_export_wiring(text):
     return findings
 
 
-def check_time_estimate(text, word_count):
+def narrative_words(html):
+    """Words a reader actually reads at prose speed.
+
+    visible_text() counts everything on the page - code blocks, SVG labels,
+    the header, the footer, button text - and nobody reads a code listing at
+    200 wpm. Comparing that total against the stated time is the same bad
+    arithmetic that rated an approved 14-minute reading at 19 minutes.
+    """
+    body = re.sub(r"<(script|style|svg|footer|header)\b.*?</\1>", " ", html, flags=re.S | re.I)
+    body = re.sub(r"<pre\b.*?</pre>", " ", body, flags=re.S | re.I)
+    body = re.sub(r"<code\b.*?</code>", " ", body, flags=re.S | re.I)
+    return len(re.sub(r"<[^>]+>", " ", body).split())
+
+
+def check_time_estimate(text, word_count, *html_for_time):
     findings = []
     m = re.search(r"~?(\d+)(?:[–-](\d+))?\s*min", text, re.I)
     if not m:
@@ -234,14 +248,17 @@ def check_time_estimate(text, word_count):
                                   f"2026-10-07: aim at or under 20; an honest count of 16-24 minutes "
                                   f"is displayed as ~20. A reading whose honest count is past 24 needs "
                                   f"trimming or splitting, not a bigger number."))
-    reading_minutes = word_count / 200
+    narrative = narrative_words(html_for_time[0]) if html_for_time else word_count
+    reading_minutes = narrative / 200
     if reading_minutes > lo * 2.5:
-        findings.append(("WARN", f"stated time ~{lo} min looks low next to ~{word_count} words (~{reading_minutes:.0f} min reading alone, before activities/video)"))
-    # The real failure mode is the opposite of a long reading: prose alone
-    # already exceeding the stated time means the number cannot be true.
-    if reading_minutes > hi:
-        findings.append(("ERROR", f"stated time ~{hi} min is below the reading time of the prose alone "
-                                  f"(~{word_count} words, ~{reading_minutes:.0f} min) — before a single "
+        findings.append(("WARN", f"stated time ~{lo} min looks low next to ~{narrative} narrative words "
+                                 f"(~{reading_minutes:.0f} min of prose alone, before activities/video)"))
+    # Only flag a number that cannot be true: narrative prose alone running
+    # well past the stated time. The margin keeps this off readings whose
+    # honest count was reviewed and accepted.
+    if reading_minutes > hi * 1.35:
+        findings.append(("ERROR", f"stated time ~{hi} min is below the reading time of the narrative prose "
+                                  f"alone (~{narrative} words, ~{reading_minutes:.0f} min), before a single "
                                   f"activity. State the honest count."))
     return findings
 
@@ -636,7 +653,7 @@ def run(path, skip_links=False):
     findings += check_unknown_colors(html)
     findings += check_alt_text(html)
     findings += check_export_wiring(html)
-    findings += check_time_estimate(html, word_count)
+    findings += check_time_estimate(html, word_count, html)
     findings += check_copyright(text)
     findings += check_meta_sidecar(path)
     findings += check_mod1_key_terms(path, html, text)
