@@ -229,10 +229,11 @@ def check_time_estimate(text, word_count):
     # 15. Angelica's call: one reading per GitBook lesson, and the stated time
     # tells the truth however long it is. Over 15 now warns, so it stays
     # visible without rewarding a false number.
-    if hi > 15:
-        findings.append(("WARN", f"stated time ~{hi} min is over the format's usual 15-minute target. "
-                                 f"Fine when the lesson genuinely carries it — confirm the number is the "
-                                 f"honest count and not a padded one."))
+    if hi > 20:
+        findings.append(("ERROR", f"stated time ~{hi} min is over the 20-minute ceiling. Angelica, "
+                                  f"2026-10-07: aim at or under 20; an honest count of 16-24 minutes "
+                                  f"is displayed as ~20. A reading whose honest count is past 24 needs "
+                                  f"trimming or splitting, not a bigger number."))
     reading_minutes = word_count / 200
     if reading_minutes > lo * 2.5:
         findings.append(("WARN", f"stated time ~{lo} min looks low next to ~{word_count} words (~{reading_minutes:.0f} min reading alone, before activities/video)"))
