@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Run It Before You Read It</title>
+<link rel="stylesheet" href="../../assets/brand-tokens.css">
+<link rel="stylesheet" href="../../assets/reading-kit.css">
+<style>
+.mlrk-illustration{width:100%;max-width:880px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
+@media(max-width:650px){.mlrk-illustration{max-width:100%}}
+/* Both files sit on screen at the point where the trace crosses between them,
+   stacked rather than side by side: main.py indents four levels deep, and a
+   half-width column wraps those lines until the indentation is unreadable. */
+.rc-compare-label{margin:1.3rem 0 .5rem;line-height:1.4}
+.rc-out{min-height:0}
+/* The six-step method is one bolded run in the chapter, so it gets one card
+   rather than six. Spanning the row keeps it readable as a list of six. */
+.rc-method{grid-column:1/-1}
+/* A traceback's spacing is meant to line up under the expression it marks, so
+   this one block scrolls sideways inside itself instead of wrapping. */
+.rc-wide{white-space:pre;overflow-x:auto;min-height:0}
+</style>
+</head><body>
+
+<header class="mlrk-header"><div class="mlrk-wrap">
+<div class="mlrk-eyebrow">Interactive reading</div>
+<h1>Run It Before You Read It</h1>
+<div class="mlrk-meta">
+  <span class="mlrk-pill">~20 minutes</span>
+  <span class="mlrk-pill">Interactive</span>
+  <span class="mlrk-pill">No setup needed to read</span>
+</div>
+</div></header>
+
+<div class="mlrk-progress-track"><div id="bar" class="mlrk-progress-bar"></div></div>
+
+<main class="mlrk-main"><div class="mlrk-wrap">
+
+<section class="mlrk-section">
+<h2>1. A program nobody can explain</h2>
+<p>Lend-a-Hand is a small Python program that a community tool library uses to track what is on its shelf. A tool library lends out drills and ladders the way a book library lends out books. One volunteer wrote Lend-a-Hand, ran it for a year, and then moved away. Now another volunteer has filed a bug: "It won't let me lend out the sander."</p>
+<p>You have two files and nothing else. No notes, no comments, nobody to ask. Opening the first file and reading from the top is how most people start, and it is also how most people get lost. A screen or two in, you are holding half a dozen facts you only half believe, and you can no longer say which ones you actually checked.</p>
+<p>There is a better order to do this in, and it starts by not reading. It is the same order whether a teammate, a library's author, or an AI model wrote the lines.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card. These are the terms the rest of the reading uses.</p>
+<div class="mlrk-grid" id="rc-flipcards">
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>building a model of someone else's intent</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>building a model of someone else's intent</strong><br>Reading code means building a model of someone else's intent from the things they left behind: the files, the names, and the behavior. You are not trying to memorize the code. You are trying to get to the point where you can predict it.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>orientation questions</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>orientation questions</strong><br>Six questions that give you a place to stand before you dive in. What is this program supposed to do? Where does the behavior show up? Which files matter? What did I try? What did I observe? What do I know, and what am I guessing? "I don't know yet" is a fine answer, because it is honest.</span></button>
+<button type="button" class="mlrk-term rc-method"><span class="mlrk-front"><strong>run it, find the entry point, find the data, trace one action, predict then run, and write down what you know and what you are guessing</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>run it, find the entry point, find the data, trace one action, predict then run, and write down what you know and what you are guessing</strong><br>The method, as one pass, in six steps. The order is the point. Running first gives you facts to check everything else against. The entry point and the data give you a map. Tracing one action keeps you from trying to hold the whole program at once. Predicting before you run turns a disagreement into something you can see. The two lists at the end tell you which of your beliefs you checked.</span></button>
+</div>
+</section>
+
+<section class="mlrk-section">
+<h2>3. Step 1: run it before you read it</h2>
+<p>Run the program and use it, before you open a file. Give it good input. Give it bad input. Try to break it. What comes back are facts about what Lend-a-Hand <em>does</em>, and every line you read afterward has to agree with those facts.</p>
+<p>Reading first builds a picture of what you <em>think</em> the program does. Then you run it, something comes out that does not match, and you can miss it, because you already believe you know the answer. Running first means the surprise arrives while you can still see it.</p>
+<p>This Terminal runs the real commands, and the real Lend-a-Hand program, against a copy of the volunteer's folder. Each line you type is echoed after the folder name, and the program's questions come out underneath it. Work through these in order.</p>
+<ol class="mlrk-small mlrk-steplist">
+  <li><code>ls</code> — see which files the volunteer left behind</li>
+  <li><code>python3 main.py</code> — start the program</li>
+  <li><code>3</code> — pick Report, and read what is on the shelf</li>
+  <li><code>2</code>, then <code>sander</code>, then <code>1</code> — try to lend the sander, which is what the bug report is about</li>
+  <li><code>2</code>, then <code>drill</code>, then <code>two</code> — hand it a word where it wants a number, then keep typing and see where you end up</li>
+  <li><code>4</code> — quit</li>
+</ol>
+<div class="mlrk-terminal" id="rc-terminal">
+  <div class="mlrk-terminal-log" aria-live="polite"></div>
+  <div class="mlrk-terminal-row"><span class="mlrk-terminal-prompt"></span><input class="mlrk-terminal-input" type="text" aria-label="Terminal input" autocomplete="off" spellcheck="false"></div>
+</div>
+<details class="mlrk-hint"><summary>What else can I try in there?</summary>
+<p>Try to lend a tool the library has never owned, such as <code>2</code>, then <code>chainsaw</code>, then <code>1</code>. Try lending more drills than the shelf holds. Pick <code>1</code> to add three of something new, then pick <code>3</code> and see whether it shows up. Quit with <code>4</code>, start the program again, and pick <code>3</code> a second time to find out whether Lend-a-Hand remembers anything between runs.</p>
+</details>
+
+<label for="rc-onesentence"><strong>You have now used Lend-a-Hand without reading a line of it.</strong> <strong>In one sentence, say what Lend-a-Hand does, from the point of view of the volunteer using it.</strong></label>
+<textarea id="rc-onesentence" class="mlrk-response" data-save></textarea>
+<details class="mlrk-hint"><summary>Compare with one possible answer</summary>
+<p>Something like: "It keeps a count of how many of each tool the library has on the shelf, lets you add to a count or lend tools out, and prints the list."</p>
+<p>That is the answer to the first orientation question, and you wrote it without reading any code. Everything you read from here on has to agree with that sentence. If something does not agree, either the sentence is wrong or you have found a bug, and either one is worth knowing.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>4. Steps 2 and 3: the entry point, the map, and the data</h2>
+<p>The entry point is the file you hand to <code>python3</code>, and, inside it, the function that starts everything. In a Python program you already know the two things to look for: the <code>if __name__ == "__main__":</code> guard, and the <code>main()</code> it calls.</p>
+<p>Then list the files. For each one, read only the <code>import</code> lines and the <code>def</code> lines, and write one sentence about what that file is <em>for</em>. Leave the bodies alone for now. You are drawing a map, not walking the ground.</p>
+<p>Here is every <code>import</code> line, every <code>def</code> line, and every top-level variable in both of Lend-a-Hand's files, with the line number each one sits on:</p>
+<div class="mlrk-code"><pre class="mlrk-screen rc-out">main.py:1:from shelf import add, lend, report
+main.py:4:def main():
+main.py:32:if __name__ == "__main__":
+
+shelf.py:1:shelf = {"ladder": 1, "drill": 2, "sander": 0}
+shelf.py:4:def add(name, quantity):
+shelf.py:9:def lend(name, quantity):
+shelf.py:18:def report():</pre></div>
+<p>That is the map. <code>main.py</code> carries the <code>__main__</code> guard, so <code>main.py</code> is the file you run and <code>main()</code> is where the program starts. <code>main.py</code> is for talking to the volunteer. <code>shelf.py</code> is for keeping and changing the shelf.</p>
+<p>Step 3 asks a different question: what does this program remember? Find every variable that lives at the top level of a file, and write down its shape. "A dictionary from a tool's name to how many are on the shelf" is a shape. Once you know the shape, every function turns into a short question: what does this one do to <code>shelf</code>?</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 880 480" role="img" aria-labelledby="rcMapTitle rcMapDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="rcMapTitle">The two files of Lend-a-Hand, and the one dictionary they share</title>
+  <desc id="rcMapDesc">Two stacked panels. The upper panel is main.py, the entry point. It holds three lines: an import statement that brings in the three names add, lend and report; a def main line, which is the menu loop and the only place the program calls input; and the if __name__ equals __main__ guard, which is what makes main.py the file you run. The lower panel is shelf.py, the data and the three functions. Its first line is highlighted: shelf is a dictionary holding ladder 1, drill 2 and sander 0, and it is the data everything touches. Under it sit def add, which puts tools on the shelf, def lend, which takes tools off the shelf, and def report, which builds the whole list as one string. A short label between the two panels reads: main.py calls add, lend and report.</desc>
+  <rect x="0" y="0" width="880" height="480" fill="#FFFCF7"/>
+  <text x="8" y="24" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#261F1D">main.py — the entry point</text>
+  <rect x="8" y="34" width="864" height="150" rx="12" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2.5"/>
+  <g font-family="Menlo, Consolas, monospace" font-size="18" fill="#261F1D">
+    <text x="26" y="70">from shelf import add, lend, report</text>
+    <text x="26" y="110">def main():</text>
+    <text x="26" y="150">if __name__ == "__main__":</text>
+  </g>
+  <g font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#261F1D">
+    <text x="440" y="70">brings in three names</text>
+    <text x="440" y="110">the menu loop, and the only input() calls</text>
+    <text x="440" y="150">so main.py is the file you run</text>
+  </g>
+  <line x1="440" y1="184" x2="440" y2="202" stroke="#83671C" stroke-width="3"/>
+  <text x="440" y="226" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#261F1D">main.py calls add, lend and report</text>
+  <line x1="440" y1="238" x2="440" y2="256" stroke="#83671C" stroke-width="3"/>
+  <text x="8" y="286" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#261F1D">shelf.py — the data and the three functions</text>
+  <rect x="8" y="296" width="864" height="176" rx="12" fill="#FFF6E4" stroke="#B3BBB0" stroke-width="2.5"/>
+  <rect x="24" y="310" width="832" height="48" rx="9" fill="#A6C2B4" stroke="#264326" stroke-width="2.5"/>
+  <text x="38" y="341" font-family="Menlo, Consolas, monospace" font-size="18" font-weight="700" fill="#204D3C">shelf = {"ladder": 1, "drill": 2, "sander": 0}</text>
+  <text x="566" y="341" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#204D3C">the data everything touches</text>
+  <g font-family="Menlo, Consolas, monospace" font-size="18" fill="#261F1D">
+    <text x="38" y="392">def add(name, quantity)</text>
+    <text x="38" y="428">def lend(name, quantity)</text>
+    <text x="38" y="464">def report()</text>
+  </g>
+  <g font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#261F1D">
+    <text x="400" y="392">puts tools on the shelf</text>
+    <text x="400" y="428">takes tools off the shelf</text>
+    <text x="400" y="464">builds the whole list as one string</text>
+  </g>
+</svg>
+
+<p>Lend-a-Hand has exactly one piece of data that lives between actions: <code>shelf</code>, on the first line of <code>shelf.py</code>. Its shape is a dictionary from a tool's name, a string, to a count, an int. Everything the program does is either a change to that one dictionary or a report on it.</p>
+
+<div class="mlrk-card">
+<p><strong>You have read only the <code>import</code> lines, the <code>def</code> lines, and the <code>shelf</code> line.</strong> <strong>Check every statement you can honestly put in your "I know" column.</strong></p>
+<label class="mlrk-selectall-option"><input type="checkbox" class="rc-know-box" value="entry"> <span><code>main.py</code> is the file you run.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="rc-know-box" value="imports"> <span><code>main.py</code> can call <code>add</code>, <code>lend</code>, and <code>report</code>.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="rc-know-box" value="shape"> <span><code>shelf</code> is a dictionary from a tool's name to a number.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="rc-know-box" value="lendtrue"> <span><code>lend</code> returns <code>True</code> whenever the tool is on the shelf.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="rc-know-box" value="reportprint"> <span><code>report</code> prints the list of tools.</span></label>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="rc-know-submit">Check my answers</button></div>
+<div id="rc-know-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>For each statement, ask which line you read it off. Three of the five come straight off a line you have seen. The other two come from a function's name, and a name is the author's claim about the code, not the code.</p>
+</details>
+
+<p>Two of those five statements are guesses wearing the clothes of facts, and both came from a function's name. A function's name and its parameter list are the author's notes to you about intent. <code>lend(name, quantity)</code> says "I lend some quantity of a named tool," which is real information and belongs in your notes. Only the body tells you whether the code lives up to the name, so until you read the body, a claim off a name goes in the "guessing" column.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>5. Step 4: trace one action from input to output</h2>
+<p>Pick one thing a person can do, start at the entry point, and follow that single action through every function it touches, in order, until the output appears. Ignore every other branch. You will come back for them. Trying to hold a whole program in your head at once is how you get lost.</p>
+<p>The bug report said the sander will not lend, so trace that one action: choose <code>2</code>, type <code>sander</code>, type <code>1</code>. Here are both files in full. This is the first point in the method where you read a body.</p>
+<p class="rc-compare-label"><strong><code>main.py</code></strong><br>talks to the volunteer</p>
+<div class="mlrk-code"><pre class="mlrk-screen rc-out">from shelf import add, lend, report
+
+
+def main():
+    print("Lend-a-Hand: the tool shelf.")
+    while True:
+        print("\n1. Add  2. Lend  3. Report  4. Quit")
+        choice = input("Choose (1-4): ").strip()
+        if choice == "4":
+            break
+        if choice == "3":
+            print(report())
+        elif choice in ("1", "2"):
+            name = input("Tool name: ").strip().lower()
+            quantity = input("How many? ").strip()
+            if not quantity.isdigit():
+                print("Please enter a whole number.")
+                continue
+            quantity = int(quantity)
+            if choice == "1":
+                total = add(name, quantity)
+                print(f"Now holding {total} {name}.")
+            elif lend(name, quantity):
+                print(f"Lent {quantity} {name}.")
+            else:
+                print(f"Can't lend {quantity} {name}.")
+        else:
+            print("That isn't an option.")
+    print("Goodbye.")
+
+
+if __name__ == "__main__":
+    main()</pre></div>
+<p class="rc-compare-label"><strong><code>shelf.py</code></strong><br>keeps and changes the shelf</p>
+<div class="mlrk-code"><pre class="mlrk-screen rc-out">shelf = {"ladder": 1, "drill": 2, "sander": 0}
+
+
+def add(name, quantity):
+    shelf[name] = shelf.get(name, 0) + quantity
+    return shelf[name]
+
+
+def lend(name, quantity):
+    if name not in shelf:
+        return False
+    if shelf[name] &lt; quantity:
+        return False
+    shelf[name] -= quantity
+    return True
+
+
+def report():
+    lines = []
+    for name, quantity in sorted(shelf.items()):
+        marker = "" if quantity &gt; 0 else " (all lent out)"
+        lines.append(f"{name}: {quantity}{marker}")
+    return "\n".join(lines)</pre></div>
+<p><strong>Each click shows the next step of the trace.</strong> The path starts in <code>main()</code>, crosses into <code>shelf.py</code>, and comes back.</p>
+<div class="mlrk-card"><div id="rc-trace"></div></div>
+<p>That is one complete path through Lend-a-Hand, and it answers the bug report. <code>lend</code> returned <code>False</code> because <code>shelf["sander"]</code> holds <code>0</code>: every sander the library owns is already lent out. The message <code>Can't lend 1 sander.</code> is true, and it never says which of the two guard clauses in <code>lend</code> stopped it. Every other path through this program is shorter than the sander path, or reuses pieces of it.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>6. Step 5: predict, then run</h2>
+<p>For each function, write down what you think it returns for one specific input before you study the body. Then check it. Read the body line by line, or open the REPL in the folder and call the function yourself.</p>
+<p>A prediction you get wrong is the most useful thing step 5 produces. It marks one exact spot where your model of the program and the program disagree, and it tells you which of the two to go fix: your model, not the code. That is a finding, and findings get written down. A round of step 5 where every prediction is right has taught you nothing you did not already believe.</p>
+<div class="mlrk-card">
+<p><strong>A volunteer buys three mowers, and <code>shelf</code> has no <code>mower</code> key yet.</strong> <strong>What does <code>add("mower", 3)</code> return?</strong></p>
+<div id="rc-add-choices">
+<button type="button" class="mlrk-choice" data-a="three"><code>3</code></button>
+<button type="button" class="mlrk-choice" data-a="true"><code>True</code></button>
+<button type="button" class="mlrk-choice" data-a="none"><code>None</code></button>
+<button type="button" class="mlrk-choice" data-a="dict"><code>{"ladder": 1, "drill": 2, "sander": 0, "mower": 3}</code></button>
+</div>
+<div id="rc-add-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p><code>add</code> has two lines. The first one stores a value in the dictionary. Read the second line, and ask what expression sits after the word <code>return</code>.</p>
+</details>
+
+<p>The <code>0</code> in <code>shelf.get(name, 0)</code> is the author's second note to you. It is a default, handed back when the key is missing. Take the default out so the line reads <code>shelf[name] = shelf.get(name) + quantity</code>, then add a tool the shelf has never held, and Python stops with this:</p>
+<div class="mlrk-code"><pre class="mlrk-screen rc-wide">Traceback (most recent call last):
+  File "try_add.py", line 3, in &lt;module&gt;
+    add("mower", 3)
+    ~~~^^^^^^^^^^^^
+  File "shelf.py", line 5, in add
+    shelf[name] = shelf.get(name) + quantity
+                  ~~~~~~~~~~~~~~~~^~~~~~~~~~
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'</pre></div>
+<p><code>.get</code> with no default hands back <code>None</code> for a missing key, and <code>None + 3</code> is not an addition Python can do. So that <code>0</code> is the whole reason a volunteer can add a tool the library has never owned before. The author put it there on purpose, and now you can say why.</p>
+
+<h3>A wrong prediction is a finding</h3>
+<p>Here is a prediction worth getting wrong. <strong>You choose <code>2</code> to lend, type <code>drill</code>, and then type <code>two</code> where Lend-a-Hand wants a number.</strong> It answers <code>Please enter a whole number.</code> <strong>You then type <code>7</code>. What does Lend-a-Hand do with the <code>7</code>?</strong></p>
+<div class="mlrk-card">
+<div id="rc-continue-choices">
+<button type="button" class="mlrk-choice" data-a="lends">It lends 7 drills.</button>
+<button type="button" class="mlrk-choice" data-a="reasks">It asks how many again, and waits for a number.</button>
+<button type="button" class="mlrk-choice" data-a="menu">It reads the <code>7</code> as a menu choice and says <code>That isn't an option.</code></button>
+</div>
+<div id="rc-continue-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<p>Here is the real session, start to finish:</p>
+<div class="mlrk-code"><pre class="mlrk-screen rc-out">Lend-a-Hand: the tool shelf.
+
+1. Add  2. Lend  3. Report  4. Quit
+Choose (1-4): 2
+Tool name: drill
+How many? two
+Please enter a whole number.
+
+1. Add  2. Lend  3. Report  4. Quit
+Choose (1-4): 7
+That isn't an option.
+
+1. Add  2. Lend  3. Report  4. Quit
+Choose (1-4): 4
+Goodbye.</pre></div>
+<p>If you predicted that the <code>7</code> would be taken as the quantity, you did not fail the question. You found something, and this is the kind of thing step 5 exists to surface. Your model of the program said "ask again for the one value that was wrong." Lend-a-Hand does "start the whole action over," because <code>continue</code> jumps to the top of the <code>while</code> loop and the first thing that loop does is print the menu.</p>
+<p>Write the difference down in plain words: "Typing a word at the quantity question sends the volunteer back to the menu, not back to the quantity question." Whether the author meant it to work that way is a fair question, and neither file answers it. That one belongs in the "guessing" column.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Reading code a model wrote</h2>
+<p>An AI model will write code like Lend-a-Hand for you, faster, with tidier comments, and in a tone of complete confidence. Reading it is the same six steps with one adjustment: the confidence tells you nothing. Generated code is plausible, and plausible is not the same as correct, so the suspicion has to come from you.</p>
+<p>Here is a function a model produced when it was asked for a piece of a shopping program.</p>
+<div class="mlrk-code"><pre class="mlrk-screen rc-out">def total_price(prices):
+    total = 0
+    for price in prices:
+        total = price
+    return total
+
+print(total_price([1.50, 4.00, 3.50]))</pre></div>
+<div class="mlrk-card">
+<p><strong>Predict first, then read the loop body closely.</strong> <strong>What does this program print?</strong></p>
+<div id="rc-total-choices">
+<button type="button" class="mlrk-choice" data-a="nine"><code>9.0</code></button>
+<button type="button" class="mlrk-choice" data-a="last"><code>3.5</code></button>
+<button type="button" class="mlrk-choice" data-a="first"><code>1.5</code></button>
+<button type="button" class="mlrk-choice" data-a="zero"><code>0</code></button>
+</div>
+<div id="rc-total-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<p>The name <code>total_price</code> and the line <code>total = 0</code> are both notes about intent: this function is meant to add things up. The body does not add anything up. When a name and a body disagree, you have found the bug, and the name usually tells you which of the two to change.</p>
+<p>Now say it the way a good bug report says it. "<code>total_price([1.50, 4.00, 3.50])</code> returns <code>3.5</code>. Expected <code>9.0</code>. The loop assigns instead of adding, on the line <code>total = price</code>." Concrete input, actual output, expected output, and where. That one sentence is worth far more than "it's broken," and it is the sentence you will be asked to write for the rest of the year.</p>
+</section>
+
+<section class="mlrk-section">
+<h2>8. Step 6: what you know and what you are guessing</h2>
+<p>Step 6 is two lists on one page. Move an item from "guessing" to "know" only after you have run code that settles it. Whatever is still in the "guessing" column at the end is your list of questions, and it is a much better list than the one you could have written before you started. Here are the two lists for Lend-a-Hand.</p>
+<p><strong>Know:</strong> one dictionary of tool counts lives in <code>shelf.py</code>. <code>add</code> can create a tool the shelf never held, because <code>.get(name, 0)</code> supplies a starting count of zero. <code>lend</code> refuses a tool that is not a key, and refuses a quantity larger than the count. <code>report</code> returns the list alphabetically as one string, and <code>main.py</code> is what prints it. Typing a word where a number belongs sends the volunteer back to the menu.</p>
+<p><strong>Still guessing:</strong> whether the author meant <code>continue</code> to go all the way back to the menu. Whether the shelf is supposed to remember its counts after you quit, which it does not, since <code>shelf</code> is rebuilt from that first line on every run.</p>
+<p><strong>Try it.</strong> The six steps are out of order. Click them in the order the method runs them.</p>
+<div class="mlrk-card">
+<ul class="mlrk-orderlist" id="rc-method-order">
+  <li class="mlrk-orderitem" data-step="data"><span class="mlrk-order-num"></span> Find the data: the one thing the program remembers, and its shape.</li>
+  <li class="mlrk-orderitem" data-step="lists"><span class="mlrk-order-num"></span> Write down what you know and what you are guessing, in two lists.</li>
+  <li class="mlrk-orderitem" data-step="run"><span class="mlrk-order-num"></span> Run it with good input and bad input.</li>
+  <li class="mlrk-orderitem" data-step="predict"><span class="mlrk-order-num"></span> Predict what one function returns, then run it and compare.</li>
+  <li class="mlrk-orderitem" data-step="map"><span class="mlrk-order-num"></span> Find the entry point and map the files by their <code>import</code> and <code>def</code> lines.</li>
+  <li class="mlrk-orderitem" data-step="trace"><span class="mlrk-order-num"></span> Trace one action from input to output, through every function it touches.</li>
+</ul>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="rc-method-check">Check my order</button></div>
+<div id="rc-method-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Two of the six are pinned by what they need. You cannot trace an action until you know which file starts the program, and you cannot write an honest "know" list until the running and predicting have given you something to put in it.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>9. Summary and reflection</h2>
+<p>Run the program before you read it, so you have facts to check your reading against. Find the entry point and the one piece of data everything revolves around, then trace a single action all the way from input to output. Predict what a function returns before you study it, and treat a wrong prediction as a finding about your own model rather than a mistake. Keep the two lists, and move an item across only after running code.</p>
+<label for="rc-reflect"><strong>A model writes you a function called <code>average_rating(ratings)</code> and tells you it is correct.</strong> In 2-3 sentences, name the one specific input you would call it with first, say what you predict it returns for that input, and say what you would write down if the prediction turns out to be wrong.</label>
+<textarea id="rc-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>10. Go further (optional)</h2>
+<p>Want more practice or a different explanation of this? Two places to go next:</p>
+<ul>
+  <li><a href="https://pythontutor.com/visualize.html" target="_blank" rel="noopener">Python Tutor</a> — paste any Python program in and step through it one line at a time, watching each variable change. It does step 4 of the method for you, which makes it a fast way to check a trace you worked out on paper.</li>
+  <li><a href="https://www.youtube.com/watch?v=L_ycOPmaZTo" target="_blank" rel="noopener">Modern Software Engineering, "The SECRET To Reading Code That's UNFAMILIAR" (about 16 minutes)</a> — a working engineer walking through the same problem on a much larger program than Lend-a-Hand, which is where this method starts to earn its keep.</li>
+</ul>
+</section>
+
+<section class="mlrk-section">
+<div id="rc-scorechip" class="mlrk-score-chip"></div>
+<div class="mlrk-export" style="margin-top:1rem">
+<div class="mlrk-actions">
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="rc-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="rc-download">Download as .txt</button>
+</div>
+<p id="rc-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+</div>
+</section>
+
+</div></main>
+
+<footer class="mlrk-footer">This reading is the property of The Marcy Lab School and Angelica Spratley. Contact the owners before republishing, reusing, or monetizing this content elsewhere.</footer>
+
+<script src="../../assets/reading-kit.js"></script>
+<script>
+(function(){
+  const K = ReadingKit;
+  const READING_ID = "reading-unfamiliar-code-reading";
+  const TITLE = "Run It Before You Read It";
+  K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
+
+  K.flipCards("#rc-flipcards", "act-flipcards");
+
+  /* ---------- the Lend-a-Hand simulator ----------
+     The terminal kit dispatches one typed line to one named command, which is
+     right for a shell and wrong for an interactive program: once main.py is
+     running, every line the student types is an answer to a question, not a
+     command name. A Proxy over the command table routes any unrecognised word
+     into the running program instead of answering "command not found", so the
+     student can actually run this thing with good and bad input. Every output
+     string below is copied from a real session of the real two files. */
+  const ROOT = "/home/student/lend-a-hand";
+  const MENU = "\n\n1. Add  2. Lend  3. Report  4. Quit\nChoose (1-4):";
+  const SHELF_START = {ladder: 1, drill: 2, sander: 0};
+
+  const prog = {mode: "shell", shelf: null, choice: null, name: null};
+
+  function has(obj, key){ return Object.prototype.hasOwnProperty.call(obj, key); }
+
+  function reportText(shelf){
+    return Object.keys(shelf).sort().map(function(name){
+      return name + ": " + shelf[name] + (shelf[name] > 0 ? "" : " (all lent out)");
+    }).join("\n");
+  }
+
+  function feed(token){
+    if(prog.mode === "menu"){
+      if(token === "4"){ prog.mode = "shell"; return "Goodbye."; }
+      if(token === "3") return reportText(prog.shelf) + MENU;
+      if(token === "1" || token === "2"){ prog.choice = token; prog.mode = "name"; return "Tool name:"; }
+      return "That isn't an option." + MENU;
+    }
+    if(prog.mode === "name"){ prog.name = token.toLowerCase(); prog.mode = "qty"; return "How many?"; }
+    // prog.mode === "qty"
+    prog.mode = "menu";
+    if(!/^[0-9]+$/.test(token)) return "Please enter a whole number." + MENU;
+    const qty = parseInt(token, 10);
+    const name = prog.name;
+    if(prog.choice === "1"){
+      prog.shelf[name] = (has(prog.shelf, name) ? prog.shelf[name] : 0) + qty;
+      return "Now holding " + prog.shelf[name] + " " + name + "." + MENU;
+    }
+    let lent = true;
+    if(!has(prog.shelf, name)) lent = false;
+    else if(prog.shelf[name] < qty) lent = false;
+    else prog.shelf[name] -= qty;
+    return (lent ? "Lent " + qty + " " + name + "." : "Can't lend " + qty + " " + name + ".") + MENU;
+  }
+
+  const BASE_CMDS = {
+    python3: function(args){
+      if(prog.mode !== "shell") return feed("python3");
+      if(args[0] !== "main.py")
+        return "python3: can't open file '" + (args[0] || "") + "': [Errno 2] No such file or directory";
+      prog.shelf = Object.assign({}, SHELF_START);
+      prog.mode = "menu";
+      return "Lend-a-Hand: the tool shelf." + MENU;
+    }
+  };
+
+  const CMDS = new Proxy(BASE_CMDS, {
+    get: function(target, key){
+      if(typeof key === "string" && has(target, key)) return target[key];
+      if(typeof key === "string" && prog.mode !== "shell") return function(){ return feed(key); };
+      return undefined;
+    }
+  });
+
+  const MAIN_SRC = [
+    "from shelf import add, lend, report",
+    "",
+    "",
+    "def main():",
+    "    print(\"Lend-a-Hand: the tool shelf.\")",
+    "    while True:",
+    "        print(\"\\n1. Add  2. Lend  3. Report  4. Quit\")",
+    "        choice = input(\"Choose (1-4): \").strip()",
+    "        if choice == \"4\":",
+    "            break",
+    "        if choice == \"3\":",
+    "            print(report())",
+    "        elif choice in (\"1\", \"2\"):",
+    "            name = input(\"Tool name: \").strip().lower()",
+    "            quantity = input(\"How many? \").strip()",
+    "            if not quantity.isdigit():",
+    "                print(\"Please enter a whole number.\")",
+    "                continue",
+    "            quantity = int(quantity)",
+    "            if choice == \"1\":",
+    "                total = add(name, quantity)",
+    "                print(f\"Now holding {total} {name}.\")",
+    "            elif lend(name, quantity):",
+    "                print(f\"Lent {quantity} {name}.\")",
+    "            else:",
+    "                print(f\"Can't lend {quantity} {name}.\")",
+    "        else:",
+    "            print(\"That isn't an option.\")",
+    "    print(\"Goodbye.\")",
+    "",
+    "",
+    "if __name__ == \"__main__\":",
+    "    main()"
+  ].join("\n");
+
+  const SHELF_SRC = [
+    "shelf = {\"ladder\": 1, \"drill\": 2, \"sander\": 0}",
+    "",
+    "",
+    "def add(name, quantity):",
+    "    shelf[name] = shelf.get(name, 0) + quantity",
+    "    return shelf[name]",
+    "",
+    "",
+    "def lend(name, quantity):",
+    "    if name not in shelf:",
+    "        return False",
+    "    if shelf[name] < quantity:",
+    "        return False",
+    "    shelf[name] -= quantity",
+    "    return True",
+    "",
+    "",
+    "def report():",
+    "    lines = []",
+    "    for name, quantity in sorted(shelf.items()):",
+    "        marker = \"\" if quantity > 0 else \" (all lent out)\"",
+    "        lines.append(f\"{name}: {quantity}{marker}\")",
+    "    return \"\\n\".join(lines)"
+  ].join("\n");
+
+  K.terminal("#rc-terminal", {
+    id: "act-terminal",
+    startPath: ROOT,
+    minCommands: 5,
+    filesystem: {
+      "/home/student/lend-a-hand": {type:"dir", children:["main.py","shelf.py"]},
+      "/home/student/lend-a-hand/main.py": {type:"file", contents: MAIN_SRC},
+      "/home/student/lend-a-hand/shelf.py": {type:"file", contents: SHELF_SRC}
+    },
+    commands: CMDS
+  });
+
+  K.freeResponse({id:"act-one-sentence", selector:"#rc-onesentence", minWords:8});
+
+  K.selectAll({
+    id: "act-know-column",
+    boxSelector: ".rc-know-box",
+    submitSelector: "#rc-know-submit",
+    feedbackSelector: "#rc-know-fb",
+    maxAttempts: 2,
+    options: [
+      {value:"entry", label:"main.py is the file you run", correct:true,
+        hint:"One of the three lines from <code>main.py</code> is the guard Python programs end with. Ask what that guard is for.",
+        explain:"<code>if __name__ == \"__main__\":</code> runs its body only when that file is the one handed to <code>python3</code>, so a file carrying the guard is a file meant to be run. <code>shelf.py</code> has no guard."},
+      {value:"imports", label:"main.py can call add, lend, and report", correct:true,
+        hint:"Read the <code>from shelf import</code> line and count the names after the word <code>import</code>.",
+        explain:"<code>from shelf import add, lend, report</code> brings those three names into <code>main.py</code>, so <code>main.py</code> can call all three. That is the whole relationship between the two files."},
+      {value:"shape", label:"shelf is a dictionary from a tool's name to a number", correct:true,
+        hint:"The <code>shelf</code> line shows the dictionary with three pairs already in it. Look at what is on each side of a colon.",
+        explain:"<code>shelf = {\"ladder\": 1, \"drill\": 2, \"sander\": 0}</code> puts a string on the left of each colon and an int on the right. That is the shape, and you can read it straight off the line."},
+      {value:"lendtrue", label:"lend returns True whenever the tool is on the shelf", correct:false,
+        hint:"Ask which line you read this off. The name <code>lend</code> is the author's claim about the body, and you have not read the body yet.",
+        explain:"This is a guess, and tracing the sander proves it wrong. <code>lend(\"sander\", 1)</code> returns <code>False</code> even though <code>\"sander\"</code> is a key, because the count is <code>0</code> and the second guard clause in <code>lend</code> catches it. A reasonable guess off a good name is still a guess."},
+      {value:"reportprint", label:"report prints the list of tools", correct:false,
+        hint:"Ask which line you read this off. Printing and returning are two different things, and only one of them shows up on screen.",
+        explain:"This is a guess too. <code>report</code> builds the lines and returns them as one string. The <code>print</code> is in <code>main.py</code>, on the line <code>print(report())</code>. The distinction matters: a function that returns a string can be tested and reused, and a function that prints can only be watched."}
+    ]
+  });
+
+  /* Every line of this trace was checked against a real run of the two files;
+     the final output line is what the program actually printed. */
+  K.traceStepper("#rc-trace", {
+    steps: [
+      {cell: 'choice = "2"',
+       line: 'main() prints the menu and reads your answer. choice holds the string "2".'},
+      {cell: '"2" != "4"',
+       line: 'choice == "4" is False, so no break. The while loop keeps going.'},
+      {cell: '"2" != "3"',
+       line: 'choice == "3" is False, so the report branch is skipped.'},
+      {cell: '"2" in ("1","2")',
+       line: 'choice in ("1", "2") is True, so main() asks for a tool name and a quantity.'},
+      {cell: 'name, quantity',
+       line: 'name holds "sander". "1" passes .isdigit(), so int() makes quantity the number 1.'},
+      {cell: 'into shelf.py',
+       line: 'choice == "1" is False, so Python reaches elif lend(name, quantity) and jumps into shelf.py.'},
+      {cell: 'lend returns False',
+       line: 'In lend: "sander" is a key, so the first guard is skipped. shelf["sander"] < quantity is 0 < 1, which is True, so lend returns False.'},
+      {cell: 'the else prints',
+       line: 'Back in main(): False makes the elif fail, so the else runs and prints:\nCan\'t lend 1 sander.'}
+    ]
+  });
+
+  K.quiz({
+    id: "act-predict-add",
+    buttonSelector: "#rc-add-choices .mlrk-choice",
+    feedbackSelector: "#rc-add-fb",
+    correct: "three",
+    answerLabel: "<code>3</code>",
+    feedback: {
+      three: "<code>shelf.get(\"mower\", 0)</code> hands back the default <code>0</code>, because <code>\"mower\"</code> is not a key yet. <code>0 + 3</code> is <code>3</code>, which gets stored as <code>shelf[\"mower\"]</code>. Then the last line of <code>add</code> is <code>return shelf[name]</code>, so <code>add</code> hands back the new count, <code>3</code>.",
+      "true": "<code>lend</code> is the function that answers <code>True</code> or <code>False</code>, since both of its guard clauses return <code>False</code> and its last line returns <code>True</code>. <code>add</code> ends with <code>return shelf[name]</code>, and <code>shelf[\"mower\"]</code> holds a count, not a boolean. It returns <code>3</code>.",
+      none: "A function that runs off the end of its body with no <code>return</code> does hand back <code>None</code>, and plenty of functions that only change a dictionary are written that way. <code>add</code> is not: its second line is <code>return shelf[name]</code>, which hands back the new count, <code>3</code>.",
+      dict: "<code>add</code> does change the whole dictionary, which is probably what made this look right. The <code>return</code> line is narrower than that: <code>return shelf[name]</code> looks up one key and hands back one value. For <code>add(\"mower\", 3)</code> that value is <code>3</code>."
+    }
+  });
+
+  K.quiz({
+    id: "act-continue-finding",
+    buttonSelector: "#rc-continue-choices .mlrk-choice",
+    feedbackSelector: "#rc-continue-fb",
+    correct: "menu",
+    answerLabel: "It reads the <code>7</code> as a menu choice and says <code>That isn't an option.</code>",
+    feedback: {
+      lends: "No drill leaves the shelf. The <code>7</code> never reaches <code>lend</code> at all, because <code>continue</code> ended that trip around the loop before the <code>quantity = int(quantity)</code> line, and the next thing the loop does is ask for a menu choice.",
+      reasks: "That is what \"ask again for the one bad value\" would look like, and it is the most common prediction here. <code>continue</code> does something wider: it jumps to the top of the <code>while</code> loop, and the first two statements in that loop print the menu and read a menu choice. So the next thing you type is read as a menu choice.",
+      menu: "<code>continue</code> jumps to the top of the <code>while</code> loop, which prints the menu and then reads a menu choice. Your <code>7</code> lands in <code>choice</code>, and <code>7</code> is not <code>\"1\"</code>, <code>\"2\"</code>, <code>\"3\"</code>, or <code>\"4\"</code>, so the final <code>else</code> prints <code>That isn't an option.</code>"
+    }
+  });
+
+  K.quiz({
+    id: "act-model-code",
+    buttonSelector: "#rc-total-choices .mlrk-choice",
+    feedbackSelector: "#rc-total-fb",
+    correct: "last",
+    answerLabel: "<code>3.5</code>",
+    feedback: {
+      nine: "<code>9.0</code> is the sum, and it is what the name <code>total_price</code> and the starting line <code>total = 0</code> both promise. The loop body breaks the promise. <code>total = price</code> replaces the running total on every pass instead of adding to it, so one character is missing: the line the author meant is <code>total += price</code>.",
+      last: "<code>total = price</code> throws the running total away on every pass and keeps the current price, so after the last pass <code>total</code> holds <code>3.5</code>, the last number in the list. The function is readable, plausible, and useless, which is exactly the shape of mistake generated code makes.",
+      first: "<code>1.50</code> is the first price, and it is what the loop would leave behind if it stopped after one pass. A <code>for</code> loop over a list of three items runs three times, so <code>total = price</code> runs three times and the last price wins. The program prints <code>3.5</code>.",
+      zero: "<code>total = 0</code> is only the starting value. The loop body does reassign <code>total</code>, three times, once per price, so the <code>0</code> is gone after the first pass. The last assignment is the one that survives, and it puts <code>3.5</code> in <code>total</code>."
+    }
+  });
+
+  K.orderSteps("#rc-method-order", {
+    id: "act-method-order",
+    correctOrder: ["run","map","data","trace","predict","lists"],
+    feedbackSelector: "#rc-method-fb",
+    checkSelector: "#rc-method-check"
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#rc-reflect", minWords:20});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#rc-scorechip"); });
+  K.Scoring.renderChip("#rc-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#rc-download"});
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#rc-copy", onDone:function(ok){
+    document.getElementById("rc-copyfb").textContent = ok
+      ? "Copied! Paste it anywhere you're keeping your notes."
+      : "Couldn't copy automatically — select the page text and copy manually.";
+  }});
+})();
+</script>
+</body></html>
