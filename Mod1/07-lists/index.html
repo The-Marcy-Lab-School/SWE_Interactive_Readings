@@ -1,13 +1,24 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Off By One Song — Python Lists and the Zero-Index Trap</title>
+<title>Off By One Song — Lists, References, and Pure Functions in Python</title>
 <link rel="stylesheet" href="../../assets/brand-tokens.css">
 <link rel="stylesheet" href="../../assets/reading-kit.css">
 <style>
-.mlrk-illustration{width:100%;max-width:700px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
-.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:20rem;font-family:var(--mlrk-font-code)}
-.mlrk-code pre{margin:0;font-family:var(--mlrk-font-code)}
+.mlrk-illustration{width:100%;max-width:900px;height:auto;margin-top:1.1rem;margin-bottom:1.1rem;display:block}
 @media(max-width:650px){.mlrk-illustration{max-width:100%}}
+/* Two labelled code blocks side by side, so a contrast never asks the reader
+   to hold one version in their head while looking at the other. Stacks below
+   900px, where two columns would wrap the longest printed list. */
+.ls-compare{display:grid;grid-template-columns:1fr;gap:1.4rem;margin:1.1rem 0;align-items:start}
+@media(min-width:900px){.ls-compare{grid-template-columns:1fr 1fr;gap:1.6rem}}
+.ls-compare-label{margin:0 0 .5rem;line-height:1.4}
+.ls-compare>div{min-width:0}
+.ls-out{min-height:0}
+.mlrk-fillblank input{border:2px solid var(--mlrk-gray-500);border-radius:8px;padding:.4rem .6rem;width:22rem;max-width:100%;font-family:var(--mlrk-font-code)}
+/* Two drop zones side by side. Its own class, not .mlrk-grid, so the
+   reading-level check's vocabulary-section strip can't swallow this section. */
+.ls-zones{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:.8rem}
+@media(min-width:760px){.ls-zones{grid-template-columns:1fr 1fr}}
 </style>
 </head><body>
 
@@ -15,7 +26,7 @@
 <div class="mlrk-eyebrow">Interactive reading</div>
 <h1>Off By One Song</h1>
 <div class="mlrk-meta">
-  <span class="mlrk-pill">~11 minutes</span>
+  <span class="mlrk-pill">~14 minutes</span>
   <span class="mlrk-pill">Interactive</span>
   <span class="mlrk-pill">No setup needed to read</span>
 </div>
@@ -26,152 +37,445 @@
 <main class="mlrk-main"><div class="mlrk-wrap">
 
 <section class="mlrk-section">
-<h2>1. The bug: "skip to 3" landed on song 4</h2>
-<p>QueueUp is a small app a coffee shop uses to run its lounge playlist: customers pick songs, and the app plays them in order. Here's the actual queue sitting behind QueueUp's bug report, exactly as it would look in Python:</p>
-<div class="mlrk-code"><pre>queue = ["Skyline Drive", "Paper Boats", "Neon Static", "Better Days", "Midnight Coast"]</pre></div>
-<p>Square brackets create a <strong>list</strong>: an ordered, changeable collection, written as comma-separated values between <code>[</code> and <code>]</code>. Order matters here in a way it doesn't for every Python collection — this list remembers that "Skyline Drive" comes before "Paper Boats," and Python gives every item a numbered position, called an <strong>index</strong>, based on exactly where it sits.</p>
-<p>Here's where QueueUp's bug came from. Whoever wrote the "skip to song" feature reached for the everyday way people count (first, second, third) and wrote <code>queue[3]</code> to mean "the 3rd song." But Python doesn't start counting at 1; it starts at 0. So <code>queue[0]</code> is the first song, <code>queue[1]</code> is the second, and <code>queue[2]</code> is the third. That makes <code>queue[3]</code> actually the <em>fourth</em> song, "Better Days." Every single listener who asked for song 3 got song 4 instead, and nobody on the team noticed until a regular in the lounge asked out loud why the app kept skipping ahead.</p>
+<h2>1. The bug: "skip to 3" played song 4</h2>
+<p>QueueUp is a small app a coffee shop uses to run its lounge playlist. Customers pick songs, and the app plays them in order. Here is the queue sitting behind QueueUp's bug report, written in Python:</p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">queue = ["Skyline Drive", "Paper Boats", "Neon Static", "Better Days", "Midnight Coast"]</pre></div>
+<p>Square brackets create a <strong>list</strong>: an ordered collection of values, separated by commas. Order is part of what a list stores, so <code>queue</code> remembers that "Skyline Drive" comes before "Paper Boats". Python also gives every value in a list a numbered position, called an index.</p>
+<p>QueueUp's "skip to song" button asked for the 3rd song and played the 4th. Whoever wrote it counted the way people count out loud, first, second, third, and wrote <code>queue[3]</code> for "the 3rd song". Python starts counting at 0 instead of 1. <code>queue[0]</code> is the first song, <code>queue[1]</code> is the second, and <code>queue[2]</code> is the third, which leaves <code>queue[3]</code> pointing at the fourth song, "Better Days". Every listener who asked for song 3 heard song 4, and nobody on the team noticed until a regular in the lounge asked out loud why the app kept skipping ahead.</p>
 
-<svg class="mlrk-illustration" viewBox="0 0 880 225" role="img" aria-labelledby="idxDiagTitle idxDiagDesc" xmlns="http://www.w3.org/2000/svg">
+<svg class="mlrk-illustration" viewBox="0 0 900 235" role="img" aria-labelledby="idxDiagTitle idxDiagDesc" xmlns="http://www.w3.org/2000/svg">
   <title id="idxDiagTitle">The QueueUp list shown with both its front-counted and back-counted index numbers</title>
   <desc id="idxDiagDesc">Five boxes in a row hold the songs Skyline Drive, Paper Boats, Neon Static, Better Days, and Midnight Coast in that order. Above each box is its index counted from the front, starting at 0 for Skyline Drive and ending at 4 for Midnight Coast. Below each box is its index counted from the back, starting at -1 for Midnight Coast and ending at -5 for Skyline Drive. The third song in everyday counting, Neon Static, sits at front-index 2, not 3.</desc>
   <g font-family="Helvetica, Arial, sans-serif">
-    <text x="10" y="55" text-anchor="start" font-size="16" font-weight="700" fill="#264326">front index</text>
-    <text x="145" y="55" text-anchor="middle" font-size="18" font-weight="800" fill="#264326">0</text>
-    <text x="305" y="55" text-anchor="middle" font-size="18" font-weight="800" fill="#264326">1</text>
-    <text x="465" y="55" text-anchor="middle" font-size="18" font-weight="800" fill="#264326">2</text>
-    <text x="625" y="55" text-anchor="middle" font-size="18" font-weight="800" fill="#264326">3</text>
-    <text x="785" y="55" text-anchor="middle" font-size="18" font-weight="800" fill="#264326">4</text>
+    <text x="10" y="55" text-anchor="start" font-size="17" font-weight="700" fill="#264326">front index</text>
+    <text x="145" y="55" text-anchor="middle" font-size="19" font-weight="800" fill="#264326">0</text>
+    <text x="305" y="55" text-anchor="middle" font-size="19" font-weight="800" fill="#264326">1</text>
+    <text x="465" y="55" text-anchor="middle" font-size="19" font-weight="800" fill="#264326">2</text>
+    <text x="625" y="55" text-anchor="middle" font-size="19" font-weight="800" fill="#264326">3</text>
+    <text x="785" y="55" text-anchor="middle" font-size="19" font-weight="800" fill="#264326">4</text>
 
     <rect x="70" y="72" width="150" height="90" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="145" y="123" text-anchor="middle" font-size="16" fill="#261F1D">Skyline Drive</text>
+    <text x="145" y="124" text-anchor="middle" font-size="17" fill="#261F1D">Skyline Drive</text>
 
     <rect x="230" y="72" width="150" height="90" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="305" y="123" text-anchor="middle" font-size="16" fill="#261F1D">Paper Boats</text>
+    <text x="305" y="124" text-anchor="middle" font-size="17" fill="#261F1D">Paper Boats</text>
 
     <rect x="390" y="72" width="150" height="90" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="465" y="123" text-anchor="middle" font-size="16" fill="#261F1D">Neon Static</text>
+    <text x="465" y="124" text-anchor="middle" font-size="17" fill="#261F1D">Neon Static</text>
 
     <rect x="550" y="72" width="150" height="90" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="625" y="123" text-anchor="middle" font-size="16" fill="#261F1D">Better Days</text>
+    <text x="625" y="124" text-anchor="middle" font-size="17" fill="#261F1D">Better Days</text>
 
     <rect x="710" y="72" width="150" height="90" rx="10" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
-    <text x="785" y="123" text-anchor="middle" font-size="16" fill="#261F1D">Midnight Coast</text>
+    <text x="785" y="124" text-anchor="middle" font-size="17" fill="#261F1D">Midnight Coast</text>
 
-    <text x="10" y="200" text-anchor="start" font-size="16" font-weight="700" fill="#83671C">back index</text>
-    <text x="145" y="200" text-anchor="middle" font-size="18" font-weight="800" fill="#83671C">-5</text>
-    <text x="305" y="200" text-anchor="middle" font-size="18" font-weight="800" fill="#83671C">-4</text>
-    <text x="465" y="200" text-anchor="middle" font-size="18" font-weight="800" fill="#83671C">-3</text>
-    <text x="625" y="200" text-anchor="middle" font-size="18" font-weight="800" fill="#83671C">-2</text>
-    <text x="785" y="200" text-anchor="middle" font-size="18" font-weight="800" fill="#83671C">-1</text>
+    <text x="10" y="205" text-anchor="start" font-size="17" font-weight="700" fill="#83671C">back index</text>
+    <text x="145" y="205" text-anchor="middle" font-size="19" font-weight="800" fill="#83671C">-5</text>
+    <text x="305" y="205" text-anchor="middle" font-size="19" font-weight="800" fill="#83671C">-4</text>
+    <text x="465" y="205" text-anchor="middle" font-size="19" font-weight="800" fill="#83671C">-3</text>
+    <text x="625" y="205" text-anchor="middle" font-size="19" font-weight="800" fill="#83671C">-2</text>
+    <text x="785" y="205" text-anchor="middle" font-size="19" font-weight="800" fill="#83671C">-1</text>
   </g>
 </svg>
 
-<p>Every box in that row has two valid addresses. Counting from the front, "Neon Static" is <code>queue[2]</code>. Counting from the back, that exact same song is <code>queue[-3]</code>. Negative indexes always count from the end of the list, and <code>queue[-1]</code> is a fast, reliable way to grab the last item without needing to know how long the list is.</p>
+<p>Every box in that row has two valid addresses. Counting from the front, "Neon Static" is <code>queue[2]</code>. Counting from the back, the same song is <code>queue[-3]</code>. A negative index always counts from the end of the list, so <code>queue[-1]</code> is the last song no matter how long the list gets.</p>
 </section>
 
 <section class="mlrk-section">
-<h2>2. Vocabulary</h2>
-<p>Flip each card before the practice below.</p>
+<h2>2. Technical vocabulary</h2>
+<p>Flip each card. These five terms are the ones the rest of the reading uses.</p>
 <div class="mlrk-grid">
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>list</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>List</strong><br>An ordered, changeable collection of values, written with square brackets: <code>["a", "b", "c"]</code>. Order is part of what a list remembers.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>index</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Index</strong><br>The numbered position of an item in a list, used inside square brackets to retrieve it: <code>queue[0]</code>. Python indexes start at 0, not 1.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>element</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Element</strong><br>One single value stored inside a list. In <code>queue</code>, "Paper Boats" is one element.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>negative index</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Negative index</strong><br>An index counted from the end of the list instead of the front. <code>queue[-1]</code> is always the last item, no matter how long the list is.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>slice</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Slice</strong><br>A sub-section of a list pulled out with a colon inside the brackets, like <code>queue[1:3]</code> — a new list containing some of the original elements.</span></button>
-<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>append</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>.append()</strong><br>A list method that adds one new element to the very end of a list, in place: <code>queue.append("new song")</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>Lists</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>Lists</strong><br>Lists are ordered collections of values. Like strings, they have indexes starting at <code>0</code>, support bracket notation and slicing, and work with <code>len()</code> and the <code>in</code> operator.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>mutable</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>mutable</strong><br>Unlike strings, lists are mutable: Python can change the values inside a list that already exists. Methods like <code>append</code>, <code>insert</code>, <code>pop</code>, and <code>remove</code> change a list in place, with no reassignment.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>reference</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>reference</strong><br>A variable does not hold a list. It holds a reference to the list. Two variables can reference the same list, and a function receiving a list receives a reference to the caller's list.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>pure function</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>pure function</strong><br>A pure function returns the same output for the same input and has no side effects. A function that mutates the list it is given is impure. To keep a function pure, copy the list first with <code>list(arr)</code>, <code>arr[:]</code>, or <code>[*arr]</code>.</span></button>
+<button type="button" class="mlrk-term"><span class="mlrk-front"><strong>2D lists</strong><br><span class="mlrk-small">Flip</span></span><span class="mlrk-back"><strong>2D lists</strong><br>Lists can contain other lists, and a list of lists is called a 2D list or a matrix. Two indexes reach one value: the first picks the row, the second picks the position inside that row.</span></button>
 </div>
 </section>
 
 <section class="mlrk-section">
-<h2>3. Predict the output</h2>
-<p>Same <code>queue</code> as above. Type what each line actually returns before checking — this is exactly the mix-up that broke QueueUp's "skip to song" button.</p>
+<h2>3. Reading a list without changing it</h2>
+<p>QueueUp's screen needs more than one song at a time. It shows how many songs are waiting, which song is up last, the next couple of titles, and whether a request is already in the queue. Every one of those reads the list and leaves it alone:</p>
+<div class="ls-compare">
+<div>
+<p class="ls-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">print(len(queue))
+print(queue[0])
+print(queue[-1])
+print(queue[1:3])
+print("Neon Static" in queue)
+print("Clair de Lune" in queue)</pre></div>
+</div>
+<div>
+<p class="ls-compare-label"><strong>What it prints</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">5
+Skyline Drive
+Midnight Coast
+['Paper Boats', 'Neon Static']
+True
+False</pre></div>
+</div>
+</div>
+<p>Four different reads, four rules:</p>
+<ul>
+  <li><code>len(queue)</code> gives the number of values in the list, which is <code>5</code> here. The last index is always one less than the length, so the last song is <code>queue[4]</code>.</li>
+  <li><code>queue[-1]</code> counts from the end, so it reaches the last song without anyone working out the length first.</li>
+  <li>A slice <code>queue[1:3]</code> builds a brand new list from the values at index 1 up to <em>but not including</em> index 3. That is why two songs come back, not three.</li>
+  <li><code>"Neon Static" in queue</code> asks whether that exact value sits somewhere in the list, and gives back <code>True</code> or <code>False</code>. It never gives back a position.</li>
+</ul>
 
 <div class="mlrk-card">
-<p><strong>QueueUp's buggy line:</strong> the code that was supposed to jump to "the 3rd song" was written as <code>queue[3]</code>. What song does that line actually return?</p>
-<div class="mlrk-fillblank"><input type="text" id="lists-idx-input" autocomplete="off" placeholder="Type the song title"> <button type="button" class="mlrk-btn" id="lists-idx-check">Check</button></div>
-<div id="lists-idxfb" class="mlrk-feedback" tabindex="-1"></div>
+<p><strong>QueueUp's buggy line was written as <code>queue[3]</code>, meaning "the 3rd song".</strong> <strong>Which song does <code>queue[3]</code> actually return?</strong></p>
+<div class="mlrk-fillblank"><input type="text" id="ls-idx-input" autocomplete="off" placeholder="Type the song title"> <button type="button" class="mlrk-btn" id="ls-idx-check">Check</button></div>
+<div id="ls-idxfb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
 <details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Count from 0, not 1: <code>queue[0]</code> is the 1st song, <code>queue[1]</code> is the 2nd, <code>queue[2]</code> is the 3rd. Keep counting up to find what <code>queue[3]</code> lands on.</p>
+<p>Count from 0, not 1: <code>queue[0]</code> is the 1st song, <code>queue[1]</code> is the 2nd, <code>queue[2]</code> is the 3rd. Keep counting up by one to find what <code>queue[3]</code> lands on.</p>
 </details>
 
-<div class="mlrk-card" style="margin-top:1rem">
-<p><strong>Predict:</strong> what does <code>queue[-1]</code> return?</p>
-<div id="lists-neg1">
-  <button type="button" class="mlrk-choice" data-a="Midnight Coast">Midnight Coast</button>
-  <button type="button" class="mlrk-choice" data-a="Skyline Drive">Skyline Drive</button>
-  <button type="button" class="mlrk-choice" data-a="Better Days">Better Days</button>
-  <button type="button" class="mlrk-choice" data-a="IndexError">IndexError — there's no such index</button>
+<h3>Visiting every song</h3>
+<p>Printing the whole queue, one song per line, is the most common thing anyone does with a list. A <code>for</code> loop visits each value in order:</p>
+<div class="ls-compare">
+<div>
+<p class="ls-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">for song in queue:
+    print(song)</pre></div>
 </div>
-<div id="lists-neg1fb" class="mlrk-feedback" tabindex="-1"></div>
+<div>
+<p class="ls-compare-label"><strong>What it prints</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">Skyline Drive
+Paper Boats
+Neon Static
+Better Days
+Midnight Coast</pre></div>
 </div>
-
-<div class="mlrk-card" style="margin-top:1rem">
-<p><strong>Predict:</strong> a slice, <code>queue[1:3]</code>, pulls out a new list. Type it exactly, as a Python list of strings (e.g. <code>["a", "b"]</code>).</p>
-<div class="mlrk-fillblank"><input type="text" id="lists-slice-input" autocomplete="off" placeholder='e.g. ["a", "b"]'> <button type="button" class="mlrk-btn" id="lists-slice-check">Check</button></div>
-<div id="lists-slicefb" class="mlrk-feedback" tabindex="-1"></div>
 </div>
-<details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>A slice <code>[start:stop]</code> includes the <code>start</code> index but stops <em>before</em> the <code>stop</code> index. So <code>queue[1:3]</code> grabs indexes 1 and 2 only, not 3.</p>
-</details>
-</section>
-
-<section class="mlrk-section">
-<h2>4. Adding a song: <code>.append()</code></h2>
-<p>Nothing about a list is fixed once it's created. To add a new song to the end of the queue, Python lists have a built-in method, <code>.append()</code>, that adds exactly one new element after everything already there:</p>
-<div class="mlrk-code"><pre>queue.append("Ocean Drive")</pre></div>
-<p>After that line runs, <code>queue</code> has six songs in it, and "Ocean Drive" sits at index <code>5</code> — one past where the last song used to be, because <code>.append()</code> always adds to the end, never the front or the middle.</p>
+<p><code>for song in queue</code> assigns one value to <code>song</code> on each pass, with no index and no <code>range()</code> anywhere. When the position matters too, <code>enumerate()</code> hands over both:</p>
+<div class="ls-compare">
+<div>
+<p class="ls-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">for position, song in enumerate(queue):
+    print(f"{position + 1}. {song}")</pre></div>
+</div>
+<div>
+<p class="ls-compare-label"><strong>What it prints</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">1. Skyline Drive
+2. Paper Boats
+3. Neon Static
+4. Better Days
+5. Midnight Coast</pre></div>
+</div>
+</div>
+<p><code>enumerate()</code> produces a position and a value on each pass, and the position starts at 0 like every other index. QueueUp adds 1 before printing, so the screen reads "1." beside the first song. That is the same gap between everyday counting and Python counting that broke the skip button, handled on purpose this time.</p>
 
 <div class="mlrk-card">
-<p><strong>Fill in the blank:</strong> a listener wants to add "Static Bloom" to the end of the queue. Complete the line:</p>
-<div class="mlrk-code"><pre>queue = ["Skyline Drive", "Paper Boats", "Neon Static", "Better Days", "Midnight Coast"]
-____________</pre></div>
-<div class="mlrk-fillblank"><input type="text" id="lists-append-input" autocomplete="off" placeholder='e.g. queue.append("Static Bloom")'> <button type="button" class="mlrk-btn" id="lists-append-check">Check</button></div>
-<div id="lists-appendfb" class="mlrk-feedback" tabindex="-1"></div>
-</div>
-<details class="mlrk-hint"><summary>Need a hint?</summary>
-<p>Start with the list's name, then a dot, then the method name from the vocabulary above, with the new song title in quotes inside the parentheses.</p>
-</details>
-</section>
-
-<section class="mlrk-section">
-<h2>5. Practice: index number vs. everyday counting</h2>
-<p>Select every statement below that's actually true about <code>queue</code> as it stood before <code>.append()</code> ran:</p>
+<p><strong>Check every statement that is true about <code>queue</code>.</strong></p>
 <div style="margin-top:.6rem">
-<label class="mlrk-selectall-option"><input type="checkbox" class="lists-truth-box" value="a"> <span><code>queue[0]</code> refers to the first song in the queue.</span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="lists-truth-box" value="b"> <span>In a 5-song queue, the last song is <code>queue[5]</code>.</span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="lists-truth-box" value="c"> <span><code>queue[-1]</code> refers to the last song, no matter how many songs are in the queue.</span></label>
-<label class="mlrk-selectall-option"><input type="checkbox" class="lists-truth-box" value="d"> <span>If a listener asks for "the 3rd song" out loud, the matching Python index is <code>2</code>, not <code>3</code>.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="ls-truth-box" value="a"> <span><code>queue[1:3]</code> gives back a list of two songs.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="ls-truth-box" value="b"> <span><code>"Neon Static" in queue</code> gives back the number <code>2</code>.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="ls-truth-box" value="c"> <span><code>queue[-1]</code> is the last song in a list of any length.</span></label>
+<label class="mlrk-selectall-option"><input type="checkbox" class="ls-truth-box" value="d"> <span><code>enumerate(queue)</code> gives the first song the position <code>1</code>.</span></label>
 </div>
-<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="lists-truth-submit">Check my answers</button></div>
-<div id="lists-truthfb" class="mlrk-feedback" tabindex="-1"></div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="ls-truth-submit">Check my answers</button></div>
+<div id="ls-truthfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
 </section>
 
 <section class="mlrk-section">
-<h2>6. Summary &amp; reflection</h2>
-<p>A Python list holds items in order, and every item has an index — its position counted from the front, starting at 0, or from the back, starting at -1. QueueUp's bug happened because "the 3rd song" in everyday counting and <code>queue[3]</code> in Python code are two different positions, off by exactly one. Slicing (<code>queue[1:3]</code>) pulls out a range using that same 0-based counting, stopping one short of the second number, and <code>.append()</code> is how a list grows, always at the end.</p>
-<label for="lists-reflect"><strong>In 2–3 sentences:</strong> now that you've seen where QueueUp's bug came from, what's one mental habit you'll use to convert an everyday position ("the 3rd item," "the last one") into the correct Python index before you write the code?</label>
-<textarea id="lists-reflect" class="mlrk-response" data-save></textarea>
+<h2>4. Changing a list in place</h2>
+<p>Listeners keep adding songs, pulling songs, and fixing typos in titles, so QueueUp has to change the queue while the app runs. Strings do not allow that. A string method such as <code>upper()</code> builds a new string and leaves the original alone, and assigning to one character raises an error. Lists do allow it. Here are both, side by side:</p>
+<div class="ls-compare">
+<div>
+<p class="ls-compare-label"><strong>A string, which cannot change</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">name = "ben"
+name[0] = "J"</pre></div>
+<p class="ls-compare-label">It raised:</p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">TypeError: 'str' object does not
+support item assignment</pre></div>
+</div>
+<div>
+<p class="ls-compare-label"><strong>A list, which can change</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">end = ["x", "y", "z"]
+end[1] = "foo"
+print(end)</pre></div>
+<p class="ls-compare-label">It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">['x', 'foo', 'z']</pre></div>
+</div>
+</div>
+<p>Lists are <strong>mutable</strong>: Python can change the values inside a list that already exists. Notice that <code>end</code> is never reassigned. The variable still refers to the same list, and only the contents of that list moved. Strings, numbers, booleans, and <code>None</code> are immutable. Lists and dictionaries are mutable.</p>
+<p>Six operations cover almost everything QueueUp does to the queue:</p>
+<ul>
+  <li><code>queue.append(value)</code> adds the value to the end, making the list one longer.</li>
+  <li><code>queue.insert(index, value)</code> puts the value at that index and pushes everything after it one place to the right.</li>
+  <li><code>queue[index] = value</code> replaces the value at that index. The length does not change.</li>
+  <li><code>queue.remove(value)</code> removes the first value equal to the one given.</li>
+  <li><code>queue.pop()</code> removes the last value and hands it back. <code>queue.pop(index)</code> removes the value at that index instead.</li>
+  <li><code>del queue[index]</code> removes the value at that index. <code>del</code> is a statement rather than a method, so it has no dot and no parentheses.</li>
+</ul>
+<p>Running all six in a row on a short queue shows what each one leaves behind:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">queue = ["Paper Boats", "Neon Static", "Better Days"]
+
+queue.append("Ocean Drive")
+queue.insert(0, "Skyline Drive")
+queue[2] = "Neon Static (live)"
+queue.remove("Better Days")
+queue.pop()
+del queue[0]</pre></div>
+<p><strong>Predict the list after each operation before you click.</strong> Each click runs the next line and adds the resulting list to the panel.</p>
+<div class="mlrk-card"><div id="ls-mutate-trace"></div></div>
+
+<div class="mlrk-card" style="margin-top:1rem">
+<p><strong>After those six lines, <code>queue</code> holds <code>['Paper Boats', 'Neon Static (live)']</code>.</strong> <strong>One more line runs: <code>queue.insert(1, "Ocean Drive")</code>. What does <code>queue</code> hold then?</strong></p>
+<div id="ls-insert-choices">
+<button type="button" class="mlrk-choice" data-a="mid"><code>['Paper Boats', 'Ocean Drive', 'Neon Static (live)']</code></button>
+<button type="button" class="mlrk-choice" data-a="front"><code>['Ocean Drive', 'Paper Boats', 'Neon Static (live)']</code></button>
+<button type="button" class="mlrk-choice" data-a="end"><code>['Paper Boats', 'Neon Static (live)', 'Ocean Drive']</code></button>
+<button type="button" class="mlrk-choice" data-a="replace"><code>['Paper Boats', 'Ocean Drive']</code></button>
+</div>
+<div id="ls-insertfb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+
+<h3>A list can hold other lists</h3>
+<p>QueueUp groups the evening into sets, and each set is itself a list of songs. A list is allowed to hold lists, and a list of lists is called a <strong>2D list</strong>:</p>
+<div class="ls-compare">
+<div>
+<p class="ls-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">sets = [
+    ["Paper Boats", "Neon Static"],
+    ["Better Days", "Ocean Drive"],
+]
+
+print(sets[0])
+print(sets[1][0])
+print(len(sets))</pre></div>
+</div>
+<div>
+<p class="ls-compare-label"><strong>What it prints</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">['Paper Boats', 'Neon Static']
+Better Days
+2</pre></div>
+</div>
+</div>
+<p>The first index picks the row and the second index picks the position inside that row, so <code>sets[1][0]</code> reads as "row 1, then position 0 of that row". <code>len(sets)</code> counts the rows, which is 2, not the four songs spread across them.</p>
 </section>
 
 <section class="mlrk-section">
-<h2>7. Go further (optional)</h2>
+<h2>5. Two names, one list</h2>
+<p>QueueUp shipped a "preview the shuffle" button. It was meant to show what a shuffled set would look like without touching the live queue. The developer wrote <code>preview = queue</code>, shuffled <code>preview</code>, and the live queue came out shuffled too. The assignment never made a copy.</p>
+<p>Here is the rule behind that. Every value in Python is an object that lives somewhere in memory, and a variable is a name that refers to one of those objects. A list works that way, and so does a number. The <code>id()</code> function gives the number that identifies the object a name refers to, and <code>is</code> asks whether two names refer to the very same object:</p>
+<div class="ls-compare">
+<div>
+<p class="ls-compare-label"><strong>The code</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">nums = [1, 2, 3]
+clone = nums
+print(nums is clone)
+
+x = 5
+y = x
+print(x is y)</pre></div>
+</div>
+<div>
+<p class="ls-compare-label"><strong>What it prints</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">True
+True</pre></div>
+</div>
+</div>
+<p><code>clone = nums</code> does not build a second list. It gives one list a second name, and <code>nums is clone</code> reports <code>True</code> because both names refer to the same object. The same is true of <code>x</code> and <code>y</code>, which both name the number 5. A name in Python is a <strong>reference</strong> to an object, and that holds for every type.</p>
+<p>What separates a list from a number is whether the object itself can change. A list is mutable, so Python can change the values inside it. A number is immutable, and no operation in Python turns the number 5 into the number 6. Watch what that does to two pairs of names:</p>
+<div class="ls-compare">
+<div>
+<p class="ls-compare-label"><strong>Changing a value inside the list</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">nums = [1, 2, 3]
+clone = nums
+clone[1] = 20
+
+print(nums)
+print(clone)</pre></div>
+<p class="ls-compare-label">It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">[1, 20, 3]
+[1, 20, 3]</pre></div>
+</div>
+<div>
+<p class="ls-compare-label"><strong>Pointing a name at a new number</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen">x = 5
+y = x
+y = 6
+
+print(x)
+print(y)</pre></div>
+<p class="ls-compare-label">It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">5
+6</pre></div>
+</div>
+</div>
+<p><code>clone[1] = 20</code> reaches inside the one list both names refer to and swaps a value, so <code>nums</code> and <code>clone</code> both print <code>[1, 20, 3]</code>. <code>y = 6</code> cannot reach inside the number 5 and edit it, so it does the only thing left: it points <code>y</code> at a different object, and <code>x</code> keeps the 5 it already had. Python does not store lists and numbers in two different ways. It is mutability, and only mutability, that decides whether a change made through one name shows up through another.</p>
+
+<svg class="mlrk-illustration" viewBox="0 0 900 340" role="img" aria-labelledby="refDiagTitle refDiagDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="refDiagTitle">Two names referring to one list, next to two names referring to two separate numbers</title>
+  <desc id="refDiagDesc">The left panel is headed clone bracket 1 equals 20, with the note that a list can change. The names nums and clone each have a line running to one single list box holding 1, 20, 3. The caption reads: one list, two names, and both show the change. The right panel is headed y equals 6, with the note that a number cannot change. The name x has a line running to a box holding 5, and the name y has a line running to a separate box holding 6. The caption reads: two numbers, and x keeps the one it had.</desc>
+  <defs>
+    <marker id="lsArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#261F1D"/>
+    </marker>
+  </defs>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <rect x="14" y="14" width="428" height="312" rx="14" fill="#DEEAF4" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="228" y="52" text-anchor="middle" font-size="19" font-weight="700" fill="#1E659D">clone[1] = 20</text>
+    <text x="228" y="80" text-anchor="middle" font-size="17" fill="#261F1D">A list can change.</text>
+
+    <rect x="44" y="104" width="120" height="54" rx="10" fill="#FFFCF7" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="104" y="138" text-anchor="middle" font-size="18" fill="#261F1D">nums</text>
+    <rect x="44" y="190" width="120" height="54" rx="10" fill="#FFFCF7" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="104" y="224" text-anchor="middle" font-size="18" fill="#261F1D">clone</text>
+
+    <rect x="252" y="147" width="160" height="68" rx="10" fill="#FFFCF7" stroke="#2274B5" stroke-width="2.5"/>
+    <text x="332" y="188" text-anchor="middle" font-size="18" fill="#261F1D">[1, 20, 3]</text>
+
+    <line x1="170" y1="131" x2="244" y2="169" stroke="#261F1D" stroke-width="2.5" marker-end="url(#lsArrow)"/>
+    <line x1="170" y1="217" x2="244" y2="193" stroke="#261F1D" stroke-width="2.5" marker-end="url(#lsArrow)"/>
+
+    <text x="228" y="296" text-anchor="middle" font-size="17" fill="#261F1D">One list, two names. Both show the change.</text>
+
+    <rect x="458" y="14" width="428" height="312" rx="14" fill="#FFEECA" stroke="#83671C" stroke-width="2.5"/>
+    <text x="672" y="52" text-anchor="middle" font-size="19" font-weight="700" fill="#675116">y = 6</text>
+    <text x="672" y="80" text-anchor="middle" font-size="17" fill="#261F1D">A number cannot change.</text>
+
+    <rect x="492" y="104" width="100" height="54" rx="10" fill="#FFFCF7" stroke="#83671C" stroke-width="2.5"/>
+    <text x="542" y="138" text-anchor="middle" font-size="18" fill="#261F1D">x</text>
+    <rect x="492" y="190" width="100" height="54" rx="10" fill="#FFFCF7" stroke="#83671C" stroke-width="2.5"/>
+    <text x="542" y="224" text-anchor="middle" font-size="18" fill="#261F1D">y</text>
+
+    <rect x="732" y="104" width="100" height="54" rx="10" fill="#FFFCF7" stroke="#83671C" stroke-width="2.5"/>
+    <text x="782" y="138" text-anchor="middle" font-size="18" fill="#261F1D">5</text>
+    <rect x="732" y="190" width="100" height="54" rx="10" fill="#FFFCF7" stroke="#83671C" stroke-width="2.5"/>
+    <text x="782" y="224" text-anchor="middle" font-size="18" fill="#261F1D">6</text>
+
+    <line x1="598" y1="131" x2="726" y2="131" stroke="#261F1D" stroke-width="2.5" marker-end="url(#lsArrow)"/>
+    <line x1="598" y1="217" x2="726" y2="217" stroke="#261F1D" stroke-width="2.5" marker-end="url(#lsArrow)"/>
+
+    <text x="672" y="296" text-anchor="middle" font-size="17" fill="#261F1D">Two numbers. x keeps the one it had.</text>
+  </g>
+</svg>
+
+<div class="mlrk-card">
+<p><strong>QueueUp's preview bug, in four lines.</strong></p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">up_next = ["Paper Boats", "Neon Static"]
+preview = up_next
+preview.append("Ocean Drive")
+
+print(len(up_next))</pre></div>
+<p><strong>What number does <code>print(len(up_next))</code> show?</strong></p>
+<div id="ls-ref-choices">
+<button type="button" class="mlrk-choice" data-a="two">2</button>
+<button type="button" class="mlrk-choice" data-a="three">3</button>
+<button type="button" class="mlrk-choice" data-a="one">1</button>
+<button type="button" class="mlrk-choice" data-a="error">Nothing. It raises an error.</button>
+</div>
+<div id="ls-reffb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p><code>preview = up_next</code> gives one list a second name. Ask yourself which list <code>preview.append("Ocean Drive")</code> grows, and then how many values that list holds.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>6. A function that changed the caller's queue</h2>
+<p>QueueUp's "now playing" panel calls <code>play_next</code> to move on to the next song. The function takes the queue and pops the first song off it:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">def play_next(songs):
+    songs.pop(0)
+
+up_next = ["Paper Boats", "Neon Static", "Better Days"]
+play_next(up_next)
+
+print(up_next)</pre></div>
+<p>It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">['Neon Static', 'Better Days']</pre></div>
+<p>The caller handed over its queue and got back a queue one song shorter. A parameter receives a reference to the caller's list, so <code>songs</code> inside <code>play_next</code> and <code>up_next</code> outside it are two names for one list. <code>songs.pop(0)</code> changes that one list, and the caller sees every bit of the change.</p>
+<p>The line that shortened the list sits inside <code>play_next</code>. When the short queue causes trouble later, on the screen or in some other function, the line where the trouble appears is nowhere near the line that caused it. That distance is what makes this kind of bug slow to track down.</p>
+<p>A <strong>pure function</strong> cannot surprise a caller this way. A pure function has two properties:</p>
+<ol class="mlrk-steplist">
+  <li>It returns the same output every time it is given the same input.</li>
+  <li>It has no side effects, which means nothing outside the function changes because the function ran.</li>
+</ol>
+<p>A function that breaks either one of those is impure. <code>play_next</code> mutates the caller's list, so <code>play_next</code> is impure.</p>
+<p>Copying the list first is the fix. These three lines all build a new list holding the same values, and any of them works:</p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">copy1 = list(songs)   # list() builds a new list from any sequence
+copy2 = songs[:]      # a slice with no start and no end copies the whole thing
+copy3 = [*songs]      # the * unpacks the values into a new list literal</pre></div>
+<p>Here is <code>rest_of_set</code>, which does the same job as <code>play_next</code> and copies first:</p>
+<div class="mlrk-code"><pre class="mlrk-screen">def rest_of_set(songs):
+    remaining = list(songs)
+    remaining.pop(0)
+    return remaining
+
+up_next = ["Paper Boats", "Neon Static", "Better Days"]
+later = rest_of_set(up_next)
+
+print(up_next)
+print(later)</pre></div>
+<p>It printed:</p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">['Paper Boats', 'Neon Static', 'Better Days']
+['Neon Static', 'Better Days']</pre></div>
+<p><code>list(songs)</code> builds a new list, so <code>remaining.pop(0)</code> shortens that new list and leaves the caller's list at its full three songs. <code>rest_of_set</code> speaks to its caller only through the value it returns, which is what makes it pure. Side by side, the copy is the whole difference between the two function bodies:</p>
+<div class="ls-compare">
+<div>
+<p class="ls-compare-label"><strong>Impure</strong><br><code>play_next</code> pops the caller's list</p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">def play_next(songs):
+    songs.pop(0)</pre></div>
+</div>
+<div>
+<p class="ls-compare-label"><strong>Pure</strong><br><code>rest_of_set</code> pops a copy</p>
+<div class="mlrk-code"><pre class="mlrk-screen ls-out">def rest_of_set(songs):
+    remaining = list(songs)
+    remaining.pop(0)
+    return remaining</pre></div>
+</div>
+</div>
+
+<div class="mlrk-card" id="ls-pure">
+<p><strong>Four whole functions, each written on one line to keep the card short. Drag each one into the group it belongs to</strong>, then press "Check my answers". <code>random.randint(1, 6)</code> picks a whole number from 1 to 6.</p>
+<div class="mlrk-drag-source" id="ls-chips">
+  <span class="mlrk-draggable" id="chip-total"><code>def total(prices): return sum(prices)</code></span>
+  <span class="mlrk-draggable" id="chip-addsong"><code>def add_song(queue, title): queue.append(title)</code></span>
+  <span class="mlrk-draggable" id="chip-roll"><code>def roll(): return random.randint(1, 6)</code></span>
+  <span class="mlrk-draggable" id="chip-shorter"><code>def shorter(items): return items[:-1]</code></span>
+</div>
+<div class="ls-zones">
+  <div class="mlrk-dropzone" id="zone-pure"><strong>pure</strong></div>
+  <div class="mlrk-dropzone" id="zone-impure"><strong>impure</strong></div>
+</div>
+<div class="mlrk-actions"><button type="button" class="mlrk-btn" id="ls-pure-check">Check my answers</button></div>
+<div id="ls-pure-fb" class="mlrk-feedback" tabindex="-1"></div>
+</div>
+<details class="mlrk-hint"><summary>Need a hint?</summary>
+<p>Ask two questions about each function. Does it give the same answer every time for the same input? Does anything outside it change because it ran? One "no" is enough to make a function impure.</p>
+</details>
+</section>
+
+<section class="mlrk-section">
+<h2>7. Summary and reflection</h2>
+<p>A list keeps values in order, and every value has an index counted from the front starting at 0, or from the back starting at -1. <code>len()</code>, slicing, <code>in</code>, <code>for</code>, and <code>enumerate()</code> all read a list without changing it. <code>append</code>, <code>insert</code>, bracket assignment, <code>remove</code>, <code>pop</code>, and <code>del</code> change a list in place, because lists are mutable. A variable holds a reference to a list rather than the list itself, so two names can refer to one list and a change made through either name shows up through both. A function given a list receives that same reference, which is why a function can shorten, empty, or reorder the caller's list. Copying the list first keeps the function pure.</p>
+<label for="ls-reflect"><strong>A teammate writes <code>def trim(items): items.pop(); return items</code> and calls it on QueueUp's live queue.</strong> In 2-3 sentences, say what happens to the caller's list, why it happens, and what one line you would add to <code>trim</code> to make it pure.</label>
+<textarea id="ls-reflect" class="mlrk-response" data-save></textarea>
+</section>
+
+<section class="mlrk-section">
+<h2>8. Go further (optional)</h2>
 <p>Want more practice or a different explanation of this? Two places to go next:</p>
 <ul>
-  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in the <code>queue</code> code from this reading and step through it one line at a time, watching exactly which index each song sits at as Python runs.</li>
-  <li><a href="https://codingbat.com/python/List-1" target="_blank" rel="noopener">CodingBat: List-1</a> — short, auto-graded list practice problems, a good way to drill index and slice thinking beyond this reading's own examples.</li>
+  <li><a href="https://pythontutor.com/visualize.html#mode=edit" target="_blank" rel="noopener">Python Tutor</a> — paste in <code>nums = [1, 2, 3]</code>, <code>clone = nums</code>, <code>clone[1] = 20</code> and step through it. It draws both names and the single list they refer to, live.</li>
+  <li><a href="https://codingbat.com/python/List-1" target="_blank" rel="noopener">CodingBat: List-1</a> — short, auto-graded list problems, a good way to drill index, slice, and list-method thinking beyond this reading's examples.</li>
 </ul>
 </section>
 
 <section class="mlrk-section">
-<div id="lists-scorechip" class="mlrk-score-chip"></div>
+<div id="ls-scorechip" class="mlrk-score-chip"></div>
 <div class="mlrk-export" style="margin-top:1rem">
 <div class="mlrk-actions">
-<button type="button" class="mlrk-btn mlrk-btn-primary" id="lists-copy">Copy Plain Text Answers</button>
-<button type="button" class="mlrk-btn" id="lists-download">Download as .txt</button>
+<button type="button" class="mlrk-btn mlrk-btn-primary" id="ls-copy">Copy Plain Text Answers</button>
+<button type="button" class="mlrk-btn" id="ls-download">Download as .txt</button>
 </div>
-<p id="lists-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
+<p id="ls-copyfb" class="mlrk-small" style="margin-top:.5rem"></p>
 </div>
 </section>
 
@@ -184,16 +488,16 @@ ____________</pre></div>
 (function(){
   const K = ReadingKit;
   const READING_ID = "python-lists-reading";
-  const TITLE = "Off By One Song — Python Lists and the Zero-Index Trap";
+  const TITLE = "Off By One Song — Lists, References, and Pure Functions in Python";
   K.init({readingId: READING_ID, title: TITLE, progressBarSelector: "#bar"});
 
   K.flipCards(document, "act-flipcards");
 
   function normalizeWord(s){ return s.trim().toLowerCase().replace(/^["']|["']$/g,""); }
 
-  const idxBtn = document.getElementById("lists-idx-check");
-  const idxInput = document.getElementById("lists-idx-input");
-  const idxFb = document.getElementById("lists-idxfb");
+  const idxBtn = document.getElementById("ls-idx-check");
+  const idxInput = document.getElementById("ls-idx-input");
+  const idxFb = document.getElementById("ls-idxfb");
   K.Scoring.register("act-idx-predict", 1, "quiz");
   let idxAttempts = 0, idxDone = false;
   idxBtn.addEventListener("click", function(){
@@ -205,127 +509,110 @@ ____________</pre></div>
     if(ok){
       K.Scoring.award("act-idx-predict", idxAttempts===1?1:0.5);
       idxFb.className = "mlrk-feedback mlrk-show mlrk-good";
-      idxFb.innerHTML = "<strong>Correct.</strong> <code>queue[3]</code> is the 4th song, \"Better Days\" — counting starts at 0, so index 3 is one past where \"the 3rd song\" actually sits (<code>queue[2]</code>, \"Neon Static\").";
+      idxFb.innerHTML = '<strong>Correct.</strong> Indexes start at 0, so <code>queue[3]</code> is the 4th song, "Better Days". The 3rd song sits one place earlier, at <code>queue[2]</code>.';
       idxDone = true;
     } else if(idxAttempts >= 2){
       K.Scoring.award("act-idx-predict", 0);
       idxFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
-      idxFb.innerHTML = "<strong>The answer is:</strong> \"Better Days.\" <code>queue[3]</code> is the 4th song, because indexes start at 0, not 1.";
+      idxFb.innerHTML = '<strong>The answer is "Better Days."</strong> Indexes start at 0, so the index of a song is always one less than its everyday position, and <code>queue[3]</code> reaches the 4th song.';
       idxDone = true;
     } else if(gotThird){
       idxFb.className = "mlrk-feedback mlrk-show mlrk-bad";
-      idxFb.innerHTML = "<strong>Not quite — but that's exactly QueueUp's bug.</strong> \"Neon Static\" is the everyday 3rd song, but it actually lives at <code>queue[2]</code>. Re-count from <code>queue[0]</code> to find what <code>queue[3]</code> lands on." +
+      idxFb.innerHTML = '<strong>"Neon Static" is the 3rd song, and that is exactly QueueUp\'s bug.</strong> The 3rd song lives at <code>queue[2]</code>, because counting starts at 0. Count one more place up to find what <code>queue[3]</code> reaches.' +
         '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
     } else {
       idxFb.className = "mlrk-feedback mlrk-show mlrk-bad";
-      idxFb.innerHTML = "<strong>Not quite.</strong> Count the boxes in the diagram starting from 0, and see which one lines up with the front-index 3." +
+      idxFb.innerHTML = '<strong>Count the boxes in the diagram starting from 0.</strong> The front index of the first song is 0, so the song you want is the one sitting under front index 3.' +
         '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
     }
     idxFb.setAttribute("tabindex","-1"); idxFb.focus();
   });
 
-  K.quiz({
-    id: "act-neg-predict",
-    buttonSelector: "#lists-neg1 .mlrk-choice",
-    feedbackSelector: "#lists-neg1fb",
-    correct: "Midnight Coast",
-    feedback: {
-      "Midnight Coast": "Right — queue[-1] always means the last item, and \"Midnight Coast\" is last in this 5-song queue.",
-      "Skyline Drive": "That's queue[0] or queue[-5], the first song. Negative indexes count from the back, so -1 is the closest one to the end.",
-      "Better Days": "That's queue[3] or queue[-2], the second-to-last song, not the last one.",
-      "IndexError": "Negative indexes are completely valid in Python — queue[-1] is a normal, reliable way to reach the last item."
-    }
-  });
-
-  function normalizeListAnswer(s){
-    return s.trim().toLowerCase().replace(/'/g,'"')
-      .replace(/\s*([\[\]{}(),:])\s*/g,"$1")
-      .replace(/\s+/g," ");
-  }
-  const sliceBtn = document.getElementById("lists-slice-check");
-  const sliceInput = document.getElementById("lists-slice-input");
-  const sliceFb = document.getElementById("lists-slicefb");
-  K.Scoring.register("act-slice-predict", 1, "quiz");
-  let sliceAttempts = 0, sliceDone = false;
-  const sliceTarget = normalizeListAnswer('["Paper Boats", "Neon Static"]');
-  sliceBtn.addEventListener("click", function(){
-    if(sliceDone) return;
-    sliceAttempts++;
-    const val = normalizeListAnswer(sliceInput.value);
-    const ok = val === sliceTarget;
-    if(ok){
-      K.Scoring.award("act-slice-predict", sliceAttempts===1?1:0.5);
-      sliceFb.className = "mlrk-feedback mlrk-show mlrk-good";
-      sliceFb.innerHTML = '<strong>Correct.</strong> <code>queue[1:3]</code> grabs index 1 and index 2 — "Paper Boats" and "Neon Static" — and stops before index 3.';
-      sliceDone = true;
-    } else if(sliceAttempts >= 2){
-      K.Scoring.award("act-slice-predict", 0);
-      sliceFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
-      sliceFb.innerHTML = '<strong>The answer is:</strong> <code>["Paper Boats", "Neon Static"]</code> — the stop index in a slice is never included.';
-      sliceDone = true;
-    } else {
-      sliceFb.className = "mlrk-feedback mlrk-show mlrk-bad";
-      sliceFb.innerHTML = "<strong>Not quite.</strong> List the titles at index 1 and index 2 only — the number after the colon marks where the slice stops, without including that index." +
-        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
-    }
-    sliceFb.setAttribute("tabindex","-1"); sliceFb.focus();
-  });
-
-  const appendBtn = document.getElementById("lists-append-check");
-  const appendInput = document.getElementById("lists-append-input");
-  const appendFb = document.getElementById("lists-appendfb");
-  K.Scoring.register("act-append-fillcode", 1, "quiz");
-  let appendAttempts = 0, appendDone = false;
-  appendBtn.addEventListener("click", function(){
-    if(appendDone) return;
-    appendAttempts++;
-    const val = normalizeListAnswer(appendInput.value);
-    const ok = /^queue\.append\("static bloom"\)$/.test(val);
-    if(ok){
-      K.Scoring.award("act-append-fillcode", appendAttempts===1?1:0.5);
-      appendFb.className = "mlrk-feedback mlrk-show mlrk-good";
-      appendFb.innerHTML = '<strong>Correct.</strong> <code>queue.append("Static Bloom")</code> adds the new song to the end of the list, in place.';
-      appendDone = true;
-    } else if(appendAttempts >= 2){
-      K.Scoring.award("act-append-fillcode", 0);
-      appendFb.className = "mlrk-feedback mlrk-show mlrk-reveal";
-      appendFb.innerHTML = '<strong>The answer is:</strong> <code>queue.append("Static Bloom")</code>';
-      appendDone = true;
-    } else {
-      appendFb.className = "mlrk-feedback mlrk-show mlrk-bad";
-      appendFb.innerHTML = "<strong>Not quite.</strong> Start with the list's name, a dot, then the method from the vocabulary above, with the song title in quotes." +
-        '<div class="mlrk-attempt-note">One more try before the answer is revealed.</div>';
-    }
-    appendFb.setAttribute("tabindex","-1"); appendFb.focus();
-  });
-
   K.selectAll({
-    id: "act-truth-selectall",
-    boxSelector: ".lists-truth-box",
-    submitSelector: "#lists-truth-submit",
-    feedbackSelector: "#lists-truthfb",
+    id: "act-read-selectall",
+    boxSelector: ".ls-truth-box",
+    submitSelector: "#ls-truth-submit",
+    feedbackSelector: "#ls-truthfb",
     options: [
-      {value:"a", label:"queue[0] refers to the first song in the queue.", correct:true,
-        explain:"Indexes start at 0, so the first element is always queue[0]."},
-      {value:"b", label:"In a 5-song queue, the last song is queue[5].", correct:false,
-        hint:"A 5-song queue only has indexes 0 through 4 — is 5 one of those?",
-        explain:"A 5-song queue only has indexes 0 through 4. queue[5] doesn't exist and would raise an IndexError; the last song is queue[4] or queue[-1]."},
-      {value:"c", label:"queue[-1] refers to the last song, no matter how many songs are in the queue.", correct:true,
-        explain:"Negative indexes always count from the end, so -1 is the last item regardless of the list's length."},
-      {value:"d", label:'If a listener asks for "the 3rd song" out loud, the matching Python index is 2, not 3.', correct:true,
-        explain:"Everyday counting starts at 1, but Python indexing starts at 0, so the 3rd item in a sentence is queue[2] in code."}
+      {value:"a", label:"queue[1:3] gives back a list of two songs.", correct:true,
+        explain:"A slice runs from the start index up to but not including the stop index, so queue[1:3] collects index 1 and index 2 and stops. That is two songs, \"Paper Boats\" and \"Neon Static\"."},
+      {value:"b", label:'"Neon Static" in queue gives back the number 2.', correct:false,
+        hint:"Look again at what the printed output shows for that line.",
+        explain:"The in operator answers a yes-or-no question, so it gives back True or False and never a position. \"Neon Static\" in queue is True. The position 2 comes from counting, or from enumerate()."},
+      {value:"c", label:"queue[-1] is the last song in a list of any length.", correct:true,
+        explain:"A negative index counts from the end, so -1 names the last value whether the list holds 5 songs or 500."},
+      {value:"d", label:"enumerate(queue) gives the first song the position 1.", correct:false,
+        hint:"enumerate() produces index numbers, and index numbers follow one rule everywhere in Python.",
+        explain:"enumerate() starts its positions at 0, the same as every other index. QueueUp adds 1 itself before printing, which is why the screen reads \"1.\" beside the first song."}
     ]
   });
 
-  K.freeResponse({id:"act-reflect", selector:"#lists-reflect", minWords:10});
+  K.traceStepper("#ls-mutate-trace", {
+    steps: [
+      {cell:'append("Ocean Drive")',
+       line:'after queue.append("Ocean Drive")\n  [\'Paper Boats\', \'Neon Static\', \'Better Days\', \'Ocean Drive\']'},
+      {cell:'insert(0, "Skyline Drive")',
+       line:'after queue.insert(0, "Skyline Drive")\n  [\'Skyline Drive\', \'Paper Boats\', \'Neon Static\', \'Better Days\', \'Ocean Drive\']'},
+      {cell:'queue[2] = "Neon Static (live)"',
+       line:'after queue[2] = "Neon Static (live)"\n  [\'Skyline Drive\', \'Paper Boats\', \'Neon Static (live)\', \'Better Days\', \'Ocean Drive\']'},
+      {cell:'remove("Better Days")',
+       line:'after queue.remove("Better Days")\n  [\'Skyline Drive\', \'Paper Boats\', \'Neon Static (live)\', \'Ocean Drive\']'},
+      {cell:'pop()',
+       line:'after queue.pop()\n  [\'Skyline Drive\', \'Paper Boats\', \'Neon Static (live)\']'},
+      {cell:'del queue[0]',
+       line:'after del queue[0]\n  [\'Paper Boats\', \'Neon Static (live)\']'}
+    ]
+  });
 
-  K.Scoring.onChange(function(){ K.Scoring.renderChip("#lists-scorechip"); });
-  K.Scoring.renderChip("#lists-scorechip");
+  K.quiz({
+    id: "act-insert-predict",
+    buttonSelector: "#ls-insert-choices .mlrk-choice",
+    feedbackSelector: "#ls-insertfb",
+    correct: "mid",
+    answerLabel: "<code>['Paper Boats', 'Ocean Drive', 'Neon Static (live)']</code>",
+    feedback: {
+      mid: "<code>insert</code> takes an index first and a value second, so <code>queue.insert(1, \"Ocean Drive\")</code> puts the new song at index 1 and pushes \"Neon Static (live)\" from index 1 to index 2. The list grows from two songs to three.",
+      front: "Index 1 is the second position, not the first. <code>queue.insert(0, \"Ocean Drive\")</code> is the line that would put the song at the front. With index 1, \"Paper Boats\" keeps index 0 and the new song lands right after it.",
+      end: "<code>queue.append(\"Ocean Drive\")</code> is the line that adds to the end. <code>insert</code> places the value at the index it is given, and index 1 is the second position, so the new song lands between the two songs already there.",
+      replace: "<code>insert</code> never replaces a value. It adds one and pushes everything from that index onward one place to the right, so the list ends up with three songs. <code>queue[1] = \"Ocean Drive\"</code> is the line that would replace \"Neon Static (live)\" and keep the length at two."
+    }
+  });
 
-  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#lists-download"});
+  K.quiz({
+    id: "act-reference-predict",
+    buttonSelector: "#ls-ref-choices .mlrk-choice",
+    feedbackSelector: "#ls-reffb",
+    correct: "three",
+    answerLabel: "3",
+    feedback: {
+      two: "That is the length <code>up_next</code> started with, and it would be the answer if <code>preview = up_next</code> had copied the list. Assignment gives one list a second name instead, so <code>preview.append(\"Ocean Drive\")</code> grows the very list <code>up_next</code> names, and the length comes out 3.",
+      three: "<code>preview = up_next</code> gives one list a second name, so <code>preview</code> and <code>up_next</code> refer to the same object. <code>preview.append(\"Ocean Drive\")</code> adds a third song to that one list, and <code>len(up_next)</code> reports 3.",
+      one: "Nothing in these four lines removes a song. <code>append</code> only adds, so the list gets longer rather than shorter, and both names end up reporting 3.",
+      error: "Every line here is valid Python. A list can be given a second name, and <code>append</code> works through either name, so the program prints 3."
+    }
+  });
 
-  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#lists-copy", onDone:function(ok){
-    document.getElementById("lists-copyfb").textContent = ok
+  K.dragDrop("#ls-pure", "act-classify-purity");
+  K.selfCheck({
+    buttonSelector: "#ls-pure-check",
+    feedbackSelector: "#ls-pure-fb",
+    mapping: {
+      "chip-total": {expectedId: "zone-pure", label: "<code>def total(prices): return sum(prices)</code> (same list of prices always gives the same sum, and nothing outside changes)", expectedLabel: "pure"},
+      "chip-shorter": {expectedId: "zone-pure", label: "<code>def shorter(items): return items[:-1]</code> (a slice builds a new list, so the caller's list is untouched)", expectedLabel: "pure"},
+      "chip-addsong": {expectedId: "zone-impure", label: "<code>def add_song(queue, title): queue.append(title)</code> (append mutates the caller's list, which is a side effect)", expectedLabel: "impure"},
+      "chip-roll": {expectedId: "zone-impure", label: "<code>def roll(): return random.randint(1, 6)</code> (same input, different output almost every call)", expectedLabel: "impure"}
+    }
+  });
+
+  K.freeResponse({id:"act-reflect", selector:"#ls-reflect", minWords:12});
+
+  K.Scoring.onChange(function(){ K.Scoring.renderChip("#ls-scorechip"); });
+  K.Scoring.renderChip("#ls-scorechip");
+
+  K.downloadPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#ls-download"});
+
+  K.copyPlainText({readingId:READING_ID, title:TITLE, buttonSelector:"#ls-copy", onDone:function(ok){
+    document.getElementById("ls-copyfb").textContent = ok
       ? "Copied! Paste it anywhere you're keeping your notes."
       : "Couldn't copy automatically — select the page text and copy manually.";
   }});
