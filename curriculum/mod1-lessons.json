@@ -1,7 +1,7 @@
 {
-  "_comment": "Mod 1 lesson map. Generated from the curriculum source repo The-Marcy-Lab-School/marcy-curriculum-docs-swe-python, NOT from the rendered GitBook: `key_terms` and both objective lists come verbatim from mod-1-python-fundamentals/learning-objectives-key-terms.md, which is itself generated from each chapter's Key Terms section by that repo's scripts/sync-key-terms.py. `gitbook_sections` comes from each chapter file. One reading per lesson; folder slug = `slug`. A reading must define every term in its own lesson's key_terms and must not add cards for terms it does not own; qa/reading_qa.py enforces both. `objectives_in_session` is what a reading is built and audited against; `objectives_end_of_module` is deferred and must not crowd out the in-session set. Regenerate when _source_commit falls behind that repo's main.",
+  "_comment": "Mod 1 lesson map. Generated from the curriculum source repo The-Marcy-Lab-School/marcy-curriculum-docs-swe-python, NOT from the rendered GitBook: `key_terms` and both objective lists come verbatim from mod-1-python-fundamentals/learning-objectives-key-terms.md, which is itself generated from each chapter's Key Terms section by that repo's scripts/sync-key-terms.py. `gitbook_sections` comes from each chapter file. One reading per lesson; folder slug = `slug`. A reading must define every term in its own lesson's key_terms and must not add cards for terms it does not own; qa/reading_qa.py enforces both. `objectives_in_session` is what a reading is built and audited against; `objectives_end_of_module` is deferred and must not crowd out the in-session set. Regenerate when _source_commit falls behind that repo's main. Lesson-to-chapter mapping is read from the docs repo's SUMMARY.md, not hardcoded, because upstream swapped 1.5 and 1.6 on 2026-10-13 and a hardcoded map desynced silently.",
   "_source_repo": "https://github.com/The-Marcy-Lab-School/marcy-curriculum-docs-swe-python",
-  "_source_commit": "dc9566e2b1608fee0d7fdc75452cb5185b6341c8",
+  "_source_commit": "943bfa8f4acc597cb1806ab786c4b883af0d95ed",
   "_source_of_truth": "mod-1-python-fundamentals/learning-objectives-key-terms.md",
   "lessons": [
     {
@@ -81,9 +81,8 @@
       "gitbook_sections": [
         "Computation is All About Data",
         "Data Types",
-        "Operators",
-        "Variables",
-        "Operators in Depth"
+        "Variables Store Data",
+        "Operators"
       ],
       "key_terms": [
         {
@@ -92,7 +91,35 @@
         },
         {
           "term": "Data types",
-          "definition": "categories of values in Python. There are 5 basic types (str, int, float, bool, None) and 3 types that hold other data or code (list, dict, and functions). Knowing the type of a value helps determines how you can use that value. Choosing the right type to represent your data is essential."
+          "definition": "categories of values in Python. There are 5 basic types (str, int, float, bool, None) and 3 types that hold other data or code (list, dict, and functions). Knowing the type of a value helps determine how you can use that value. Choosing the right type to represent your data is essential."
+        },
+        {
+          "term": "Variables",
+          "definition": "named containers for data. You can assign, reference and reassign variables to store and update information in your program."
+        },
+        {
+          "term": "assign",
+          "definition": "Variables are named containers for data. You can assign, reference and reassign variables to store and update information in your program.",
+          "parent": "Variables"
+        },
+        {
+          "term": "reference",
+          "definition": "Variables are named containers for data. You can assign, reference and reassign variables to store and update information in your program.",
+          "parent": "Variables"
+        },
+        {
+          "term": "reassign",
+          "definition": "Variables are named containers for data. You can assign, reference and reassign variables to store and update information in your program.",
+          "parent": "Variables"
+        },
+        {
+          "term": "assigned",
+          "definition": "A variable is created the first time it is . Names in ALL_CAPS are a signal to readers that a value is a constant and should not be reassigned.",
+          "parent": "Variables"
+        },
+        {
+          "term": "snake_case",
+          "definition": "the Python convention for naming variables and functions: lowercase words joined by underscores, like days_in_each_month."
         },
         {
           "term": "Operators",
@@ -131,14 +158,6 @@
         {
           "term": "Operator precedence",
           "definition": "the order in which Python evaluates the operators in an expression, such as multiplication before addition. Parentheses change that order: whatever is inside them is evaluated first."
-        },
-        {
-          "term": "Variables",
-          "definition": "named containers for data. You can reference and reassign variables to store and update information in your program. A variable is created the first time it is assigned. Names in ALL_CAPS are a signal to readers that a value is a constant and should not be reassigned."
-        },
-        {
-          "term": "snake_case",
-          "definition": "the Python convention for naming variables and functions: lowercase words joined by underscores, like days_in_each_month."
         }
       ],
       "objectives_in_session": [
@@ -197,6 +216,11 @@
         {
           "term": "default values",
           "definition": "Parameters can have , and arguments can be passed by keyword as well as by position."
+        },
+        {
+          "term": "keyword",
+          "definition": "Parameters can have default values, and arguments can be passed by keyword as well as by position.",
+          "parent": "default values"
         },
         {
           "term": "NameError",
@@ -266,6 +290,11 @@
           "definition": "Non-boolean values used in a boolean context are considered if they evaluate to True or falsy if they evaluate to False. All values are truthy except for None, False, the numbers 0 and 0.0, the empty string \"\", and empty collections such as [] and {}."
         },
         {
+          "term": "falsy",
+          "definition": "Non-boolean values used in a boolean context are considered truthy if they evaluate to True or falsy if they evaluate to False. All values are truthy except for None, False, the numbers 0 and 0.0, the empty string \"\", and empty collections such as [] and {}.",
+          "parent": "truthy"
+        },
+        {
           "term": "Conditional expressions",
           "definition": "provide a concise way to choose between two values based on a condition."
         }
@@ -282,14 +311,95 @@
     },
     {
       "lesson": "1.5",
-      "slug": "05-loops",
+      "slug": "05-strings-inputs-and-outputs",
+      "title": "Strings, Inputs and Outputs",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/5-inputs-outputs",
+      "source_file": "mod-1-python-fundamentals/5-inputs-outputs.md",
+      "gitbook_sections": [
+        "Strings",
+        "Input",
+        "Output",
+        "Madlib Challenge"
+      ],
+      "key_terms": [
+        {
+          "term": "Strings",
+          "definition": "sequences of characters enclosed in quotes (single or double). Strings are immutable, meaning all operations are \"read-only\"."
+        },
+        {
+          "term": "in operator",
+          "definition": "The checks whether one string contains another."
+        },
+        {
+          "term": "Bracket notation",
+          "definition": "returns individual characters within a string: str[index]"
+        },
+        {
+          "term": "len()",
+          "definition": "The built-in function returns the number of characters in a string (and you can use this method on lists and dictionaries too!)."
+        },
+        {
+          "term": "method",
+          "definition": "A is a function that is attached to a value. Methods are invoked using dot notation: value.method()."
+        },
+        {
+          "term": "dot notation",
+          "definition": "A method is a function that is attached to a value. Methods are invoked using dot notation: value.method().",
+          "parent": "method"
+        },
+        {
+          "term": "String methods",
+          "definition": "like startswith, endswith, find, upper, replace, strip, and split allow you to search, analyze, and manipulate string data."
+        },
+        {
+          "term": "print()",
+          "definition": "takes any number of values. It puts sep between them, a space unless you say otherwise, and end after them, a new line unless you say otherwise."
+        },
+        {
+          "term": "f-strings",
+          "definition": "interpolate the value of any expression written inside {} into a string. A format specifier after a colon, like {price:.2f}, controls how the value is displayed."
+        },
+        {
+          "term": "format specifier",
+          "definition": "f-strings interpolate the value of any expression written inside {} into a string. A format specifier after a colon, like {price:.2f}, controls how the value is displayed.",
+          "parent": "f-strings"
+        },
+        {
+          "term": "input()",
+          "definition": "The function gets input from the user. It always returns a string, so casting it to another type is your job."
+        },
+        {
+          "term": "Type casting",
+          "definition": "with str(), int(), float(), bool() turns a value of one type into another."
+        },
+        {
+          "term": "hard-coded",
+          "definition": "A program is if the program code must be modified in order to produce a new result."
+        }
+      ],
+      "objectives_in_session": [
+        "Access a character of a string by positive or negative index, take a slice, and predict the IndexError for a position that does not exist.",
+        "Print several values in one print() call, control what goes between and after them with sep and end, and build a message with an f-string that formats a decimal with :.2f.",
+        "Read a line of input with input(), clean it with strip() and lower(), explain why it is always a string, and cast it with int() or float() after validating it with isdigit().",
+        "Refactor a hard-coded program into one that takes its values from input(), turning a Y/N answer into a boolean and using indexes, slices, in, and len() to adapt its output to whatever words the user types."
+      ],
+      "objectives_end_of_module": [
+        "Explain what it means that strings are immutable and predict the TypeError from trying to change one in place.",
+        "Search and change strings with in, find(), startswith(), endswith(), replace(), and split(), and chain two methods in one expression.",
+        "Predict the TypeError from \"1\" + 1 and fix it by casting one side.",
+        "Explain the difference between displaying a number with :.2f and changing it with round()."
+      ]
+    },
+    {
+      "lesson": "1.6",
+      "slug": "06-loops",
       "title": "Loops",
-      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/5-loops",
-      "source_file": "mod-1-python-fundamentals/5-loops.md",
+      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/6-loops",
+      "source_file": "mod-1-python-fundamentals/6-loops.md",
       "gitbook_sections": [
         "Intro to Iteration",
         "The `for` loop",
-        "While Loops and Infinite Loops",
+        "While Loops",
         "Nested Loops"
       ],
       "key_terms": [
@@ -300,6 +410,11 @@
         {
           "term": "for loop",
           "definition": "The with range() is best for repeating a process a known number of times, such as counting."
+        },
+        {
+          "term": "range()",
+          "definition": "The for loop with range() is best for repeating a process a known number of times, such as counting.",
+          "parent": "for loop"
         },
         {
           "term": "iterable",
@@ -331,78 +446,6 @@
       ]
     },
     {
-      "lesson": "1.6",
-      "slug": "06-inputs-and-outputs",
-      "title": "Inputs and Outputs",
-      "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/6-inputs-outputs",
-      "source_file": "mod-1-python-fundamentals/6-inputs-outputs.md",
-      "gitbook_sections": [
-        "Strings",
-        "Output with `print()`",
-        "Input with `input()`",
-        "Type Conversion",
-        "Madlib Challenge"
-      ],
-      "key_terms": [
-        {
-          "term": "Strings",
-          "definition": "sequences of characters enclosed in quotes (single or double). Strings are immutable, meaning their characters cannot be changed directly."
-        },
-        {
-          "term": "bracket notation",
-          "definition": "You can _access_ individual characters of a string with ."
-        },
-        {
-          "term": "len(str)",
-          "definition": "You can check the length of a string with (and you can use this method on lists and dictionaries too!)."
-        },
-        {
-          "term": "method",
-          "definition": "A is a function that is attached to a value. Methods are invoked using dot notation: value.method()."
-        },
-        {
-          "term": "String methods",
-          "definition": "like startswith, endswith, find, upper, replace, strip, and split allow you to search, analyze, and manipulate string data."
-        },
-        {
-          "term": "in operator",
-          "definition": "The checks whether one string contains another."
-        },
-        {
-          "term": "print()",
-          "definition": "takes any number of values. It puts sep between them, a space unless you say otherwise, and end after them, a new line unless you say otherwise."
-        },
-        {
-          "term": "f-strings",
-          "definition": "interpolate the value of any expression written inside {} into a string. A format specifier after a colon, like {price:.2f}, controls how the value is displayed."
-        },
-        {
-          "term": "input()",
-          "definition": "The function gets input from the user. It always returns a string, so converting it to another type is your job."
-        },
-        {
-          "term": "Type conversion",
-          "definition": "with str(), int(), float(), bool() turns a value of one type into another."
-        },
-        {
-          "term": "hard-coded",
-          "definition": "A program is if the program code must be modified in order to produce a new result."
-        }
-      ],
-      "objectives_in_session": [
-        "Access a character of a string by positive or negative index, take a slice, and predict the IndexError for a position that does not exist.",
-        "Print several values in one print() call, control what goes between and after them with sep and end, and build a message with an f-string that formats a decimal with :.2f.",
-        "Read a line of input with input(), clean it up with strip() and lower(), explain why it is always a string, and convert it with int() or float() after checking it with isdigit().",
-        "Convert a hard-coded program into one that takes its values from input(), turning a Y/N answer into a boolean."
-      ],
-      "objectives_end_of_module": [
-        "Explain what it means that strings are immutable and predict the TypeError from trying to change one in place.",
-        "Search and change strings with in, find(), startswith(), endswith(), replace(), and split(), and chain two methods in one expression.",
-        "Predict the TypeError from \"1\" + 1 and fix it by converting one side.",
-        "Explain the difference between displaying a number with :.2f and changing it with round()."
-      ]
-    },
-    {
       "lesson": "1.7",
       "slug": "07-lists",
       "title": "Lists",
@@ -420,11 +463,11 @@
         },
         {
           "term": "mutable",
-          "definition": "Unlike strings, lists are . Methods like append, insert, pop, and remove change a list in place."
+          "definition": "Unlike strings, lists are so methods like append, insert, pop, and remove change a list in place."
         },
         {
           "term": "reference",
-          "definition": "A variable does not hold a list. It holds a to the list. Two variables can reference the same list, and a function receiving a list receives a reference to the caller's list."
+          "definition": "A variable does not hold a value: it holds a to the value. Two variables can reference the same list, and a function receiving a list receives a reference to the caller's list."
         },
         {
           "term": "pure function",
@@ -433,6 +476,16 @@
         {
           "term": "2D lists",
           "definition": "Lists can contain other lists (), and a list can be unpacked into several variables at once. A tuple is a list that cannot change, written with parentheses."
+        },
+        {
+          "term": "unpacked",
+          "definition": "Lists can contain other lists (2D lists), and a list can be unpacked into several variables at once. A tuple is a list that cannot change, written with parentheses.",
+          "parent": "2D lists"
+        },
+        {
+          "term": "tuple",
+          "definition": "Lists can contain other lists (2D lists), and a list can be unpacked into several variables at once. A tuple is a list that cannot change, written with parentheses.",
+          "parent": "2D lists"
         }
       ],
       "objectives_in_session": [
@@ -482,6 +535,11 @@
           "definition": "Dictionary values are accessed using (my_dict[\"key\"]), which raises a KeyError for a missing key, or with the .get() method, which returns None (or a default you choose) instead."
         },
         {
+          "term": ".get()",
+          "definition": "Dictionary values are accessed using bracket notation (my_dict[\"key\"]), which raises a KeyError for a missing key, or with the .get() method, which returns None (or a default you choose) instead.",
+          "parent": "bracket notation"
+        },
+        {
           "term": "mutable",
           "definition": "Dictionaries are , meaning you can add, modify, or delete key-value pairs after creation using assignment, del, or .pop()."
         },
@@ -496,6 +554,16 @@
         {
           "term": ".keys()",
           "definition": ".values(), and .items() let you loop over a dictionary. .items() hands you each key and value together."
+        },
+        {
+          "term": ".values()",
+          "definition": ".keys(), .values(), and .items() let you loop over a dictionary. .items() hands you each key and value together.",
+          "parent": ".keys()"
+        },
+        {
+          "term": ".items()",
+          "definition": ".keys(), .values(), and .items() let you loop over a dictionary. .items() hands you each key and value together.",
+          "parent": ".keys()"
         }
       ],
       "objectives_in_session": [
@@ -555,8 +623,13 @@
           "definition": "Third-party packages are published on the and installed with pip, Python's package installer."
         },
         {
+          "term": "pip",
+          "definition": "Third-party packages are published on the Python Package Index (PyPI) and installed with pip, Python's package installer.",
+          "parent": "Python Package Index (PyPI)"
+        },
+        {
           "term": "virtual environment",
-          "definition": "A is a private copy of Python and its packages for one project. You create one with python3 -m venv .venv and turn it on with source .venv/bin/activate. Installing a package inside an activated virtual environment installs it only there."
+          "definition": "A is a folder that holds one project's private set of packages, together with a link to the Python installed on your computer. You create one with python3 -m venv .venv and turn it on with source .venv/bin/activate. Installing a package inside an activated virtual environment installs it only there."
         },
         {
           "term": "sub-dependencies",
@@ -582,6 +655,11 @@
         {
           "term": "unit test",
           "definition": "A is a small program that calls one function with a known input and checks that the output is what you expected. A collection of them is a test suite."
+        },
+        {
+          "term": "test suite",
+          "definition": "A unit test is a small program that calls one function with a known input and checks that the output is what you expected. A collection of them is a test suite.",
+          "parent": "unit test"
         },
         {
           "term": "test file",
@@ -681,8 +759,48 @@
           "definition": "occur when code is invalid and can't be executed (e.g., missing quotes, wrong indentation), while runtime errors occur when code executes but encounters faulty logic or improper data type usage. Python calls runtime errors exceptions."
         },
         {
+          "term": "runtime errors",
+          "definition": "Syntax errors occur when code is invalid and can't be executed (e.g., missing quotes, wrong indentation), while runtime errors occur when code executes but encounters faulty logic or improper data type usage. Python calls runtime errors exceptions.",
+          "parent": "Syntax errors"
+        },
+        {
+          "term": "exceptions",
+          "definition": "Syntax errors occur when code is invalid and can't be executed (e.g., missing quotes, wrong indentation), while runtime errors occur when code executes but encounters faulty logic or improper data type usage. Python calls runtime errors exceptions.",
+          "parent": "Syntax errors"
+        },
+        {
           "term": "SyntaxError",
           "definition": "Common error types include (invalid Python), NameError (undefined variables), TypeError (wrong data types), ValueError (right type, wrong value), IndexError and KeyError (missing positions and keys), and FileNotFoundError (operating system constraints)."
+        },
+        {
+          "term": "NameError",
+          "definition": "Common error types include SyntaxError (invalid Python), NameError (undefined variables), TypeError (wrong data types), ValueError (right type, wrong value), IndexError and KeyError (missing positions and keys), and FileNotFoundError (operating system constraints).",
+          "parent": "SyntaxError"
+        },
+        {
+          "term": "TypeError",
+          "definition": "Common error types include SyntaxError (invalid Python), NameError (undefined variables), TypeError (wrong data types), ValueError (right type, wrong value), IndexError and KeyError (missing positions and keys), and FileNotFoundError (operating system constraints).",
+          "parent": "SyntaxError"
+        },
+        {
+          "term": "ValueError",
+          "definition": "Common error types include SyntaxError (invalid Python), NameError (undefined variables), TypeError (wrong data types), ValueError (right type, wrong value), IndexError and KeyError (missing positions and keys), and FileNotFoundError (operating system constraints).",
+          "parent": "SyntaxError"
+        },
+        {
+          "term": "IndexError",
+          "definition": "Common error types include SyntaxError (invalid Python), NameError (undefined variables), TypeError (wrong data types), ValueError (right type, wrong value), IndexError and KeyError (missing positions and keys), and FileNotFoundError (operating system constraints).",
+          "parent": "SyntaxError"
+        },
+        {
+          "term": "KeyError",
+          "definition": "Common error types include SyntaxError (invalid Python), NameError (undefined variables), TypeError (wrong data types), ValueError (right type, wrong value), IndexError and KeyError (missing positions and keys), and FileNotFoundError (operating system constraints).",
+          "parent": "SyntaxError"
+        },
+        {
+          "term": "FileNotFoundError",
+          "definition": "Common error types include SyntaxError (invalid Python), NameError (undefined variables), TypeError (wrong data types), ValueError (right type, wrong value), IndexError and KeyError (missing positions and keys), and FileNotFoundError (operating system constraints).",
+          "parent": "SyntaxError"
         },
         {
           "term": "traceback",
@@ -741,6 +859,11 @@
         {
           "term": "wrapper",
           "definition": "A is a function returned by another function that calls the original and adds behavior around it. Written with an @ above a definition, it is called a decorator."
+        },
+        {
+          "term": "decorator",
+          "definition": "A wrapper is a function returned by another function that calls the original and adds behavior around it. Written with an @ above a definition, it is called a decorator.",
+          "parent": "wrapper"
         }
       ],
       "objectives_in_session": [
@@ -798,16 +921,71 @@
           "definition": "min(), max(), and len() combine a whole list into a single value. When none of them fits, the accumulator pattern does: start a variable, update it in a loop, return it."
         },
         {
+          "term": "min()",
+          "definition": "sum(), min(), max(), and len() combine a whole list into a single value. When none of them fits, the accumulator pattern does: start a variable, update it in a loop, return it.",
+          "parent": "sum()"
+        },
+        {
+          "term": "max()",
+          "definition": "sum(), min(), max(), and len() combine a whole list into a single value. When none of them fits, the accumulator pattern does: start a variable, update it in a loop, return it.",
+          "parent": "sum()"
+        },
+        {
+          "term": "len()",
+          "definition": "sum(), min(), max(), and len() combine a whole list into a single value. When none of them fits, the accumulator pattern does: start a variable, update it in a loop, return it.",
+          "parent": "sum()"
+        },
+        {
+          "term": "accumulator pattern",
+          "definition": "sum(), min(), max(), and len() combine a whole list into a single value. When none of them fits, the accumulator pattern does: start a variable, update it in a loop, return it.",
+          "parent": "sum()"
+        },
+        {
           "term": "sorted()",
           "definition": "returns a new sorted list and .sort() sorts a list in place. Both take a key callback that says what to compare and reverse=True for descending order."
+        },
+        {
+          "term": ".sort()",
+          "definition": "sorted() returns a new sorted list and .sort() sorts a list in place. Both take a key callback that says what to compare and reverse=True for descending order.",
+          "parent": "sorted()"
         },
         {
           "term": "enumerate()",
           "definition": "zip(), any(), and all() cover the other everyday loop shapes without an index in sight."
         },
         {
+          "term": "zip()",
+          "definition": "enumerate(), zip(), any(), and all() cover the other everyday loop shapes without an index in sight.",
+          "parent": "enumerate()"
+        },
+        {
+          "term": "any()",
+          "definition": "enumerate(), zip(), any(), and all() cover the other everyday loop shapes without an index in sight.",
+          "parent": "enumerate()"
+        },
+        {
+          "term": "all()",
+          "definition": "enumerate(), zip(), any(), and all() cover the other everyday loop shapes without an index in sight.",
+          "parent": "enumerate()"
+        },
+        {
           "term": "==",
           "definition": "compares the contents of two values. is and is not compare identity: whether two names refer to the very same object. A test for a pure function uses == to check the returned contents and is not to check that a new list came back rather than the original."
+        },
+        {
+          "term": "is",
+          "definition": "== compares the contents of two values. is and is not compare identity: whether two names refer to the very same object. A test for a pure function uses == to check the returned contents and is not to check that a new list came back rather than the original.",
+          "parent": "=="
+        },
+        {
+          "term": "is not",
+          "definition": "== compares the contents of two values. is and is not compare identity: whether two names refer to the very same object. A test for a pure function uses == to check the returned contents and is not to check that a new list came back rather than the original.",
+          "parent": "=="
+        },
+        {
+          "term": "pure function",
+          "definition": "== compares the contents of two values. is and is not compare identity: whether two names refer to the very same object. A test for a pure function uses == to check the returned contents and is not to check that a new list came back rather than the original.",
+          "parent": "=="
         },
         {
           "term": "refactor",
@@ -816,6 +994,16 @@
         {
           "term": "Test-driven development (TDD)",
           "definition": "a workflow that writes the test first, watches it fail (red), writes just enough code to pass (green), and then refactors while the tests stay green."
+        },
+        {
+          "term": "red",
+          "definition": "Test-driven development (TDD) is a workflow that writes the test first, watches it fail (red), writes just enough code to pass (green), and then refactors while the tests stay green.",
+          "parent": "Test-driven development (TDD)"
+        },
+        {
+          "term": "green",
+          "definition": "Test-driven development (TDD) is a workflow that writes the test first, watches it fail (red), writes just enough code to pass (green), and then refactors while the tests stay green.",
+          "parent": "Test-driven development (TDD)"
         },
         {
           "term": "isinstance(value, type)",
@@ -859,7 +1047,7 @@
       "slug": "14-regex",
       "title": "Regex",
       "optional": true,
-      "optional_note": "GitBook labels this 'Regex (Optional Friday Reading)'. It is a page, so it gets a reading, but it is absent from the scope-and-sequence calendar and from learning-objectives-key-terms.md — hence no objectives.",
+      "optional_note": "GitBook labels this 'Regex (Optional Friday Reading)'. It is a page, so it gets a reading, but it is absent from the scope-and-sequence calendar and from learning-objectives-key-terms.md, hence no objectives.",
       "gitbook_page": "https://marcylabschool.gitbook.io/swe/computational-thinking-and-responsible-use-of-ai/mod-1-python-fundamentals/regex",
       "source_file": "mod-1-python-fundamentals/regex.md",
       "gitbook_sections": [
@@ -877,6 +1065,11 @@
           "definition": "In Python, regular expressions live in the standard library's , and patterns are written as raw strings (r\"pattern\") that can include special characters like ^ (start), $ (end), \\w (word characters), and + (one or more)."
         },
         {
+          "term": "special characters",
+          "definition": "In Python, regular expressions live in the standard library's re module, and patterns are written as raw strings (r\"pattern\") that can include special characters like ^ (start), $ (end), \\w (word characters), and + (one or more).",
+          "parent": "re module"
+        },
+        {
           "term": "String validation",
           "definition": "a common use case, allowing you to check if strings match specific formats like email addresses, phone numbers, or date formats."
         },
@@ -887,6 +1080,21 @@
         {
           "term": "fullmatch()",
           "definition": "The re module provides several functions: for validation, search() for finding the first match and its position, findall() for extracting every match, and sub() for substitutions."
+        },
+        {
+          "term": "search()",
+          "definition": "The re module provides several functions: fullmatch() for validation, search() for finding the first match and its position, findall() for extracting every match, and sub() for substitutions.",
+          "parent": "fullmatch()"
+        },
+        {
+          "term": "findall()",
+          "definition": "The re module provides several functions: fullmatch() for validation, search() for finding the first match and its position, findall() for extracting every match, and sub() for substitutions.",
+          "parent": "fullmatch()"
+        },
+        {
+          "term": "sub()",
+          "definition": "The re module provides several functions: fullmatch() for validation, search() for finding the first match and its position, findall() for extracting every match, and sub() for substitutions.",
+          "parent": "fullmatch()"
         },
         {
           "term": "Flags",

@@ -237,6 +237,12 @@ del queue[0]</pre></div>
 
 <h3>A list can hold other lists</h3>
 <p>QueueUp groups the evening into sets, and each set is itself a list of songs. A list is allowed to hold lists, and a list of lists is called a <strong>2D list</strong>:</p>
+<p>Two more pieces of list syntax belong here, because the <code>sets</code> list uses both. A list can be <strong>unpacked</strong> into several variables at once, one per element, which is what <code>for i, song in enumerate(queue)</code> has been doing all along: <code>enumerate()</code> hands back a pair each time round, and the two names on the left take one part each. The number of names has to match the number of elements, or Python raises a <code>ValueError</code>.</p>
+<div class="mlrk-code"><pre class="mlrk-screen">opener, closer = sets[0]
+print(opener)   # Paper Boats
+print(closer)   # Neon Static</pre></div>
+<p>A <strong>tuple</strong> is a list that cannot change, written with parentheses instead of square brackets. Reading a tuple works exactly like reading a list, and assigning into one raises a <code>TypeError</code> rather than changing it. That is the point: a tuple is the right type for a pair of values that belong together and should stay put, which is why <code>enumerate()</code> hands back tuples rather than lists.</p>
+
 <div class="ls-compare">
 <div>
 <p class="ls-compare-label"><strong>The code</strong></p>
